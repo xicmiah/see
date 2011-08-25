@@ -16,7 +16,7 @@ public class Assign<T> implements SingleArgFunction<Assign.VariableAndValue<T>, 
 		return variableAndValue.value;
 	}
 
-	public static class VariableAndValue<T> implements ContextAware {
+	public static final class VariableAndValue<T> implements ContextAware {
 		private Map<String, Object> context;
 		private final String variable;
 		private final T value;
