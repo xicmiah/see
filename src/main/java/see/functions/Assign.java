@@ -1,34 +1,33 @@
 package see.functions;
 
-import see.evaluator.ContextAware;
+import com.google.common.base.Function;
 
 import java.util.List;
 import java.util.Map;
 
-public class Assign<T> implements SingleArgFunction<Assign.VariableAndValue<T>, T> {
-	@Override
-	public T apply(List<VariableAndValue<T>> input) {
-		VariableAndValue<T> variableAndValue = input.get(0);
+import static com.google.common.base.Preconditions.checkArgument;
 
-		Map<String, Object> context = variableAndValue.context;
-		context.put(variableAndValue.variable, variableAndValue.value);
+/**
+ * Assignment.
+ *
+ * Updates context and returns assigned value
+ * @param <T>
+ */
+public class Assign<T> implements ContextCurriedFunction<Function<List<Object>, T>> {
+    @Override
+    public Function<List<Object>, T> apply(final Map<String, Object> context) {
+        return new Function<List<Object>, T>() {
+            @Override
+            public T apply(List<Object> args) {
+                checkArgument(args.size() == 2, "Assign takes variable name and value");
 
-		return variableAndValue.value;
-	}
+                String variable = (String) args.get(0);
+                T value = (T) args.get(1);
 
-	public static final class VariableAndValue<T> implements ContextAware {
-		private Map<String, Object> context;
-		private final String variable;
-		private final T value;
+                context.put(variable, value);
 
-		public VariableAndValue(String variable, T value) {
-			this.variable = variable;
-			this.value = value;
-		}
-
-		@Override
-		public void setContext(Map<String, Object> context) {
-			this.context = context;
-		}
-	}
+                return value;
+            }
+        };
+    }
 }
