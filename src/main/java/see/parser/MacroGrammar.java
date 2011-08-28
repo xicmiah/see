@@ -7,8 +7,12 @@ import see.tree.Node;
 public abstract class MacroGrammar extends BaseParser<Node<Number>> {
     public static final String WHITESPACE = " \t\f\r\n";
 
-    Rule CalcExpression() {
-        return Sequence(ExpressionList(), "return", RightExpression());
+    public Rule CalcExpression() {
+        return Sequence(ExpressionList(), "return", RightExpression(), EOI);
+    }
+
+    public Rule Condition() {
+        return Sequence(RightExpression(), EOI);
     }
 
     Rule ExpressionList() {
@@ -39,13 +43,11 @@ public abstract class MacroGrammar extends BaseParser<Node<Number>> {
 
 
     Rule Whitespace() {
-        return ZeroOrMore(AnyOf(WHITESPACE));
+        return ZeroOrMore(AnyOf(WHITESPACE)).suppressNode();
     }
 
     @Override
     protected Rule fromStringLiteral(String string) {
-        return string.endsWith(WHITESPACE) ?
-                Sequence(String(string.trim()), Whitespace()) :
-                String(string);
+        return Sequence(String(string.trim()), Whitespace());
     }
 }
