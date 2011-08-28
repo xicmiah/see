@@ -2,6 +2,8 @@ package see.parser;
 
 import org.parboiled.Rule;
 import org.parboiled.annotations.BuildParseTree;
+import org.parboiled.annotations.SuppressNode;
+import org.parboiled.annotations.SuppressSubnodes;
 
 @SuppressWarnings({"InfiniteRecursion"})
 @BuildParseTree
@@ -12,15 +14,15 @@ public class FullGrammar extends MacroGrammar {
     }
 
     Rule OrExpression() {
-        return Sequence(AndExpression(), ZeroOrMore("||", AndExpression()));
+        return rep1sep(AndExpression(), "||");
     }
 
     Rule AndExpression() {
-        return Sequence(EqualExpression(), ZeroOrMore("&&", EqualExpression()));
+        return rep1sep(EqualExpression(), "&&");
     }
 
     Rule EqualExpression() {
-        return Sequence(RelationalExpression(), ZeroOrMore(FirstOf("!=", "=="), RelationalExpression()));
+        return rep1sep(RelationalExpression(), FirstOf("!=", "=="));
     }
 
     Rule RelationalExpression() {
@@ -53,24 +55,45 @@ public class FullGrammar extends MacroGrammar {
     }
 
     Rule ArgumentList() {
-        return Sequence(Expression(), ZeroOrMore(ArgumentSeparator(), Expression()));
+        return repsep(Expression(), ArgumentSeparator());
     }
 
+    @SuppressNode
     Rule ArgumentSeparator() {
         return FirstOf(",", ";");
     }
 
-
+    @SuppressSubnodes
     Rule Constant() {
-        return FirstOf(StringLiteral(), NumericLiteral());
+        return FirstOf(StringLiteral(), FloatLiteral(), IntLiteral());
     }
 
+    // Rules for literals
+    // WARNING: all literals should care about matching whitespace
+    
     Rule StringLiteral() {
         return Sequence(Ch('"'), ZeroOrMore(Sequence(TestNot("\""), ANY)).suppressSubnodes(), Ch('"'), Whitespace());
     }
 
-    Rule NumericLiteral() {
-        return OneOrMore(CharRange('0', '9'), Whitespace());
+    Rule IntLiteral() {
+        return OneOrMore(Digit(), Whitespace());
+    }
+
+
+    Rule FloatLiteral(){
+        return Sequence(FirstOf(
+                Sequence(OneOrMore(Digit()), DecimalSeparator(), ZeroOrMore(Digit()), Optional(Exponent())),
+                Sequence(DecimalSeparator(), OneOrMore(Digit()), Optional(Exponent())),
+                Sequence(OneOrMore(Digit()), Exponent())
+        ), Whitespace());
+    }
+
+    Rule DecimalSeparator() {
+        return Ch('.');
+    }
+
+    Rule Exponent() {
+        return Sequence(AnyOf("eE"), Optional(AnyOf("+-")), OneOrMore(Digit()));
     }
 
 
@@ -84,10 +107,34 @@ public class FullGrammar extends MacroGrammar {
     }
 
     Rule LetterOrDigit() {
-        return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), '-', CharRange('0', '9'));
+        return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), '-', Digit());
     }
 
+    Rule Digit() {
+        return CharRange('0', '9');
+    }
+
+    /**
+     * Repeat expression with separator. Expression must match at least once.
+     * Corresponds to (rule (separator rule)*)
+     * 
+     * @param rule expression to repeat
+     * @param separator separator between repeats of rule
+     * @return resulting rule
+     */
     Rule rep1sep(Object rule, Object separator) {
         return Sequence(rule, ZeroOrMore(separator, rule));
+    }
+
+    /**
+     * Repeat expression with separator. Expression can match zero times.
+     * Corresponds to (rule (separator rule)*)?
+     *
+     * @param rule expression to repeat
+     * @param separator separator between repeats of rule
+     * @return resulting rule
+     */
+    Rule repsep(Object rule, Object separator) {
+        return Optional(rep1sep(rule, separator));
     }
 }
