@@ -114,27 +114,4 @@ public class FullGrammar extends MacroGrammar {
         return CharRange('0', '9');
     }
 
-    /**
-     * Repeat expression with separator. Expression must match at least once.
-     * Corresponds to (rule (separator rule)*)
-     * 
-     * @param rule expression to repeat
-     * @param separator separator between repeats of rule
-     * @return resulting rule
-     */
-    Rule rep1sep(Object rule, Object separator) {
-        return Sequence(rule, ZeroOrMore(separator, rule));
-    }
-
-    /**
-     * Repeat expression with separator. Expression can match zero times.
-     * Corresponds to (rule (separator rule)*)?
-     *
-     * @param rule expression to repeat
-     * @param separator separator between repeats of rule
-     * @return resulting rule
-     */
-    Rule repsep(Object rule, Object separator) {
-        return Optional(rep1sep(rule, separator));
-    }
 }
