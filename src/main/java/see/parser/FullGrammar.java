@@ -46,7 +46,7 @@ public class FullGrammar extends MacroGrammar {
     }
 
     Rule UnaryExpressionNotPlusMinus() {
-        return FirstOf(Constant(), Function(), Variable());
+        return FirstOf(Constant(), Function(), Variable(), Sequence("(", Expression(), ")"));
     }
 
 
