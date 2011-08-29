@@ -11,11 +11,12 @@ import org.junit.runner.RunWith;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ParseRunner;
 import org.parboiled.parserunners.ReportingParseRunner;
+import see.parser.grammar.Expressions;
 
 import static org.junit.Assert.assertThat;
 
 @RunWith(Theories.class)
-public class FullGrammarRecognitionTest {
+public class ExpressionsRecognitionTest {
 
     @DataPoints
     public static final String[] additive = {"1+2", "1+2+3", "1 +2 + 3"};
@@ -47,7 +48,7 @@ public class FullGrammarRecognitionTest {
      * Matcher for expressions
      */
     public static class ConditionMatcher extends TypeSafeMatcher<String> {
-        private final FullGrammar grammar = Parboiled.createParser(FullGrammar.class);
+        private final Expressions grammar = Parboiled.createParser(Expressions.class);
         private final ParseRunner<?> runner  = new ReportingParseRunner<Object>(grammar.Condition());
 
         @Override

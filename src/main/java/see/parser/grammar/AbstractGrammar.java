@@ -1,46 +1,12 @@
-package see.parser;
+package see.parser.grammar;
 
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressNode;
 import see.tree.Node;
 
-public abstract class MacroGrammar extends BaseParser<Node<Number>> {
+public abstract class AbstractGrammar extends BaseParser<Node<Number>> {
     public static final String WHITESPACE = " \t\f\r\n";
-
-    public Rule CalcExpression() {
-        return Sequence(ExpressionList(), "return", RightExpression(), EOI);
-    }
-
-    public Rule Condition() {
-        return Sequence(RightExpression(), EOI);
-    }
-
-    Rule ExpressionList() {
-        return Sequence(Expression(), ZeroOrMore(";", Optional(Expression())));
-    }
-
-    Rule Expression() {
-        return FirstOf(AssignExpression(), Conditional(), RightExpression());
-    }
-
-    Rule AssignExpression() {
-        return Sequence(Variable(), ";", Expression());
-    }
-
-    Rule Conditional() {
-        return Sequence("if", "(", RightExpression(), ")",
-                "then", "{", ExpressionList(), "}",
-                Optional("else", "{", ExpressionList(), "}"));
-    }
-
-    Rule Variable() {
-        return Identifier();
-    }
-
-    abstract Rule RightExpression();
-
-    abstract Rule Identifier();
 
     @SuppressNode
     Rule Whitespace() {

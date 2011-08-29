@@ -1,5 +1,6 @@
-package see.parser;
+package see.parser.grammar;
 
+import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 import org.parboiled.annotations.BuildParseTree;
 import org.parboiled.annotations.SuppressNode;
@@ -7,8 +8,39 @@ import org.parboiled.annotations.SuppressSubnodes;
 
 @SuppressWarnings({"InfiniteRecursion"})
 @BuildParseTree
-public class FullGrammar extends MacroGrammar {
-    @Override
+public class Expressions extends AbstractGrammar {
+    private final Literals literals = Parboiled.createParser(Literals.class);
+
+    public Rule CalcExpression() {
+        return Sequence(ExpressionList(), "return", RightExpression(), EOI);
+    }
+
+    public Rule Condition() {
+        return Sequence(RightExpression(), EOI);
+    }
+
+    Rule ExpressionList() {
+        return Sequence(Expression(), ZeroOrMore(";", Optional(Expression())));
+    }
+
+    Rule Expression() {
+        return FirstOf(AssignExpression(), Conditional(), RightExpression());
+    }
+
+    Rule AssignExpression() {
+        return Sequence(Variable(), ";", Expression());
+    }
+
+    Rule Conditional() {
+        return Sequence("if", "(", RightExpression(), ")",
+                "then", "{", ExpressionList(), "}",
+                Optional("else", "{", ExpressionList(), "}"));
+    }
+
+    Rule Variable() {
+        return Identifier();
+    }
+
     Rule RightExpression() {
         return OrExpression();
     }
@@ -60,58 +92,17 @@ public class FullGrammar extends MacroGrammar {
 
     @SuppressNode
     Rule ArgumentSeparator() {
-        return FirstOf(",", ";");
+        return fromStringLiteral(",");
     }
 
     @SuppressSubnodes
     Rule Constant() {
-        return FirstOf(StringLiteral(), FloatLiteral(), IntLiteral());
+        return FirstOf(literals.StringLiteral(), literals.FloatLiteral(), literals.IntLiteral());
     }
 
-    // Rules for literals
-    // WARNING: all literals should care about matching whitespace
-    
-    Rule StringLiteral() {
-        return Sequence(Ch('"'), ZeroOrMore(Sequence(TestNot("\""), ANY)).suppressSubnodes(), Ch('"'), Whitespace());
-    }
-
-    Rule IntLiteral() {
-        return OneOrMore(Digit(), Whitespace());
-    }
-
-
-    Rule FloatLiteral(){
-        return Sequence(FirstOf(
-                Sequence(OneOrMore(Digit()), DecimalSeparator(), ZeroOrMore(Digit()), Optional(Exponent())),
-                Sequence(DecimalSeparator(), OneOrMore(Digit()), Optional(Exponent())),
-                Sequence(OneOrMore(Digit()), Exponent())
-        ), Whitespace());
-    }
-
-    Rule DecimalSeparator() {
-        return Ch('.');
-    }
-
-    Rule Exponent() {
-        return Sequence(AnyOf("eE"), Optional(AnyOf("+-")), OneOrMore(Digit()));
-    }
-
-
-    @Override
+    @SuppressSubnodes
     Rule Identifier() {
-        return Sequence(Letter(), ZeroOrMore(LetterOrDigit()), Whitespace());
-    }
-
-    Rule Letter() {
-        return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), '-');
-    }
-
-    Rule LetterOrDigit() {
-        return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), '-', Digit());
-    }
-
-    Rule Digit() {
-        return CharRange('0', '9');
+        return Sequence(literals.Letter(), ZeroOrMore(literals.LetterOrDigit()), Whitespace());
     }
 
 }
