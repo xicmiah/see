@@ -3,12 +3,7 @@ package see.evaluator;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import see.tree.BlockNode;
-import see.tree.ConstNode;
-import see.tree.FunctionNode;
-import see.tree.Node;
-import see.tree.VarNode;
-import see.tree.Visitor;
+import see.tree.*;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +31,7 @@ public class ContextualVisitor implements Visitor {
 		});
 
 		// Note: evaluatedArgs are lazy
-		return node.getFunction().apply(evaluatedArgs);
+		return node.getFunction().apply(context).apply(evaluatedArgs);
 	}
 
 	public <T> T visit(VarNode<T> node) {
