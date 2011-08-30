@@ -1,7 +1,6 @@
 package see.parser.grammar;
 
 import com.google.common.base.Function;
-import com.google.common.collect.MapMaker;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 import org.parboiled.annotations.BuildParseTree;
@@ -12,14 +11,13 @@ import org.parboiled.support.Var;
 import see.evaluator.DoubleNumberFactory;
 import see.evaluator.NumberFactory;
 import see.functions.ContextCurriedFunction;
-import see.functions.PureFunction;
+import see.parser.FunctionResolver;
 import see.tree.ConstNode;
 import see.tree.FunctionNode;
 import see.tree.Node;
 import see.tree.VarNode;
 
 import java.util.List;
-import java.util.Map;
 
 @SuppressWarnings({"InfiniteRecursion"})
 @BuildParseTree
@@ -27,24 +25,8 @@ public class Expressions extends AbstractGrammar {
     final Literals literals = Parboiled.createParser(Literals.class);
 
     // TODO: add proper injection
-    private NumberFactory numberFactory = new DoubleNumberFactory();
-
-    /**
-     * Function table stub
-     * Returns PureFunction wrapping null, with toString() returning function name
-     */
-    // TODO: add proper function resolution
-    Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> funTab = new MapMaker().makeComputingMap(new Function<String, ContextCurriedFunction<Function<List<Object>, Object>>>() {
-        @Override
-        public ContextCurriedFunction<Function<List<Object>, Object>> apply(final String name) {
-            return new PureFunction<Function<List<Object>, Object>>(null) {
-                @Override
-                public String toString() {
-                    return name;
-                }
-            };
-        }
-    });
+    final NumberFactory numberFactory = new DoubleNumberFactory();
+    final FunctionResolver functions = new FunctionResolver();
 
     public Rule CalcExpression() {
         return Sequence(ExpressionList(), "return", RightExpression(), EOI);
@@ -122,7 +104,7 @@ public class Expressions extends AbstractGrammar {
         Var<ImmutableList<Node<Object>>> args = new Var<ImmutableList<Node<Object>>>(ImmutableList.<Node<Object>>of());
         return Sequence(
                 Identifier(),
-                function.set(funTab.get(match())),
+                function.set(functions.get(match())),
                 "(", ArgumentList(args), ")",
                 push(new FunctionNode<Object, Object>(function.get(), args.get()))
         );
