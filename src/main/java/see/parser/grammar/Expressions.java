@@ -24,15 +24,37 @@ public class Expressions extends AbstractGrammar {
     final FunctionResolver functions = new FunctionResolver();
 
     public Rule CalcExpression() {
-        return Sequence(ExpressionList(), "return", RightExpression(), EOI);
+        return Sequence(ReturnExpression(), EOI);
     }
 
     public Rule Condition() {
         return Sequence(RightExpression(), EOI);
     }
 
+    Rule ReturnExpression() {
+        NodeListVar statements = new NodeListVar();
+        return Sequence(Optional(ExpressionList(), statements.append(pop())),
+                "return", RightExpression(), statements.append(pop()),
+                push(makeSeqNode(statements.get())));
+    }
+
     Rule ExpressionList() {
-        return Sequence(Expression(), ZeroOrMore(";", Optional(Expression())));
+        NodeListVar statements = new NodeListVar();
+        return Sequence(
+                Expression(), statements.append(pop()),
+                ZeroOrMore(";", Optional(Expression(), statements.append(pop()))),
+                push(makeSeqNode(statements.get())));
+    }
+
+    /**
+     * Wraps list of expressions in FunctionNode with Sequence function
+     * Short-circuits if list has only one element.
+     * Expects sequence function to map to operator ';'
+     * @param statements list of expressions to wrap
+     * @return constructed node
+     */
+    Node<Object> makeSeqNode(ImmutableList<Node<Object>> statements) {
+        return statements.size() > 1 ? makeFNode(";", statements): statements.get(0);
     }
 
     Rule Expression() {
@@ -40,13 +62,27 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule AssignExpression() {
-        return Sequence(Variable(), ";", Expression());
+        return Sequence(Variable(), "=", Expression());
     }
 
     Rule Conditional() {
-        return Sequence("if", "(", RightExpression(), ")",
-                "then", "{", ExpressionList(), "}",
-                Optional("else", "{", ExpressionList(), "}"));
+        return FirstOf(
+                Sequence(IfThenClause(), ElseClause(),
+                        swap3() && push(makeFNode("if", ImmutableList.of(pop(), pop(), pop())))),
+                Sequence(IfThenClause(),
+                        swap() && push(makeFNode("if", ImmutableList.of(pop(), pop()))))
+        );
+    }
+
+    Rule IfThenClause() {
+        return Sequence(
+                "if", "(", RightExpression(), ")",
+                "then", "{", ExpressionList(), "}"
+        );
+    }
+
+    Rule ElseClause() {
+        return Sequence("else", "{", ExpressionList(), "}");
     }
 
     Rule RightExpression() {
