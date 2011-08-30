@@ -62,7 +62,7 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule AssignExpression() {
-        return Sequence(Variable(), "=", Expression());
+        return Sequence(Variable(), "=", Expression(), pushBinOp("="));
     }
 
     Rule Conditional() {
