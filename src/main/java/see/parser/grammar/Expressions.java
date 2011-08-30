@@ -11,6 +11,7 @@ import see.evaluator.DoubleNumberFactory;
 import see.evaluator.NumberFactory;
 import see.tree.ConstNode;
 import see.tree.FunctionNode;
+import see.tree.Node;
 import see.tree.VarNode;
 
 @SuppressWarnings({"InfiniteRecursion"})
@@ -53,39 +54,76 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule OrExpression() {
-        return rep1sep(AndExpression(), "||");
+        return repeatWithOperator(AndExpression(), "||");
     }
 
     Rule AndExpression() {
-        return rep1sep(EqualExpression(), "&&");
+        return repeatWithOperator(EqualExpression(), "&&");
     }
 
     Rule EqualExpression() {
-        return rep1sep(RelationalExpression(), FirstOf("!=", "=="));
+        return repeatWithOperator(RelationalExpression(), FirstOf("!=", "=="));
     }
 
     Rule RelationalExpression() {
-        return rep1sep(AdditiveExpression(), FirstOf("<", ">", "<=", ">="));
+        return repeatWithOperator(AdditiveExpression(), FirstOf("<", ">", "<=", ">="));
     }
 
     Rule AdditiveExpression() {
-        return rep1sep(MultiplicativeExpression(), FirstOf("+", "-"));
+        return repeatWithOperator(MultiplicativeExpression(), FirstOf("+", "-"));
     }
 
     Rule MultiplicativeExpression() {
-        return rep1sep(UnaryExpression(), FirstOf("*", "/"));
+        return repeatWithOperator(UnaryExpression(), FirstOf("*", "/"));
     }
 
     Rule UnaryExpression() {
         return FirstOf(Sequence(AnyOf("+-!"), UnaryExpression()), PowerExpression());
     }
 
+
     Rule PowerExpression() {
-        return Sequence(UnaryExpressionNotPlusMinus(), Optional("^", UnaryExpression()));
+        return Sequence(UnaryExpressionNotPlusMinus(),
+                Optional("^", UnaryExpression(), pushBinOp("^")));
     }
 
     Rule UnaryExpressionNotPlusMinus() {
         return FirstOf(Constant(), Function(), Variable(), Sequence("(", Expression(), ")"));
+    }
+
+    /**
+     * Repeat rule with separator, combining results into binary tree.
+     * Matches like rep1sep, but combines results.
+     * @param rule rule to match. Expected to push one node.
+     * @param separator separator between rules
+     * @return rule
+     */
+    Rule repeatWithOperator(Rule rule, Object separator) {
+        Var<String> operator = new Var<String>("");
+        return Sequence(rule,
+                ZeroOrMore(separator, operator.set(matchTrim()),
+                        rule,
+                        pushBinOp(operator.get()))
+        );
+    }
+
+    /**
+     * Combines two entries on top of the stack into FunctionNode with specified operator
+     * @param operator function name
+     * @return true if operation succeded
+     */
+    boolean pushBinOp(String operator) {
+        return swap() && push(makeFNode(operator, ImmutableList.of(pop(), pop())));
+    }
+
+    /**
+     * Construct function node with resolved function
+     * @param function function name
+     * @param args argument list
+     * @return constructed node
+     */
+    FunctionNode<Object, Object> makeFNode(String function, ImmutableList<Node<Object>> args) {
+        return new FunctionNode<Object, Object>(functions.get(function), args);
     }
 
     /**
@@ -102,13 +140,13 @@ public class Expressions extends AbstractGrammar {
      * @return rule
      */
     Rule Function() {
-        Var<UntypedFunction> function = new Var<UntypedFunction>();
+        Var<String> function = new Var<String>("");
         NodeListVar args = new NodeListVar();
         return Sequence(
                 Identifier(),
-                function.set(functions.get(matchTrim())),
+                function.set(matchTrim()),
                 "(", ArgumentList(args), ")",
-                push(new FunctionNode<Object, Object>(function.get(), args.get()))
+                push(makeFNode(function.get(), args.get()))
         );
     }
 
