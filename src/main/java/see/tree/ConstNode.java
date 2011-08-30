@@ -14,4 +14,9 @@ public final class ConstNode<T> implements Node<T> {
 	public T getValue() {
 		return value;
 	}
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
 }

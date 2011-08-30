@@ -15,4 +15,8 @@ public final class VarNode<T> implements Node<T> {
 		return name;
 	}
 
+    @Override
+    public String toString() {
+        return new StringBuilder("Var(").append(name).append(")").toString();
+    }
 }

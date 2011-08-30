@@ -32,4 +32,10 @@ public final class FunctionNode<Arg, Result> implements Node<Result> {
 		return arguments;
 	}
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(function).append(arguments);
+        return sb.toString();
+    }
 }
