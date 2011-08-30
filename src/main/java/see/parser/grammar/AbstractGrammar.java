@@ -5,7 +5,7 @@ import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressNode;
 import see.tree.Node;
 
-public abstract class AbstractGrammar extends BaseParser<Node<Number>> {
+public abstract class AbstractGrammar extends BaseParser<Node<Object>> {
     public static final String WHITESPACE = " \t\f\r\n";
 
     @SuppressNode
@@ -15,7 +15,7 @@ public abstract class AbstractGrammar extends BaseParser<Node<Number>> {
 
     @Override
     protected Rule fromStringLiteral(String string) {
-        return Sequence(String(string.trim()), Whitespace());
+        return Sequence(String(string.trim()), Whitespace()).suppressNode();
     }
 
     /**

@@ -1,15 +1,50 @@
 package see.parser.grammar;
 
+import com.google.common.base.Function;
+import com.google.common.collect.MapMaker;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 import org.parboiled.annotations.BuildParseTree;
 import org.parboiled.annotations.SuppressNode;
 import org.parboiled.annotations.SuppressSubnodes;
+import org.parboiled.common.ImmutableList;
+import org.parboiled.support.Var;
+import see.evaluator.DoubleNumberFactory;
+import see.evaluator.NumberFactory;
+import see.functions.ContextCurriedFunction;
+import see.functions.PureFunction;
+import see.tree.ConstNode;
+import see.tree.FunctionNode;
+import see.tree.Node;
+import see.tree.VarNode;
+
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings({"InfiniteRecursion"})
 @BuildParseTree
 public class Expressions extends AbstractGrammar {
-    private final Literals literals = Parboiled.createParser(Literals.class);
+    final Literals literals = Parboiled.createParser(Literals.class);
+
+    // TODO: add proper injection
+    private NumberFactory numberFactory = new DoubleNumberFactory();
+
+    /**
+     * Function table stub
+     * Returns PureFunction wrapping null, with toString() returning function name
+     */
+    // TODO: add proper function resolution
+    Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> funTab = new MapMaker().makeComputingMap(new Function<String, ContextCurriedFunction<Function<List<Object>, Object>>>() {
+        @Override
+        public ContextCurriedFunction<Function<List<Object>, Object>> apply(final String name) {
+            return new PureFunction<Function<List<Object>, Object>>(null) {
+                @Override
+                public String toString() {
+                    return name;
+                }
+            };
+        }
+    });
 
     public Rule CalcExpression() {
         return Sequence(ExpressionList(), "return", RightExpression(), EOI);
@@ -35,10 +70,6 @@ public class Expressions extends AbstractGrammar {
         return Sequence("if", "(", RightExpression(), ")",
                 "then", "{", ExpressionList(), "}",
                 Optional("else", "{", ExpressionList(), "}"));
-    }
-
-    Rule Variable() {
-        return Identifier();
     }
 
     Rule RightExpression() {
@@ -81,13 +112,28 @@ public class Expressions extends AbstractGrammar {
         return FirstOf(Constant(), Function(), Variable(), Sequence("(", Expression(), ")"));
     }
 
-
-    Rule Function() {
-        return Sequence(Identifier(), "(", ArgumentList(), ")");
+    @SuppressSubnodes
+    Rule Constant() {
+        return FirstOf(String(), Float(), Int());
     }
 
-    Rule ArgumentList() {
-        return repsep(Expression(), ArgumentSeparator());
+    Rule Function() {
+        Var<ContextCurriedFunction<Function<List<Object>, Object>>> function = new Var<ContextCurriedFunction<Function<List<Object>, Object>>>();
+        Var<ImmutableList<Node<Object>>> args = new Var<ImmutableList<Node<Object>>>(ImmutableList.<Node<Object>>of());
+        return Sequence(
+                Identifier(),
+                function.set(funTab.get(match())),
+                "(", ArgumentList(args), ")",
+                push(new FunctionNode<Object, Object>(function.get(), args.get()))
+        );
+    }
+
+
+    Rule ArgumentList(Var<ImmutableList<Node<Object>>> args) {
+        return repsep(
+                Sequence(Expression(), args.set(ImmutableList.<Node<Object>>of(args.get(), pop()))),
+                ArgumentSeparator()
+        );
     }
 
     @SuppressNode
@@ -95,9 +141,24 @@ public class Expressions extends AbstractGrammar {
         return fromStringLiteral(",");
     }
 
-    @SuppressSubnodes
-    Rule Constant() {
-        return FirstOf(literals.StringLiteral(), literals.FloatLiteral(), literals.IntLiteral());
+    Rule Variable() {
+        return Sequence(Identifier(), push(new VarNode<Object>(match().trim())));
+    }
+
+    Rule String() {
+        return Sequence(literals.StringLiteral(), push(new ConstNode<Object>(match().trim())));
+    }
+
+    Rule Float() {
+        return Sequence(literals.FloatLiteral(), push(new ConstNode<Object>(matchNumber())));
+    }
+
+    /**
+     * A constant literal. Expected to push it's value.
+     * @return constructed rule
+     */
+    Rule Int() {
+        return Sequence(literals.IntLiteral(), push(new ConstNode<Object>(matchNumber())));
     }
 
     @SuppressSubnodes
@@ -105,4 +166,7 @@ public class Expressions extends AbstractGrammar {
         return Sequence(literals.Letter(), ZeroOrMore(literals.LetterOrDigit()), Whitespace());
     }
 
+    Number matchNumber() {
+        return numberFactory.getNumber(match());
+    }
 }
