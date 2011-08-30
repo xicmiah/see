@@ -1,9 +1,7 @@
-package see.parser;
+package see.parser.grammar;
 
 import com.google.common.base.Function;
 import com.google.common.collect.MapMaker;
-import see.functions.ContextCurriedFunction;
-import see.functions.PureFunction;
 
 import java.util.List;
 import java.util.Map;
@@ -15,13 +13,18 @@ public class FunctionResolver {
      * Returns PureFunction wrapping null, with toString() returning function name
      */
     // TODO: add proper function resolution
-    private final Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> funTab;
+    private final Map<String, UntypedFunction> funTab;
 
     public FunctionResolver() {
-        funTab = new MapMaker().makeComputingMap(new Function<String, ContextCurriedFunction<Function<List<Object>, Object>>>() {
+        funTab = new MapMaker().makeComputingMap(new Function<String, UntypedFunction>() {
             @Override
-            public ContextCurriedFunction<Function<List<Object>, Object>> apply(final String name) {
-                return new PureFunction<Function<List<Object>, Object>>(null) {
+            public UntypedFunction apply(final String name) {
+                return new UntypedFunction() {
+                    @Override
+                    public Function<List<Object>, Object> apply(Map<String, Object> context) {
+                        return null;
+                    }
+
                     @Override
                     public String toString() {
                         return name;
@@ -36,7 +39,7 @@ public class FunctionResolver {
      * @param name function name
      * @return corresponding function
      */
-    public ContextCurriedFunction<Function<List<Object>, Object>> get(String name) {
+    public UntypedFunction get(String name) {
         return funTab.get(name);
     }
 
@@ -45,7 +48,7 @@ public class FunctionResolver {
      * @param operator operator name
      * @return corresponding operator function
      */
-    public ContextCurriedFunction<Function<List<Object>, Object>> getOp(String operator) {
+    public UntypedFunction getOp(String operator) {
         return funTab.get(operator);
     }
 }

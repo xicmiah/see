@@ -19,6 +19,14 @@ public abstract class AbstractGrammar extends BaseParser<Node<Object>> {
     }
 
     /**
+     * Returns match() with removed trailing whitespace.
+     * @return mached input text
+     */
+    protected String matchTrim() {
+        return match().trim();
+    }
+
+    /**
      * Repeat expression with separator. Expression must match at least once.
      * Corresponds to (rule (separator rule)*)
      *

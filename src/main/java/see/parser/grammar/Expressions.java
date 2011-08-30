@@ -1,23 +1,17 @@
 package see.parser.grammar;
 
-import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 import org.parboiled.annotations.BuildParseTree;
 import org.parboiled.annotations.SuppressNode;
 import org.parboiled.annotations.SuppressSubnodes;
-import org.parboiled.common.ImmutableList;
 import org.parboiled.support.Var;
 import see.evaluator.DoubleNumberFactory;
 import see.evaluator.NumberFactory;
-import see.functions.ContextCurriedFunction;
-import see.parser.FunctionResolver;
 import see.tree.ConstNode;
 import see.tree.FunctionNode;
-import see.tree.Node;
 import see.tree.VarNode;
-
-import java.util.List;
 
 @SuppressWarnings({"InfiniteRecursion"})
 @BuildParseTree
@@ -94,28 +88,32 @@ public class Expressions extends AbstractGrammar {
         return FirstOf(Constant(), Function(), Variable(), Sequence("(", Expression(), ")"));
     }
 
+    /**
+     * Constant. Pushes ConstNode(value)
+     * @return rule
+     */
     @SuppressSubnodes
     Rule Constant() {
         return FirstOf(String(), Float(), Int());
     }
 
+    /**
+     * Function application. Pushes FunctionNode(f, args).
+     * @return rule
+     */
     Rule Function() {
-        Var<ContextCurriedFunction<Function<List<Object>, Object>>> function = new Var<ContextCurriedFunction<Function<List<Object>, Object>>>();
-        Var<ImmutableList<Node<Object>>> args = new Var<ImmutableList<Node<Object>>>(ImmutableList.<Node<Object>>of());
+        Var<UntypedFunction> function = new Var<UntypedFunction>();
+        NodeListVar args = new NodeListVar();
         return Sequence(
                 Identifier(),
-                function.set(functions.get(match())),
+                function.set(functions.get(matchTrim())),
                 "(", ArgumentList(args), ")",
                 push(new FunctionNode<Object, Object>(function.get(), args.get()))
         );
     }
 
-
-    Rule ArgumentList(Var<ImmutableList<Node<Object>>> args) {
-        return repsep(
-                Sequence(Expression(), args.set(ImmutableList.<Node<Object>>of(args.get(), pop()))),
-                ArgumentSeparator()
-        );
+    Rule ArgumentList(NodeListVar args) {
+        return repsep(Sequence(Expression(), args.append(pop())), ArgumentSeparator());
     }
 
     @SuppressNode
@@ -124,19 +122,27 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule Variable() {
-        return Sequence(Identifier(), push(new VarNode<Object>(match().trim())));
+        return Sequence(Identifier(), push(new VarNode<Object>(matchTrim())));
     }
 
+    /**
+     * String literal. Expected to push it's value/
+     * @return rule
+     */
     Rule String() {
-        return Sequence(literals.StringLiteral(), push(new ConstNode<Object>(match().trim())));
+        return Sequence(literals.StringLiteral(), push(new ConstNode<Object>(matchTrim())));
     }
 
+    /**
+     * Floating point literal. Expected to push it's value
+     * @return rule
+     */
     Rule Float() {
         return Sequence(literals.FloatLiteral(), push(new ConstNode<Object>(matchNumber())));
     }
 
     /**
-     * A constant literal. Expected to push it's value.
+     * Integer literal. Expected to push it's value.
      * @return constructed rule
      */
     Rule Int() {
@@ -149,6 +155,6 @@ public class Expressions extends AbstractGrammar {
     }
 
     Number matchNumber() {
-        return numberFactory.getNumber(match());
+        return numberFactory.getNumber(matchTrim());
     }
 }
