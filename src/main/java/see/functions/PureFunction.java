@@ -19,4 +19,9 @@ public class PureFunction<F extends Function<?, ?>> implements ContextCurriedFun
     public F apply(Map<String, Object> context) {
         return delegate;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("Pure(").append(delegate).append(")").toString();
+    }
 }
