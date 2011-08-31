@@ -16,4 +16,9 @@ public class IsDefined implements ContextCurriedFunction<Function<List<String>, 
             }
         };
     }
+
+    @Override
+    public String toString() {
+        return "isDefined";
+    }
 }

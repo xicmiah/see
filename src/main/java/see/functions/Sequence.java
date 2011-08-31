@@ -25,4 +25,9 @@ public class Sequence<T> implements Function<List<T>, T> {
 		
 		return lastValue;
 	}
+
+    @Override
+    public String toString() {
+        return "seq";
+    }
 }

@@ -22,6 +22,6 @@ public class PureFunction<F extends Function<?, ?>> implements ContextCurriedFun
 
     @Override
     public String toString() {
-        return new StringBuilder("Pure(").append(delegate).append(")").toString();
+        return String.valueOf(delegate);
     }
 }

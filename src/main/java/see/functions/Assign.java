@@ -30,4 +30,9 @@ public class Assign<T> implements ContextCurriedFunction<Function<List<Object>, 
             }
         };
     }
+
+    @Override
+    public String toString() {
+        return "assign";
+    }
 }
