@@ -6,22 +6,42 @@ import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertThat;
-import static see.parser.ConditionMatcher.returnExpression;
+import static org.junit.Assume.assumeThat;
+import static org.junit.Assume.assumeTrue;
+import static see.parser.ExpressionMatcher.expressionList;
+import static see.parser.ExpressionMatcher.returnExpression;
 
 @RunWith(Theories.class)
 public class ExpressionsComplexRecognitionTest {
+    @DataPoints
+    public static final String[] returns = {"", "c || r; n <= 9; i && n != 42"};
 
     @DataPoints
-    public static final String[] returns = {"return 9", "a = 5 return a", "a=5; b return 9", "a=5; b; return 9"};
+    public static final String[] assigns = {"a = 4", "a = b = 42"};
 
     @DataPoints
-    public static final String[] assigns = {"a = 4 return 9", "a = b = 42; return 9"};
+    public static final String[] conditions = {"if (c != 9) then {1} else {2}", "if (c != 9) then {1}"};
 
-    @DataPoints
-    public static final String[] conditions = {"if (c != 9) then {1} else {2} return 9", "if (c != 9) then {1} return 9"};
+    /**
+     * Test that all non-empty inputs are valid expression lists
+     * @param expression
+     * @throws Exception
+     */
+    @Theory
+    public void testExpressionRecognition(String expression) throws Exception {
+        assumeTrue(!expression.isEmpty());
+        assertThat(expression, expressionList());
+    }
 
     @Theory
-    public void testComplexRecognition(String expression) throws Exception {
-        assertThat(expression, returnExpression());
+    public void testAdditionalSemicolons(String expression) throws Exception {
+        assumeThat(expression, expressionList());
+        assertThat(expression + ";", expressionList());
+    }
+
+    @Theory
+    public void testAddingReturn(String expression) throws Exception {
+        assumeThat(expression, expressionList());
+        assertThat(expression + " return 9", returnExpression());
     }
 }

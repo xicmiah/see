@@ -14,11 +14,11 @@ import see.parser.grammar.Expressions;
 /**
  * Matcher for expressions
  */
-public class ConditionMatcher extends TypeSafeMatcher<String> {
+public class ExpressionMatcher extends TypeSafeMatcher<String> {
     private final ParseRunner<?> runner;
     private final String description;
 
-    public ConditionMatcher(Rule rule, String description) {
+    public ExpressionMatcher(Rule rule, String description) {
         this.runner = new ReportingParseRunner<Object>(rule);
         this.description = description;
     }
@@ -34,12 +34,17 @@ public class ConditionMatcher extends TypeSafeMatcher<String> {
     }
 
     @Factory
-    public static Matcher<String> condition() {
-        return new ConditionMatcher(Parboiled.createParser(Expressions.class).Condition(), "a condition");
+    public static Matcher<String> singleExpression() {
+        return new ExpressionMatcher(Parboiled.createParser(Expressions.class).Condition(), "a single expression");
     }
 
     @Factory
     public static Matcher<String> returnExpression() {
-        return new ConditionMatcher(Parboiled.createParser(Expressions.class).CalcExpression(), "an expression");
+        return new ExpressionMatcher(Parboiled.createParser(Expressions.class).CalcExpression(), "an expression");
+    }
+
+    @Factory
+    public static Matcher<String> expressionList() {
+        return new ExpressionMatcher(Parboiled.createParser(Expressions.class).Statements(), "a list of expressions");
     }
 }

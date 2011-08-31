@@ -28,11 +28,15 @@ public class Expressions extends AbstractGrammar {
     final ImmutableCollection<String> keywords = ImmutableSet.of("if", "then", "else", "return");
 
     public Rule CalcExpression() {
-        return Sequence(ReturnExpression(), EOI);
+        return Sequence(Whitespace(), ReturnExpression(), EOI);
     }
 
     public Rule Condition() {
-        return Sequence(RightExpression(), EOI);
+        return Sequence(Whitespace(), RightExpression(), EOI);
+    }
+
+    public Rule Statements() {
+        return Sequence(Whitespace(), ExpressionList(), EOI);
     }
 
     Rule ReturnExpression() {
@@ -183,7 +187,7 @@ public class Expressions extends AbstractGrammar {
         Var<String> function = new Var<String>("");
         NodeListVar args = new NodeListVar();
         return Sequence(
-                Identifier(),
+                FirstOf(Identifier(), "if"),
                 function.set(matchTrim()),
                 "(", ArgumentList(args), ")",
                 push(makeFNode(function.get(), args.get()))
@@ -200,11 +204,7 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule Variable() {
-        return Sequence(TestNot(Keyword()), Identifier(), push(new VarNode<Object>(matchTrim())));
-    }
-
-    Rule Keyword() {
-        return Sequence(Identifier(), keywords.contains(matchTrim()));
+        return Sequence(Identifier(), push(new VarNode<Object>(matchTrim())));
     }
 
     /**
@@ -233,6 +233,10 @@ public class Expressions extends AbstractGrammar {
 
     @SuppressSubnodes
     Rule Identifier() {
+        return Sequence(Name(), !keywords.contains(matchTrim()));
+    }
+
+    Rule Name() {
         return Sequence(literals.Letter(), ZeroOrMore(literals.LetterOrDigit()), Whitespace());
     }
 
