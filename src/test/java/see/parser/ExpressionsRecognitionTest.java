@@ -1,17 +1,9 @@
 package see.parser;
 
-import org.hamcrest.Description;
-import org.hamcrest.Factory;
-import org.hamcrest.Matcher;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
-import org.junit.internal.matchers.TypeSafeMatcher;
 import org.junit.runner.RunWith;
-import org.parboiled.Parboiled;
-import org.parboiled.parserunners.ParseRunner;
-import org.parboiled.parserunners.ReportingParseRunner;
-import see.parser.grammar.Expressions;
 
 import static org.junit.Assert.assertThat;
 
@@ -57,28 +49,6 @@ public class ExpressionsRecognitionTest {
     @Theory
     public void testRecognition(String example) throws Exception {
         assertThat(example, ConditionMatcher.condition());
-    }
-
-    /**
-     * Matcher for expressions
-     */
-    public static class ConditionMatcher extends TypeSafeMatcher<String> {
-        private final Expressions grammar = Parboiled.createParser(Expressions.class);
-        private final ParseRunner<?> runner  = new ReportingParseRunner<Object>(grammar.Condition());
-
-        @Override
-        public boolean matchesSafely(String item) {
-            return runner.run(item).matched;
-        }
-
-        public void describeTo(Description description) {
-            description.appendText("a condition");
-        }
-
-        @Factory
-        public static Matcher<String> condition() {
-            return new ConditionMatcher();
-        }
     }
 
 }
