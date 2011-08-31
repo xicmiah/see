@@ -1,6 +1,8 @@
 package see.parser.grammar;
 
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 import org.parboiled.annotations.BuildParseTree;
@@ -22,6 +24,8 @@ public class Expressions extends AbstractGrammar {
     // TODO: add proper injection
     final NumberFactory numberFactory = new DoubleNumberFactory();
     final FunctionResolver functions = new FunctionResolver();
+
+    final ImmutableCollection<String> keywords = ImmutableSet.of("if", "then", "else", "return");
 
     public Rule CalcExpression() {
         return Sequence(ReturnExpression(), EOI);
@@ -196,7 +200,11 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule Variable() {
-        return Sequence(Identifier(), push(new VarNode<Object>(matchTrim())));
+        return Sequence(TestNot(Keyword()), Identifier(), push(new VarNode<Object>(matchTrim())));
+    }
+
+    Rule Keyword() {
+        return Sequence(Identifier(), keywords.contains(matchTrim()));
     }
 
     /**
