@@ -102,7 +102,7 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule RelationalExpression() {
-        return repeatWithOperator(AdditiveExpression(), FirstOf("<", ">", "<=", ">="));
+        return repeatWithOperator(AdditiveExpression(), FirstOf("<=", ">=", "<", ">"));
     }
 
     Rule AdditiveExpression() {
