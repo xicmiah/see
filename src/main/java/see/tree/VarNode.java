@@ -1,5 +1,7 @@
 package see.tree;
 
+import com.google.common.base.Objects;
+
 public final class VarNode<T> implements Node<T> {
 	private final String name;
 
@@ -14,6 +16,22 @@ public final class VarNode<T> implements Node<T> {
 	public String getName() {
 		return name;
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        VarNode that = (VarNode) o;
+
+        return Objects.equal(name, that.name);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
+    }
 
     @Override
     public String toString() {

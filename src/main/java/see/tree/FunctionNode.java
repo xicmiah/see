@@ -1,6 +1,7 @@
 package see.tree;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import see.functions.ContextCurriedFunction;
 
@@ -31,6 +32,21 @@ public final class FunctionNode<Arg, Result> implements Node<Result> {
     public List<Node<Arg>> getArguments() {
 		return arguments;
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FunctionNode that = (FunctionNode) o;
+
+        return Objects.equal(function, that.function) && Objects.equal(arguments, that.arguments);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(function, arguments);
+    }
 
     @Override
     public String toString() {
