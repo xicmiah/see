@@ -19,10 +19,25 @@ import static org.junit.Assert.assertThat;
 public class ExpressionsRecognitionTest {
 
     @DataPoints
+    public static final String[] logical = {"100500 || c != 9 && a==42"};
+    
+    @DataPoints
+    public static final String[] equality = {"c==9", "a != 42"};
+
+    @DataPoints
+    public static final String[] relational = {"1<2", "2 <=3", "9>= 42", "42 > 100500"};
+
+    @DataPoints
     public static final String[] additive = {"1+2", "1+2+3", "1 +2 + 3"};
 
     @DataPoints
     public static final String[] multiplicative = {"1*2", "1*2*3", "1*2 + 2* 3 + 4"};
+
+    @DataPoints
+    public static final String[] unary = {"!9", "-9", "-a", "+9", "+a"};
+
+    @DataPoints
+    public static final String[] power = {"9^42", "100500^-9", "(100500)^(9-42)"};
 
     @DataPoints
     public static final String[] parens = {"1*(2+3)", "(9 + 42)", "1 + (2 + (3+4)) "};
