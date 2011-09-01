@@ -2,6 +2,7 @@ package see.functions;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
+import see.functions.service.Assign;
 
 import java.util.HashMap;
 import java.util.Map;

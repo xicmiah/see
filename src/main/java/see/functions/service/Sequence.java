@@ -1,4 +1,4 @@
-package see.functions;
+package see.functions.service;
 
 import com.google.common.base.Function;
 

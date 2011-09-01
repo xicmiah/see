@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.junit.Test;
+import see.functions.service.Sequence;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;

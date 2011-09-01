@@ -1,6 +1,7 @@
-package see.functions;
+package see.functions.service;
 
 import com.google.common.base.Function;
+import see.functions.ContextCurriedFunction;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ public class Assign<T> implements ContextCurriedFunction<Function<List<Object>, 
                 checkArgument(args.size() == 2, "Assign takes variable name and value");
 
                 String variable = (String) args.get(0);
-                T value = (T) args.get(1);
+                @SuppressWarnings("unchecked") T value = (T) args.get(1);
 
                 context.put(variable, value);
 

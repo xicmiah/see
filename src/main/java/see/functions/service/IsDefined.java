@@ -1,7 +1,8 @@
-package see.functions;
+package see.functions.service;
 
 
 import com.google.common.base.Function;
+import see.functions.ContextCurriedFunction;
 
 import java.util.List;
 import java.util.Map;
