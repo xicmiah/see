@@ -2,10 +2,13 @@ package see;
 
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
+import see.evaluator.BigDecimalFactory;
 import see.evaluator.SimpleEvaluator;
 import see.parser.BasicParser;
+import see.parser.GrammarConfiguration;
 import see.parser.Parser;
 import see.parser.grammar.Expressions;
+import see.parser.grammar.FunctionResolver;
 import see.tree.Node;
 
 import java.util.Map;
@@ -63,6 +66,10 @@ public class See {
     }
 
     private Expressions getGrammar() {
-        return Parboiled.createParser(Expressions.class);
+        return Parboiled.createParser(Expressions.class, getDefaultConfig());
+    }
+
+    private GrammarConfiguration getDefaultConfig() {
+        return new GrammarConfiguration(new FunctionResolver(), new BigDecimalFactory());
     }
 }

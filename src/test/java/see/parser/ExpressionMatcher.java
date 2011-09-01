@@ -9,7 +9,9 @@ import org.parboiled.Rule;
 import org.parboiled.parserunners.ParseRunner;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
+import see.evaluator.BigDecimalFactory;
 import see.parser.grammar.Expressions;
+import see.parser.grammar.FunctionResolver;
 
 /**
  * Matcher for expressions
@@ -33,18 +35,23 @@ public class ExpressionMatcher extends TypeSafeMatcher<String> {
         description.appendText(this.description);
     }
 
+    private static Expressions getDefaultGrammar() {
+        GrammarConfiguration config = new GrammarConfiguration(new FunctionResolver(), new BigDecimalFactory());
+        return Parboiled.createParser(Expressions.class, config);
+    }
+
     @Factory
     public static Matcher<String> singleExpression() {
-        return new ExpressionMatcher(Parboiled.createParser(Expressions.class).Condition(), "a single expression");
+        return new ExpressionMatcher(getDefaultGrammar().Condition(), "a single expression");
     }
 
     @Factory
     public static Matcher<String> returnExpression() {
-        return new ExpressionMatcher(Parboiled.createParser(Expressions.class).CalcExpression(), "an expression");
+        return new ExpressionMatcher(getDefaultGrammar().CalcExpression(), "an expression");
     }
 
     @Factory
     public static Matcher<String> expressionList() {
-        return new ExpressionMatcher(Parboiled.createParser(Expressions.class).Statements(), "a list of expressions");
+        return new ExpressionMatcher(getDefaultGrammar().Statements(), "a list of expressions");
     }
 }
