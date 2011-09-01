@@ -9,7 +9,7 @@ import org.parboiled.annotations.BuildParseTree;
 import org.parboiled.annotations.SuppressNode;
 import org.parboiled.annotations.SuppressSubnodes;
 import org.parboiled.support.Var;
-import see.evaluator.DoubleNumberFactory;
+import see.evaluator.BigDecimalFactory;
 import see.evaluator.NumberFactory;
 import see.tree.ConstNode;
 import see.tree.FunctionNode;
@@ -22,7 +22,7 @@ public class Expressions extends AbstractGrammar {
     final Literals literals = Parboiled.createParser(Literals.class);
 
     // TODO: add proper injection
-    final NumberFactory numberFactory = new DoubleNumberFactory();
+    final NumberFactory numberFactory = new BigDecimalFactory();
     final FunctionResolver functions = new FunctionResolver();
 
     final ImmutableCollection<String> keywords = ImmutableSet.of("if", "then", "else", "return");
