@@ -15,14 +15,6 @@ public class ContextualVisitor implements Visitor {
 		this.context = Maps.newHashMap(context);
 	}
 
-	public <T> T visit(BlockNode<T> node) {
-		for (Node<?> statement : node.init()) {
-			statement.accept(this);
-		}
-
-		return node.last().accept(this);
-	}
-
 	public <Arg, Result> Result visit(FunctionNode<Arg, Result> node) {
 		List<Arg> evaluatedArgs = Lists.transform(node.getArguments(), new Function<Node<Arg>, Arg>() {
 			public Arg apply(Node<Arg> input) {
@@ -34,7 +26,8 @@ public class ContextualVisitor implements Visitor {
 		return node.getFunction().apply(context).apply(evaluatedArgs);
 	}
 
-	public <T> T visit(VarNode<T> node) {
+	@SuppressWarnings("unchecked")
+    public <T> T visit(VarNode<T> node) {
 		return (T) context.get(node.getName());
 	}
 
