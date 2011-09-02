@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
-import org.parboiled.annotations.BuildParseTree;
 import org.parboiled.annotations.SuppressNode;
 import org.parboiled.annotations.SuppressSubnodes;
 import org.parboiled.support.Var;
@@ -19,7 +18,6 @@ import see.tree.VarNode;
 import java.util.Set;
 
 @SuppressWarnings({"InfiniteRecursion"})
-@BuildParseTree
 public class Expressions extends AbstractGrammar {
     final Literals literals;
 
