@@ -1,4 +1,4 @@
-package see.evaluator;
+package see.parser.config;
 
 public class DoubleNumberFactory implements NumberFactory {
     @Override

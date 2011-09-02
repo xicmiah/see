@@ -2,13 +2,13 @@ package see;
 
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
-import see.evaluator.BigDecimalFactory;
 import see.evaluator.SimpleEvaluator;
 import see.parser.BasicParser;
-import see.parser.GrammarConfiguration;
 import see.parser.Parser;
+import see.parser.config.BigDecimalFactory;
+import see.parser.config.FunctionResolver;
+import see.parser.config.GrammarConfiguration;
 import see.parser.grammar.Expressions;
-import see.parser.grammar.FunctionResolver;
 import see.tree.Node;
 
 import java.util.Map;

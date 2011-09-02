@@ -1,4 +1,4 @@
-package see.parser.grammar;
+package see.parser.config;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
@@ -39,6 +39,19 @@ public class FunctionResolver {
             .build();
 
     /**
+     * Get function by name
+     * @param name function name
+     * @return corresponding function
+     */
+    public ContextCurriedFunction<Function<List<Object>, Object>> get(String name) {
+        if (aliases.containsKey(name)) {
+            return functions.get(aliases.get(name));
+        } else {
+            return functions.get(name);
+        }
+    }
+
+    /**
      * Cast supplied function to UntypedFunction
      * @param function function to wrap
      * @param <Arg> function argument type
@@ -69,16 +82,8 @@ public class FunctionResolver {
     }
 
     /**
-     * Get function by name
-     * @param name function name
-     * @return corresponding function
+     * A curried untyped function.
+     * Serves as shortcut for long generic type declaration
      */
-    public UntypedFunction get(String name) {
-        if (aliases.containsKey(name)) {
-            return functions.get(aliases.get(name));
-        } else {
-            return functions.get(name);
-        }
-    }
-
+    private static interface UntypedFunction extends ContextCurriedFunction<Function<List<Object>, Object>> {}
 }

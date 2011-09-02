@@ -9,9 +9,10 @@ import org.parboiled.Rule;
 import org.parboiled.parserunners.ParseRunner;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
-import see.evaluator.BigDecimalFactory;
+import see.parser.config.BigDecimalFactory;
+import see.parser.config.FunctionResolver;
+import see.parser.config.GrammarConfiguration;
 import see.parser.grammar.Expressions;
-import see.parser.grammar.FunctionResolver;
 
 /**
  * Matcher for expressions
