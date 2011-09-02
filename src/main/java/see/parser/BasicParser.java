@@ -4,6 +4,7 @@ import org.parboiled.Rule;
 import org.parboiled.parserunners.ParseRunner;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
+import see.exceptions.ParseException;
 import see.tree.Node;
 
 public class BasicParser<T> implements Parser<T> {
@@ -20,8 +21,7 @@ public class BasicParser<T> implements Parser<T> {
         ParsingResult<Node<T>> result = runner.run(input);
         
         if (!result.matched) {
-            // TODO: add proper exception hierarchy
-            throw new RuntimeException("Syntax error");
+            throw new ParseException(result);
         }
 
         return result.resultValue;

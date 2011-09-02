@@ -1,5 +1,6 @@
 package see.evaluator;
 
+import see.exceptions.EvaluationException;
 import see.parser.numbers.NumberFactory;
 import see.tree.Node;
 
@@ -12,8 +13,12 @@ public class SimpleEvaluator implements Evaluator {
     public SimpleEvaluator(NumberFactory numberFactory) {
         this.numberFactory = numberFactory;
     }
-
-    public <T> T evaluate(Node<T> tree, Map<String, Object> context) {
-        return tree.accept(new ContextualVisitor(numberFactory, context));
-	}
+    
+    public <T> T evaluate(Node<T> tree, Map<String, Object> context) throws EvaluationException {
+        try {
+            return tree.accept(new ContextualVisitor(numberFactory, context));
+        } catch (Exception e) {
+            throw new EvaluationException(e);
+        }
+    }
 }
