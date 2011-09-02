@@ -9,9 +9,7 @@ import org.parboiled.Rule;
 import org.parboiled.parserunners.ParseRunner;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
-import see.parser.config.BigDecimalFactory;
-import see.parser.config.FunctionResolver;
-import see.parser.config.GrammarConfiguration;
+import see.parser.config.ConfigBuilder;
 import see.parser.grammar.Expressions;
 
 /**
@@ -37,8 +35,7 @@ public class ExpressionMatcher extends TypeSafeMatcher<String> {
     }
 
     private static Expressions getDefaultGrammar() {
-        GrammarConfiguration config = new GrammarConfiguration(new FunctionResolver(), new BigDecimalFactory());
-        return Parboiled.createParser(Expressions.class, config);
+        return Parboiled.createParser(Expressions.class, ConfigBuilder.defaultConfig().build());
     }
 
     @Factory

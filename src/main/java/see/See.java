@@ -5,8 +5,7 @@ import org.parboiled.Rule;
 import see.evaluator.SimpleEvaluator;
 import see.parser.BasicParser;
 import see.parser.Parser;
-import see.parser.config.BigDecimalFactory;
-import see.parser.config.FunctionResolver;
+import see.parser.config.ConfigBuilder;
 import see.parser.config.GrammarConfiguration;
 import see.parser.grammar.Expressions;
 import see.tree.Node;
@@ -18,6 +17,17 @@ import java.util.Map;
  * All operations are thread-safe. Parse results are immutable and can be reused/cached between different instances.
  */
 public class See {
+
+    private final GrammarConfiguration config;
+
+    public See() {
+        config = ConfigBuilder.defaultConfig().build();
+    }
+
+    public See(GrammarConfiguration config) {
+        this.config = config;
+    }
+
     /**
      * Parse a single expression
      *
@@ -66,10 +76,7 @@ public class See {
     }
 
     private Expressions getGrammar() {
-        return Parboiled.createParser(Expressions.class, getDefaultConfig());
+        return Parboiled.createParser(Expressions.class, config);
     }
 
-    private GrammarConfiguration getDefaultConfig() {
-        return new GrammarConfiguration(new FunctionResolver(), new BigDecimalFactory());
-    }
 }
