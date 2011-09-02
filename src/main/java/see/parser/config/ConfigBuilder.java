@@ -3,10 +3,11 @@ package see.parser.config;
 import com.google.common.base.Function;
 import see.functions.ContextCurriedFunction;
 import see.functions.PureFunction;
-import see.functions.arithmetic.Divide;
-import see.functions.arithmetic.Minus;
-import see.functions.arithmetic.Product;
-import see.functions.arithmetic.Sum;
+import see.functions.arithmetic.*;
+import see.functions.bool.And;
+import see.functions.bool.Not;
+import see.functions.bool.Or;
+import see.functions.compare.*;
 import see.functions.service.Assign;
 import see.functions.service.If;
 import see.functions.service.IsDefined;
@@ -33,22 +34,42 @@ public class ConfigBuilder {
         Map<String, String> aliases = new HashMap<String, String>();
         aliases.put(";", "seq");
         aliases.put("=", "assign");
+
+        aliases.put("!", "not");
+        aliases.put("&&", "and");
+        aliases.put("||", "or");
+
         aliases.put("+", "sum");
         aliases.put("-", "minus");
         aliases.put("*", "product");
         aliases.put("/", "divide");
-        
+        aliases.put("^", "pow");
+
         Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions =
                 new HashMap<String, ContextCurriedFunction<Function<List<Object>, Object>>>();
+
         functions.put("seq", wrap(new Sequence<Object>()));
         functions.put("assign", wrap(new Assign<Object>()));
         functions.put("if", wrap(new If<Object>()));
         functions.put("isDefined", wrap(new IsDefined()));
-        
+
+        functions.put("not", wrap(new Not()));
+        functions.put("and", wrap(new And()));
+        functions.put("or", wrap(new Or()));
+
+        functions.put("==", wrap(new Eq()));
+        functions.put("!=", wrap(new Neq()));
+        functions.put(">", wrap(new Gt()));
+        functions.put(">=", wrap(new Geq()));
+        functions.put("<", wrap(new Lt()));
+        functions.put("<=", wrap(new Leq()));
+
         functions.put("sum", wrap(new Sum()));
         functions.put("minus", wrap(new Minus()));
         functions.put("product", wrap(new Product()));
         functions.put("divide", wrap(new Divide()));
+        functions.put("pow", wrap(new Power()));
+
         return new ConfigBuilder(aliases, functions, new BigDecimalFactory());
     }
 
