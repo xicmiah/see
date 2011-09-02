@@ -10,6 +10,7 @@ import see.parser.config.GrammarConfiguration;
 import see.parser.grammar.Expressions;
 import see.tree.Node;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -68,6 +69,32 @@ public class See {
      */
     public <T> T evaluate(Node<T> tree, Map<String, Object> context) {
         return new SimpleEvaluator().evaluate(tree, context);
+    }
+
+    /**
+     * Evaluate tree with empty context. 
+     *
+     * @param tree tree to evaluate
+     * @param <T> return type
+     * @return evaluated value
+     */
+    public <T> T evaluate(Node<T> tree) {
+        return new SimpleEvaluator().evaluate(tree, new HashMap<String, Object>());
+    }
+
+    /**
+     * Parse and evaluate simple expression.
+     * Equivalent to evaluate(parseExpression(expression), context).
+     * @param expression expression to evaluate
+     * @param context variable->value mapping
+     * @return evaluated value
+     */
+    public Object eval(String expression, Map<String, Object> context) {
+        return evaluate(parseExpression(expression), context);
+    }
+
+    public Object eval(String expression) {
+        return evaluate(parseExpression(expression));
     }
 
     private Node<Object> parse(String expression, Rule rule) {
