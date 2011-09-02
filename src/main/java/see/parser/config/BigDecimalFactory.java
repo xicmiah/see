@@ -16,4 +16,9 @@ public class BigDecimalFactory implements NumberFactory {
             return BigDecimal.valueOf(number.doubleValue());
         }
     }
+
+    @Override
+    public Character getDecimalSeparator() {
+        return '.';
+    }
 }

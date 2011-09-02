@@ -21,17 +21,21 @@ import java.util.Set;
 @SuppressWarnings({"InfiniteRecursion"})
 @BuildParseTree
 public class Expressions extends AbstractGrammar {
-    final Literals literals = Parboiled.createParser(Literals.class);
+    final Literals literals;
 
-    // TODO: add proper injection
     final NumberFactory numberFactory;
     final FunctionResolver functions;
+
+    final Character argumentSeparator;
 
     final Set<String> keywords = ImmutableSet.of("if", "then", "else", "return");
 
     public Expressions(GrammarConfiguration config) {
         numberFactory = config.getNumberFactory();
         functions = config.getFunctions();
+        
+        argumentSeparator = numberFactory.getDecimalSeparator() == ',' ? ';' : ',';
+        literals = Parboiled.createParser(Literals.class, numberFactory.getDecimalSeparator());
     }
 
     public Rule CalcExpression() {
@@ -207,7 +211,7 @@ public class Expressions extends AbstractGrammar {
 
     @SuppressNode
     Rule ArgumentSeparator() {
-        return fromStringLiteral(",");
+        return Sequence(Ch(argumentSeparator), Whitespace());
     }
 
     Rule Variable() {

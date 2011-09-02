@@ -6,4 +6,5 @@ package see.parser.config;
 public interface NumberFactory {
     Number getNumber(String string);
     Number getNumber(Number number);
+    Character getDecimalSeparator();
 }

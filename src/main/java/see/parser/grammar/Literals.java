@@ -3,6 +3,12 @@ package see.parser.grammar;
 import org.parboiled.Rule;
 
 public class Literals extends AbstractGrammar {
+    final Character decimalSeparator;
+
+    public Literals(Character decimalSeparator) {
+        this.decimalSeparator = decimalSeparator;
+    }
+
     Rule StringLiteral() {
         return Sequence(Ch('"'), ZeroOrMore(Sequence(TestNot("\""), ANY)).suppressSubnodes(), Ch('"'), Whitespace());
     }
@@ -14,15 +20,12 @@ public class Literals extends AbstractGrammar {
 
     Rule FloatLiteral(){
         return Sequence(FirstOf(
-                Sequence(OneOrMore(Digit()), DecimalSeparator(), ZeroOrMore(Digit()), Optional(Exponent())),
-                Sequence(DecimalSeparator(), OneOrMore(Digit()), Optional(Exponent())),
+                Sequence(OneOrMore(Digit()), decimalSeparator, ZeroOrMore(Digit()), Optional(Exponent())),
+                Sequence(decimalSeparator, OneOrMore(Digit()), Optional(Exponent())),
                 Sequence(OneOrMore(Digit()), Exponent())
         ), Whitespace());
     }
 
-    Rule DecimalSeparator() {
-        return Ch('.');
-    }
 
     Rule Exponent() {
         return Sequence(AnyOf("eE"), Optional(AnyOf("+-")), OneOrMore(Digit()));

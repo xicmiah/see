@@ -10,4 +10,9 @@ public class DoubleNumberFactory implements NumberFactory {
     public Number getNumber(Number number) {
         return number.doubleValue();
     }
+
+    @Override
+    public Character getDecimalSeparator() {
+        return '.';
+    }
 }
