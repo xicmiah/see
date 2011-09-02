@@ -68,7 +68,7 @@ public class See {
      * @return evaluated value
      */
     public <T> T evaluate(Node<T> tree, Map<String, Object> context) {
-        return new SimpleEvaluator().evaluate(tree, context);
+        return new SimpleEvaluator(config.getNumberFactory()).evaluate(tree, context);
     }
 
     /**
@@ -79,7 +79,7 @@ public class See {
      * @return evaluated value
      */
     public <T> T evaluate(Node<T> tree) {
-        return new SimpleEvaluator().evaluate(tree, new HashMap<String, Object>());
+        return new SimpleEvaluator(config.getNumberFactory()).evaluate(tree, new HashMap<String, Object>());
     }
 
     /**

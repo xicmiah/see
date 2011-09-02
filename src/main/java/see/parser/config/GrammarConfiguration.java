@@ -1,5 +1,7 @@
 package see.parser.config;
 
+import see.parser.numbers.NumberFactory;
+
 public class GrammarConfiguration {
     private final FunctionResolver functions;
     private final NumberFactory numberFactory;

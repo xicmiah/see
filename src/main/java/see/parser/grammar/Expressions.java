@@ -9,7 +9,7 @@ import org.parboiled.annotations.SuppressSubnodes;
 import org.parboiled.support.Var;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
-import see.parser.config.NumberFactory;
+import see.parser.numbers.NumberFactory;
 import see.tree.ConstNode;
 import see.tree.FunctionNode;
 import see.tree.Node;

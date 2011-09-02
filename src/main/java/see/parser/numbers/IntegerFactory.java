@@ -1,14 +1,14 @@
-package see.parser.config;
+package see.parser.numbers;
 
-public class DoubleNumberFactory implements NumberFactory {
+public class IntegerFactory implements NumberFactory {
     @Override
     public Number getNumber(String string) {
-        return Double.parseDouble(string);
+        return Integer.valueOf(string);
     }
 
     @Override
     public Number getNumber(Number number) {
-        return number.doubleValue();
+        return number.intValue();
     }
 
     @Override

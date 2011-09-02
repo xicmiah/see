@@ -1,4 +1,4 @@
-package see.parser.config;
+package see.parser.numbers;
 
 /**
  * Abstract factory for creating different Number instances

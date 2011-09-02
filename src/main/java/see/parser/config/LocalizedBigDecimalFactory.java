@@ -1,11 +1,13 @@
 package see.parser.config;
 
+import see.parser.numbers.BigDecimalFactory;
+
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
-public class LocalizedBigDecimalFactory extends BigDecimalFactory{
+public class LocalizedBigDecimalFactory extends BigDecimalFactory {
     private final Locale locale;
 
     public LocalizedBigDecimalFactory(Locale locale) {

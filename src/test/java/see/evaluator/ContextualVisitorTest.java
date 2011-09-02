@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import see.functions.ContextCurriedFunction;
 import see.functions.PureFunction;
+import see.parser.numbers.IntegerFactory;
 import see.tree.ConstNode;
 import see.tree.FunctionNode;
 import see.tree.Node;
@@ -53,7 +54,7 @@ public class ContextualVisitorTest {
                 }
             }
         });
-        evaluator = new SimpleEvaluator();
+        evaluator = new SimpleEvaluator(new IntegerFactory());
     }
 
     @Test

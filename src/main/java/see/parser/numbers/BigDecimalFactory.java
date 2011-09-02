@@ -1,4 +1,4 @@
-package see.parser.config;
+package see.parser.numbers;
 
 import java.math.BigDecimal;
 
