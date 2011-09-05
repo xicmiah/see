@@ -1,6 +1,5 @@
 package see.functions;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import see.functions.service.IsDefined;

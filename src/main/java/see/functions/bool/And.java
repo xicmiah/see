@@ -1,6 +1,6 @@
 package see.functions.bool;
 
-import com.google.common.base.Function;
+import see.functions.Function;
 
 import java.math.BigDecimal;
 import java.util.List;

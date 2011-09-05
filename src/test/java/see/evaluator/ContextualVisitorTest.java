@@ -1,11 +1,11 @@
 package see.evaluator;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 import see.functions.ContextCurriedFunction;
+import see.functions.Function;
 import see.functions.PureFunction;
 import see.parser.numbers.IntegerFactory;
 import see.tree.ConstNode;

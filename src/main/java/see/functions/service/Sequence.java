@@ -1,6 +1,6 @@
 package see.functions.service;
 
-import com.google.common.base.Function;
+import see.functions.Function;
 
 import java.util.Iterator;
 import java.util.List;

@@ -1,8 +1,8 @@
 package see.evaluator;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import see.functions.Function;
 import see.parser.numbers.NumberFactory;
 import see.tree.*;
 

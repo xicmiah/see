@@ -1,7 +1,7 @@
 package see.parser.config;
 
-import com.google.common.base.Function;
 import see.functions.ContextCurriedFunction;
+import see.functions.Function;
 import see.functions.PureFunction;
 import see.functions.arithmetic.*;
 import see.functions.bool.And;

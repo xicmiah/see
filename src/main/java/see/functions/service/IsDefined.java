@@ -1,9 +1,9 @@
 package see.functions.service;
 
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import see.functions.ContextCurriedFunction;
+import see.functions.Function;
 
 import java.math.BigDecimal;
 import java.util.List;

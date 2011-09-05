@@ -1,8 +1,8 @@
 package see.parser.config;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import see.functions.ContextCurriedFunction;
+import see.functions.Function;
 
 import java.util.List;
 import java.util.Map;
