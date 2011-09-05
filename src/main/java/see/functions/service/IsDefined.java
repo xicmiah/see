@@ -2,6 +2,7 @@ package see.functions.service;
 
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import see.functions.ContextCurriedFunction;
 
 import java.math.BigDecimal;
@@ -16,7 +17,11 @@ public class IsDefined implements ContextCurriedFunction<Function<List<String>, 
         return new Function<List<String>, BigDecimal>() {
             @Override
             public BigDecimal apply(List<String> strings) {
-                return fromBoolean(context.get(strings.get(0)) != null);
+                Preconditions.checkArgument(strings.size() == 1, "isDefined takes variable name");
+
+                String variable = strings.get(0);
+                
+                return fromBoolean(context.get(variable) != null);
             }
         };
     }
