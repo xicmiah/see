@@ -79,7 +79,15 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule AssignExpression() {
-        return Sequence(Variable(), "=", Expression(), pushBinOp("="));
+        return Sequence(LValue(), "=", Expression(), pushBinOp("="));
+    }
+
+    /**
+     * Left side of assignment. Matches variable, pushes variable name.
+     * @return
+     */
+    Rule LValue() {
+        return Sequence(Variable(), drop() && push(new ConstNode<Object>(matchTrim())));
     }
 
     Rule Conditional() {
