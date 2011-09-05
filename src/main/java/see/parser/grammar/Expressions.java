@@ -79,14 +79,14 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule AssignExpression() {
-        return Sequence(LValue(), "=", Expression(), pushBinOp("="));
+        return Sequence(VarName(), "=", Expression(), pushBinOp("="));
     }
 
     /**
-     * Left side of assignment. Matches variable, pushes variable name.
-     * @return
+     * Special form. Matches variable, pushes variable name.
+     * @return rule
      */
-    Rule LValue() {
+    Rule VarName() {
         return Sequence(Variable(), drop() && push(new ConstNode<Object>(matchTrim())));
     }
 
@@ -149,7 +149,7 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule UnaryExpressionNotPlusMinus() {
-        return FirstOf(Constant(), Function(), Variable(), Sequence("(", Expression(), ")"));
+        return FirstOf(Constant(), SpecialForm(), Function(), Variable(), Sequence("(", Expression(), ")"));
     }
 
     /**
@@ -206,13 +206,35 @@ public class Expressions extends AbstractGrammar {
         return Sequence(
                 FirstOf(Identifier(), "if"),
                 function.set(matchTrim()),
-                "(", ArgumentList(args), ")",
+                ArgumentList(args),
                 push(makeFNode(function.get(), args.get()))
         );
     }
 
+    /**
+     * A special form.
+     * @return rule
+     */
+    Rule SpecialForm() {
+        return IsDefined();
+    }
+
+    /**
+     * Special form for isDefined function.
+     * Matches like function application, but requires one Variable inside.
+     * @return rule
+     */
+    Rule IsDefined() {
+        NodeListVar args = new NodeListVar();
+        return Sequence(
+                "isDefined",
+                "(", VarName(), ")",
+                push(makeFNode("isDefined", ImmutableList.of(pop())))
+        );
+    }
+
     Rule ArgumentList(NodeListVar args) {
-        return repsep(Sequence(Expression(), args.append(pop())), ArgumentSeparator());
+        return Sequence("(", repsep(Sequence(Expression(), args.append(pop())), ArgumentSeparator()), ")");
     }
 
     @SuppressNode

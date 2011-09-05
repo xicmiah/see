@@ -1,6 +1,5 @@
 package see.integration;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import see.See;
 import see.exceptions.EvaluationException;
@@ -25,12 +24,11 @@ public class ServiceFunctionsTest {
         assertEquals(BigDecimal.valueOf(9), eval("a = b = 4; a = 5; a + b"));
     }
 
-    @Ignore("not implemented properly")
     @Test
     public void testIsDefined() throws Exception {
         assertEquals(BigDecimal.ZERO, eval("isDefined(a)"));
         assertEquals(BigDecimal.ONE, eval("a = 5; isDefined(a)"));
-        assertEquals(BigDecimal.ONE, eval("a = 5; isDefined(b)"));
+        assertEquals(BigDecimal.ZERO, eval("a = 5; isDefined(b)"));
     }
 
     @Test
