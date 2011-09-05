@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
-import org.parboiled.annotations.SuppressNode;
 import org.parboiled.annotations.SuppressSubnodes;
 import org.parboiled.support.Var;
 import see.parser.config.FunctionResolver;
@@ -51,7 +50,7 @@ public class Expressions extends AbstractGrammar {
     Rule ReturnExpression() {
         NodeListVar statements = new NodeListVar();
         return Sequence(Optional(ExpressionList(), statements.append(pop())),
-                "return", RightExpression(), statements.append(pop()),
+                "return", RightExpression(), Optional(";"), statements.append(pop()),
                 push(makeSeqNode(statements.get())));
     }
 
@@ -237,7 +236,6 @@ public class Expressions extends AbstractGrammar {
         return Sequence("(", repsep(Sequence(Expression(), args.append(pop())), ArgumentSeparator()), ")");
     }
 
-    @SuppressNode
     Rule ArgumentSeparator() {
         return Sequence(Ch(argumentSeparator), Whitespace());
     }

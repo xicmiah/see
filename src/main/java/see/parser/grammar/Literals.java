@@ -32,11 +32,11 @@ public class Literals extends AbstractGrammar {
     }
 
     Rule Letter() {
-        return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), '-');
+        return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), '-', '_');
     }
 
     Rule LetterOrDigit() {
-        return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), '-', Digit());
+        return FirstOf(Letter(), Digit());
     }
 
     Rule Digit() {
