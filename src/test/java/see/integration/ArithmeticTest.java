@@ -27,7 +27,6 @@ public class ArithmeticTest {
 
     @Test
     public void testArithmetic() throws Exception {
-
         assertEquals(nine, eval("4+5"));
         assertEquals(nine, eval("42-33"));
         assertEquals(nine, eval("3*3"));
@@ -35,6 +34,20 @@ public class ArithmeticTest {
         
         assertEquals(nine, eval("4 + 2 * 3 - 5 / 5"));
         assertEquals(nine, eval("((4 + (2*3)) - (5/5))"));
+    }
+
+    @Test
+    public void testUnaryPlusMinus() throws Exception {
+        assertEquals(valueOf(-9), eval("-9"));
+        assertEquals(valueOf(9), eval("+9"));
+        assertEquals(valueOf(9), eval("-(-9)"));
+    }
+
+    @Test
+    public void testLogicalOps() throws Exception {
+        assertEquals(valueOf(0), eval("!9"));
+        assertEquals(valueOf(0), eval("!1"));
+        assertEquals(valueOf(1), eval("!0"));
     }
 
     @Test

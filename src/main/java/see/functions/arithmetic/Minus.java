@@ -7,12 +7,22 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * Binary/unary minus operation.
+ * Differentiates by argument count.
+ */
 public class Minus implements Function<List<BigDecimal>, BigDecimal> {
     @Override
     public BigDecimal apply(List<BigDecimal> input) {
-        checkArgument(input.size() == 2, "Minus takes only two arguments");
+        int size = input.size();
+        checkArgument(size == 1 || size == 2, "Minus takes one or two arguments");
 
-        return input.get(0).subtract(input.get(1));
+        if (size == 1) {
+            return input.get(0).negate();
+        } else {
+            return input.get(0).subtract(input.get(1));
+        }
+
     }
 
     @Override

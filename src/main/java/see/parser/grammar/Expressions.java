@@ -138,9 +138,12 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule UnaryExpression() {
-        return FirstOf(Sequence(AnyOf("+-!"), UnaryExpression()), PowerExpression());
+        Var<String> op = new Var<String>("");
+        return FirstOf(
+                Sequence(AnyOf("+-!"), op.set(matchTrim()), UnaryExpression(), push(makeUNode(op.get(), pop()))),
+                PowerExpression()
+        );
     }
-
 
     Rule PowerExpression() {
         return Sequence(UnaryExpressionNotPlusMinus(),
@@ -174,6 +177,21 @@ public class Expressions extends AbstractGrammar {
      */
     boolean pushBinOp(String operator) {
         return swap() && push(makeFNode(operator, ImmutableList.of(pop(), pop())));
+    }
+
+    /**
+     * Construct unary function node.
+     * Short-circuits for unary plus.
+     * @param operator unary operator
+     * @param expr operator argument
+     * @return constructed node
+     */
+    Node<Object> makeUNode(String operator, Node<Object> expr) {
+        if (operator.equals("+")) {
+            return expr;
+        } else {
+            return makeFNode(operator, ImmutableList.of(expr));
+        }
     }
 
     /**
