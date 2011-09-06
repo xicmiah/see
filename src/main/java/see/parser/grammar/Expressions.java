@@ -10,10 +10,11 @@ import org.parboiled.support.Var;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
-import see.tree.ConstNode;
 import see.tree.FunctionNode;
 import see.tree.Node;
-import see.tree.VarNode;
+import see.tree.immutable.ImmutableConstNode;
+import see.tree.immutable.ImmutableFunctionNode;
+import see.tree.immutable.ImmutableVarNode;
 
 import java.util.Set;
 
@@ -176,11 +177,11 @@ public class Expressions extends AbstractGrammar {
      * @return constructed node
      */
     FunctionNode<Object, Object> makeFNode(String function, ImmutableList<Node<Object>> args) {
-        return new FunctionNode<Object, Object>(functions.get(function), args);
+        return new ImmutableFunctionNode<Object, Object>(functions.get(function), args);
     }
 
     /**
-     * Constant. Pushes ConstNode(value)
+     * Constant. Pushes ImmutableConstNode(value)
      * @return rule
      */
     @SuppressSubnodes
@@ -213,7 +214,7 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule Variable() {
-        return Sequence(Identifier(), push(new VarNode<Object>(matchTrim())));
+        return Sequence(Identifier(), push(new ImmutableVarNode<Object>(matchTrim())));
     }
 
     /**
@@ -221,7 +222,7 @@ public class Expressions extends AbstractGrammar {
      * @return rule
      */
     Rule String() {
-        return Sequence(literals.StringLiteral(), push(new ConstNode<Object>(matchTrim())));
+        return Sequence(literals.StringLiteral(), push(new ImmutableConstNode<Object>(matchTrim())));
     }
 
     /**
@@ -229,7 +230,7 @@ public class Expressions extends AbstractGrammar {
      * @return rule
      */
     Rule Float() {
-        return Sequence(literals.FloatLiteral(), push(new ConstNode<Object>(matchNumber())));
+        return Sequence(literals.FloatLiteral(), push(new ImmutableConstNode<Object>(matchNumber())));
     }
 
     /**
@@ -237,7 +238,7 @@ public class Expressions extends AbstractGrammar {
      * @return constructed rule
      */
     Rule Int() {
-        return Sequence(literals.IntLiteral(), push(new ConstNode<Object>(matchNumber())));
+        return Sequence(literals.IntLiteral(), push(new ImmutableConstNode<Object>(matchNumber())));
     }
 
     @SuppressSubnodes
