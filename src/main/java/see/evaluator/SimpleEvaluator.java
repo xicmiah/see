@@ -14,7 +14,8 @@ public class SimpleEvaluator implements Evaluator {
         this.numberFactory = numberFactory;
     }
     
-    public <T> T evaluate(Node<T> tree, Map<String, Object> context) throws EvaluationException {
+    @Override
+    public <T> T evaluate(Node<T> tree, Map<String, ?> context) throws EvaluationException {
         try {
             return tree.accept(new ContextualVisitor(numberFactory, context));
         } catch (Exception e) {

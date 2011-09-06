@@ -1,11 +1,11 @@
 package see.evaluator;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 import see.functions.ContextCurriedFunction;
+import see.functions.Function;
 import see.functions.PureFunction;
 import see.parser.numbers.IntegerFactory;
 import see.tree.ConstNode;
@@ -31,6 +31,7 @@ public class ContextualVisitorTest {
     @Before
     public void setUp() throws Exception {
         plus = new PureFunction<Function<List<Integer>, Integer>>(new Function<List<Integer>, Integer>() {
+            @Override
             public Integer apply(List<Integer> input) {
                 int result = 0;
                 for (Integer value : input) {

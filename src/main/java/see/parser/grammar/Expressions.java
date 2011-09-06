@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
-import org.parboiled.annotations.SuppressNode;
 import org.parboiled.annotations.SuppressSubnodes;
 import org.parboiled.support.Var;
 import see.parser.config.FunctionResolver;
@@ -52,7 +51,7 @@ public class Expressions extends AbstractGrammar {
     Rule ReturnExpression() {
         NodeListVar statements = new NodeListVar();
         return Sequence(Optional(ExpressionList(), statements.append(pop())),
-                "return", RightExpression(), statements.append(pop()),
+                "return", RightExpression(), Optional(";"), statements.append(pop()),
                 push(makeSeqNode(statements.get())));
     }
 
@@ -80,7 +79,15 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule AssignExpression() {
-        return Sequence(Variable(), "=", Expression(), pushBinOp("="));
+        return Sequence(VarName(), "=", Expression(), pushBinOp("="));
+    }
+
+    /**
+     * Special form. Matches variable, pushes variable name.
+     * @return rule
+     */
+    Rule VarName() {
+        return Sequence(Variable(), drop() && push(new ImmutableConstNode<Object>(matchTrim())));
     }
 
     Rule Conditional() {
@@ -132,9 +139,12 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule UnaryExpression() {
-        return FirstOf(Sequence(AnyOf("+-!"), UnaryExpression()), PowerExpression());
+        Var<String> op = new Var<String>("");
+        return FirstOf(
+                Sequence(AnyOf("+-!"), op.set(matchTrim()), UnaryExpression(), push(makeUNode(op.get(), pop()))),
+                PowerExpression()
+        );
     }
-
 
     Rule PowerExpression() {
         return Sequence(UnaryExpressionNotPlusMinus(),
@@ -142,7 +152,7 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule UnaryExpressionNotPlusMinus() {
-        return FirstOf(Constant(), Function(), Variable(), Sequence("(", Expression(), ")"));
+        return FirstOf(Constant(), SpecialForm(), Function(), Variable(), Sequence("(", Expression(), ")"));
     }
 
     /**
@@ -168,6 +178,21 @@ public class Expressions extends AbstractGrammar {
      */
     boolean pushBinOp(String operator) {
         return swap() && push(makeFNode(operator, ImmutableList.of(pop(), pop())));
+    }
+
+    /**
+     * Construct unary function node.
+     * Short-circuits for unary plus.
+     * @param operator unary operator
+     * @param expr operator argument
+     * @return constructed node
+     */
+    Node<Object> makeUNode(String operator, Node<Object> expr) {
+        if (operator.equals("+")) {
+            return expr;
+        } else {
+            return makeFNode(operator, ImmutableList.of(expr));
+        }
     }
 
     /**
@@ -199,16 +224,37 @@ public class Expressions extends AbstractGrammar {
         return Sequence(
                 FirstOf(Identifier(), "if"),
                 function.set(matchTrim()),
-                "(", ArgumentList(args), ")",
+                ArgumentList(args),
                 push(makeFNode(function.get(), args.get()))
         );
     }
 
-    Rule ArgumentList(NodeListVar args) {
-        return repsep(Sequence(Expression(), args.append(pop())), ArgumentSeparator());
+    /**
+     * A special form.
+     * @return rule
+     */
+    Rule SpecialForm() {
+        return IsDefined();
     }
 
-    @SuppressNode
+    /**
+     * Special form for isDefined function.
+     * Matches like function application, but requires one Variable inside.
+     * @return rule
+     */
+    Rule IsDefined() {
+        NodeListVar args = new NodeListVar();
+        return Sequence(
+                "isDefined",
+                "(", VarName(), ")",
+                push(makeFNode("isDefined", ImmutableList.of(pop())))
+        );
+    }
+
+    Rule ArgumentList(NodeListVar args) {
+        return Sequence("(", repsep(Sequence(Expression(), args.append(pop())), ArgumentSeparator()), ")");
+    }
+
     Rule ArgumentSeparator() {
         return Sequence(Ch(argumentSeparator), Whitespace());
     }

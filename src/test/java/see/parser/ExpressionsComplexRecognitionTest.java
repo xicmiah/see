@@ -24,7 +24,7 @@ public class ExpressionsComplexRecognitionTest {
 
     /**
      * Test that all non-empty inputs are valid expression lists
-     * @param expression
+     * @param expression input
      * @throws Exception
      */
     @Theory
@@ -43,5 +43,6 @@ public class ExpressionsComplexRecognitionTest {
     public void testAddingReturn(String expression) throws Exception {
         assumeThat(expression, expressionList());
         assertThat(expression + " return 9", returnExpression());
+        assertThat(expression + " return 9;", returnExpression());
     }
 }

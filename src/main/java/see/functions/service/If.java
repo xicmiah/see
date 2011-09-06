@@ -1,10 +1,11 @@
 package see.functions.service;
 
-import com.google.common.base.Function;
+import see.functions.Function;
 
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static see.functions.bool.BooleanCastHelper.toBoolean;
 
 public class If<T> implements Function<List<T>, T> {
     @Override
@@ -24,7 +25,7 @@ public class If<T> implements Function<List<T>, T> {
         if (condition instanceof Boolean) {
             return (Boolean) condition;
         } else if (condition instanceof Number) {
-            return ((Number) condition).intValue() == 0;
+            return toBoolean((Number) condition);
         } else {
             throw new IllegalArgumentException("Cannot evaluate condition " + condition);
         }

@@ -1,6 +1,6 @@
 package see.parser.antlr.tree;
 
-import com.google.common.base.Function;
+import see.functions.Function;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 import see.functions.ContextCurriedFunction;

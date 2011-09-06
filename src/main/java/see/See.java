@@ -67,7 +67,7 @@ public class See {
      * @param <T> return type
      * @return evaluated value
      */
-    public <T> T evaluate(Node<T> tree, Map<String, Object> context) {
+    public <T> T evaluate(Node<T> tree, Map<String, ?> context) {
         return new SimpleEvaluator(config.getNumberFactory()).evaluate(tree, context);
     }
 

@@ -1,7 +1,8 @@
 package see.tree;
 
-import com.google.common.base.Function;
+
 import see.functions.ContextCurriedFunction;
+import see.functions.Function;
 
 import java.util.List;
 

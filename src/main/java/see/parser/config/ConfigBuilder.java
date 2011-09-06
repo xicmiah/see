@@ -1,7 +1,7 @@
 package see.parser.config;
 
-import com.google.common.base.Function;
 import see.functions.ContextCurriedFunction;
+import see.functions.Function;
 import see.functions.PureFunction;
 import see.functions.arithmetic.*;
 import see.functions.bool.And;
@@ -86,8 +86,30 @@ public class ConfigBuilder {
         return this;
     }
 
-    public ConfigBuilder addFunction(String name, ContextCurriedFunction<Function<List<Object>, Object>> function) {
-        functions.put(name, function);
+    /**
+     * Add supplied function to registry.
+     * Function should accept context via currying
+     * @param name function name
+     * @param function function to add
+     * @param <T> function argument type
+     * @param <R> function result type
+     * @return this instance
+     */
+    public <T, R> ConfigBuilder addFunction(String name, ContextCurriedFunction<Function<List<T>, R>> function) {
+        functions.put(name, wrap(function));
+        return this;
+    }
+
+    /**
+     * Add supplied pure function to registry.
+     * @param name function name
+     * @param function function to add
+     * @param <T> function argument type
+     * @param <R> function result type
+     * @return this instance
+     */
+    public <T, R> ConfigBuilder addPureFunction(String name, Function<List<T>, R> function) {
+        functions.put(name, wrap(function));
         return this;
     }
 
