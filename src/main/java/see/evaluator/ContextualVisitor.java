@@ -13,14 +13,16 @@ public class ContextualVisitor implements Visitor {
 	private final Map<String, Object> context;
     private final NumberFactory numberFactory;
 
-	public ContextualVisitor(NumberFactory numberFactory, Map<String, Object> context) {
+	public ContextualVisitor(NumberFactory numberFactory, Map<String, ?> context) {
         this.numberFactory = numberFactory;
         this.context = Maps.newHashMap(context);
 	}
 
-	public <Arg, Result> Result visit(FunctionNode<Arg, Result> node) {
+	@Override
+    public <Arg, Result> Result visit(FunctionNode<Arg, Result> node) {
 		List<Arg> evaluatedArgs = Lists.transform(node.getArguments(), new Function<Node<Arg>, Arg>() {
-			public Arg apply(Node<Arg> input) {
+			@Override
+            public Arg apply(Node<Arg> input) {
 				return input.accept(ContextualVisitor.this);
 			}
 		});
@@ -38,7 +40,8 @@ public class ContextualVisitor implements Visitor {
      * @param <T> node type
      * @return extracted value
      */
-	@SuppressWarnings("unchecked")
+	@Override
+    @SuppressWarnings("unchecked")
     public <T> T visit(VarNode<T> node) {
         Object value = context.get(node.getName());
         
@@ -49,7 +52,8 @@ public class ContextualVisitor implements Visitor {
         }
 	}
 
-	public <T> T visit(ConstNode<T> node) {
+	@Override
+    public <T> T visit(ConstNode<T> node) {
 		return node.getValue();
 	}
 }

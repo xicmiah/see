@@ -30,6 +30,7 @@ public class ContextualVisitorTest {
     @Before
     public void setUp() throws Exception {
         plus = new PureFunction<Function<List<Integer>, Integer>>(new Function<List<Integer>, Integer>() {
+            @Override
             public Integer apply(List<Integer> input) {
                 int result = 0;
                 for (Integer value : input) {
