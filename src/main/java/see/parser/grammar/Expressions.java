@@ -40,7 +40,7 @@ public class Expressions extends AbstractGrammar {
     }
 
     public Rule Condition() {
-        return Sequence(Whitespace(), RightExpression(), EOI);
+        return Sequence(Whitespace(), Expression(), EOI);
     }
 
     public Rule Statements() {
@@ -57,9 +57,18 @@ public class Expressions extends AbstractGrammar {
     Rule ExpressionList() {
         NodeListVar statements = new NodeListVar();
         return Sequence(
-                Expression(), statements.append(pop()),
-                ZeroOrMore(";", Optional(Expression(), statements.append(pop()))),
+                Term(), statements.append(pop()),
+                ZeroOrMore(Term(), statements.append(pop())),
                 push(makeSeqNode(statements.get())));
+    }
+
+    /**
+     * A if..then..else or expression ending with semicolon.
+     * Pushes it's value to stack
+     * @return rule
+     */
+    Rule Term() {
+        return FirstOf(Conditional(), Sequence(Expression(), ";"));
     }
 
     /**
@@ -74,7 +83,7 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule Expression() {
-        return FirstOf(AssignExpression(), Conditional(), RightExpression());
+        return FirstOf(AssignExpression(), RightExpression());
     }
 
     Rule AssignExpression() {
