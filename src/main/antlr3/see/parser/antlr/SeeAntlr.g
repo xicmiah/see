@@ -105,7 +105,7 @@ constant
 	:	NUMBER | STRING;
 
 func
-	:	id=ID LEFT_PAREN functionParams? RIGHT_PAREN -> ^(FUNCTION_CALL[$id ,"f_call"] ID LEFT_PAREN RIGHT_PAREN functionParams?)
+	:	id=ID LEFT_PAREN functionParams? RIGHT_PAREN -> ^(FUNCTION_CALL[$id] ID LEFT_PAREN RIGHT_PAREN functionParams?)
 	;
 
 functionParams
@@ -119,7 +119,6 @@ THEN:	'then';
 ELSE:	'else';
 RETURN
 	:	'return';
-
 
 SEMICOLON
 	:	 ';';

@@ -1,23 +1,30 @@
-package see.parser.antlr;
+package see.parser.antlr.tree;
 
 import org.antlr.runtime.ClassicToken;
+import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.BaseTree;
+import see.tree.Node;
 
 /**
  * @author pavlov
  * @since 05.09.11
  */
-public abstract class SeeTreeNode extends BaseTree {
+public abstract class SeeTreeNode<T> extends BaseTree implements Node<T> {
 
-    private final ClassicToken token;
+    private final Token token;
 
     private int childIndex;
 
-    protected SeeTreeNode(ClassicToken token) {
+    protected SeeTreeNode(Token token) {
         this.token = token;
     }
 
-    public ClassicToken getToken() {
+    @Override
+    public boolean isNil() {
+        return token == null;
+    }
+
+    public Token getToken() {
         return token;
     }
 
