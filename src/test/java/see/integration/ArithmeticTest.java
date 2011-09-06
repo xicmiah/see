@@ -70,6 +70,12 @@ public class ArithmeticTest {
     }
 
     @Test
+    public void testMinMax() throws Exception {
+        assertEquals(nine, see.eval("max(-100500, -9000, 9, 4.2)"));
+        assertEquals(nine, see.eval("min(100500, 9, 42)"));
+    }
+
+    @Test
     public void testIdentifiers() throws Exception {
         ImmutableMap<String, Object> context = ImmutableMap.<String, Object>builder()
                 .put("a", valueOf(10))

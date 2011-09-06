@@ -15,6 +15,7 @@ import see.functions.service.Sequence;
 import see.parser.numbers.BigDecimalFactory;
 import see.parser.numbers.NumberFactory;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +66,9 @@ public class ConfigBuilder {
         functions.put(">=", wrap(new Geq()));
         functions.put("<", wrap(new Lt()));
         functions.put("<=", wrap(new Leq()));
+
+        functions.put("min", wrap(new Min<BigDecimal>()));
+        functions.put("max", wrap(new Max<BigDecimal>()));
 
         functions.put("sum", wrap(new Sum()));
         functions.put("minus", wrap(new Minus()));
