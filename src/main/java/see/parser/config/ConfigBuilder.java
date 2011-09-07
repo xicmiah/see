@@ -128,35 +128,19 @@ public class ConfigBuilder {
     }
 
     /**
-     * Cast supplied function to UntypedFunction
+     * Cast supplied function to type
      * @param function function to wrap
-     * @param <Arg> function argument type
-     * @param <Result> function result type
      * @return wrapped function
      */
-    private static <Arg, Result> UntypedFunction wrap(final ContextCurriedFunction<Function<List<Arg>, Result>> function) {
-        return new UntypedFunction() {
-            @Override
-            public String toString() {
-                return function.toString();
-            }
-
-            @Override
-            public Function<List<Object>, Object> apply(final Map<String, Object> context) {
-                return new Function<List<Object>, Object>() {
-                    @Override
-                    public Object apply(List<Object> input) {
-                        return function.apply(context).apply((List<Arg>) input);
-                    }
-                };
-            }
-        };
+    @SuppressWarnings("unchecked")
+    private static <Arg, Result> ContextCurriedFunction<Function<List<Object>, Object>> wrap(final ContextCurriedFunction<Function<List<Arg>, Result>> function) {
+        // Intentional raw type usage
+        return (ContextCurriedFunction) function;
     }
 
-    private static <Arg, Result> UntypedFunction wrap(final Function<List<Arg>, Result> function) {
-        return wrap(new PureFunction<Function<List<Arg>, Result>>(function));
+    @SuppressWarnings("unchecked")
+    private static <Arg, Result> ContextCurriedFunction<Function<List<Object>, Object>> wrap(final Function<List<Arg>, Result> function) {
+        // Intentional raw type usage
+        return new PureFunction(function);
     }
-
-    private static interface UntypedFunction extends ContextCurriedFunction<Function<List<Object>, Object>> {}
-
 }
