@@ -5,7 +5,10 @@ import com.google.common.collect.ImmutableSet;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressSubnodes;
+import org.parboiled.errors.ParsingException;
 import org.parboiled.support.Var;
+import see.functions.ContextCurriedFunction;
+import see.functions.Function;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
@@ -14,6 +17,7 @@ import see.tree.FunctionNode;
 import see.tree.Node;
 import see.tree.VarNode;
 
+import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings({"InfiniteRecursion"})
@@ -205,12 +209,16 @@ public class Expressions extends AbstractGrammar {
 
     /**
      * Construct function node with resolved function
-     * @param function function name
+     * @param name function name
      * @param args argument list
      * @return constructed node
      */
-    FunctionNode<Object, Object> makeFNode(String function, ImmutableList<Node<Object>> args) {
-        return new FunctionNode<Object, Object>(functions.get(function), args);
+    FunctionNode<Object, Object> makeFNode(String name, ImmutableList<Node<Object>> args) {
+        ContextCurriedFunction<Function<List<Object>,Object>> function = functions.get(name);
+        if (function == null) {
+            throw new ParsingException("Function not found: " + name);
+        }
+        return new FunctionNode<Object, Object>(function, args);
     }
 
     /**

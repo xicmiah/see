@@ -44,7 +44,7 @@ public class ExpressionsRecognitionTest {
     public static final String[] strings = {"\"\"", "\"c\"", "\"bk\""};
 
     @DataPoints
-    public static final String[] functions = {"sum(9, 42)", "cos(0)", "win()"};
+    public static final String[] functions = {"sum(9, 42)", "sum(0)", "sum()"};
 
     @DataPoints
     public static final String[] assigns = {"a = 4", "a = b = 42"};
