@@ -30,4 +30,9 @@ public class If<T> implements Function<List<T>, T> {
             throw new IllegalArgumentException("Cannot evaluate condition " + condition);
         }
     }
+
+    @Override
+    public String toString() {
+        return "if";
+    }
 }
