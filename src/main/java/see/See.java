@@ -94,7 +94,8 @@ public class See {
     }
 
     public Object eval(String expression) {
-        return evaluate(parseExpression(expression));
+        Node<Object> tree = parseExpression(expression);
+        return evaluate(tree);
     }
 
     private Node<Object> parse(String expression, Rule rule) {
