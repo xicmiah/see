@@ -40,6 +40,11 @@ public class ArithmeticTest {
     }
 
     @Test
+    public void testDivision() throws Exception {
+        assertEquals(1.0D/3, ((Number) see.eval("1/3")).doubleValue(), 1e-9);
+    }
+
+    @Test
     public void testUnaryPlusMinus() throws Exception {
         assertEquals(valueOf(-9), see.eval("-9"));
         assertEquals(valueOf(9), see.eval("+9"));
