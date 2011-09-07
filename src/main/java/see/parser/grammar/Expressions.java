@@ -276,7 +276,7 @@ public class Expressions extends AbstractGrammar {
      * @return rule
      */
     Rule String() {
-        return Sequence(literals.StringLiteral(), push(new ConstNode<Object>(matchTrim())));
+        return Sequence(literals.StringLiteral(), push(new ConstNode<Object>(stripQuotes(matchTrim()))));
     }
 
     /**
@@ -306,5 +306,15 @@ public class Expressions extends AbstractGrammar {
 
     Number matchNumber() {
         return numberFactory.getNumber(matchTrim());
+    }
+
+    /**
+     * Return input without first and last character.
+     * I.e. "str" -> str
+     * @param input input string
+     * @return truncated input
+     */
+    String stripQuotes(String input) {
+        return input.substring(1, input.length() - 1);
     }
 }
