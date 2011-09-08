@@ -13,6 +13,8 @@ import see.tree.Node;
 import java.util.Locale;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import static see.parser.antlr.TreeBuilderHelper.*;
@@ -22,6 +24,7 @@ import static see.parser.antlr.TreeBuilderHelper.*;
  */
 public class SimpleAntlrExpressionParseTest {
 
+    private static final String UNREGISTERED_FUNCITON_NAME = "someUnregisteredFunction";
     private AntlrExpressionParser<Object> parser;
     private static GrammarConfiguration gc;
 
@@ -81,4 +84,9 @@ public class SimpleAntlrExpressionParseTest {
     }
 
 
+    @Test(expected = RuntimeException.class)
+    public void testNotRegisteredFunctionCall() throws Exception {
+        assertNull(gc.getFunctions().get(UNREGISTERED_FUNCITON_NAME));
+        parser.parse(UNREGISTERED_FUNCITON_NAME+"()");
+    }
 }

@@ -40,6 +40,11 @@ public class ArithmeticTest {
     }
 
     @Test
+    public void testDivision() throws Exception {
+        assertEquals(1.0D/3, ((Number) see.eval("1/3")).doubleValue(), 1e-9);
+    }
+
+    @Test
     public void testUnaryPlusMinus() throws Exception {
         assertEquals(valueOf(-9), see.eval("-9"));
         assertEquals(valueOf(9), see.eval("+9"));
@@ -67,6 +72,12 @@ public class ArithmeticTest {
     public void testLogicalShortCircuit() throws Exception {
         assertEquals(valueOf(0), see.eval("0 && fail()"));
         assertEquals(valueOf(1), see.eval("1 || fail()"));
+    }
+
+    @Test
+    public void testMinMax() throws Exception {
+        assertEquals(nine, see.eval("max(-100500, -9000, 9, 4.2)"));
+        assertEquals(nine, see.eval("min(100500, 9, 42)"));
     }
 
     @Test

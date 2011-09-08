@@ -28,7 +28,10 @@ public class ContextualVisitor implements Visitor {
 		});
 
 		// Note: evaluatedArgs are lazy
-		return node.getFunction().apply(context).apply(evaluatedArgs);
+        Function<List<Arg>, Result> partial = node.getFunction().apply(context);
+        Result result = partial.apply(evaluatedArgs);
+
+        return passThroughNumberFactory(result);
 	}
 
     /**
@@ -44,16 +47,26 @@ public class ContextualVisitor implements Visitor {
     @SuppressWarnings("unchecked")
     public <T> T visit(VarNode<T> node) {
         Object value = context.get(node.getName());
-        
-        if (value instanceof Number) {
-            return (T) numberFactory.getNumber((Number) value);
-        } else {
-            return (T) value;
-        }
+
+        return (T) passThroughNumberFactory(value);
 	}
 
 	@Override
     public <T> T visit(ConstNode<T> node) {
 		return node.getValue();
 	}
+
+    /**
+     * Pass value through number factory if value is number, return it otherwise.
+     * @param value value to pass
+     * @param <T> value type
+     * @return converted value
+     */
+    private <T> T passThroughNumberFactory(T value) {
+        if (value instanceof Number) {
+            return (T) numberFactory.getNumber((Number) value);
+        } else {
+            return value;
+        }
+    }
 }

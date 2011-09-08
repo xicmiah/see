@@ -5,7 +5,10 @@ import com.google.common.collect.ImmutableSet;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressSubnodes;
+import org.parboiled.errors.ParsingException;
 import org.parboiled.support.Var;
+import see.functions.ContextCurriedFunction;
+import see.functions.Function;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
@@ -15,6 +18,7 @@ import see.tree.immutable.ImmutableConstNode;
 import see.tree.immutable.ImmutableFunctionNode;
 import see.tree.immutable.ImmutableVarNode;
 
+import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings({"InfiniteRecursion"})
@@ -41,7 +45,7 @@ public class Expressions extends AbstractGrammar {
     }
 
     public Rule Condition() {
-        return Sequence(Whitespace(), RightExpression(), EOI);
+        return Sequence(Whitespace(), Expression(), EOI);
     }
 
     public Rule Statements() {
@@ -58,9 +62,18 @@ public class Expressions extends AbstractGrammar {
     Rule ExpressionList() {
         NodeListVar statements = new NodeListVar();
         return Sequence(
-                Expression(), statements.append(pop()),
-                ZeroOrMore(";", Optional(Expression(), statements.append(pop()))),
+                Term(), statements.append(pop()),
+                ZeroOrMore(Term(), statements.append(pop())),
                 push(makeSeqNode(statements.get())));
+    }
+
+    /**
+     * A if..then..else or expression ending with semicolon.
+     * Pushes it's value to stack
+     * @return rule
+     */
+    Rule Term() {
+        return FirstOf(Conditional(), Sequence(Expression(), ";"));
     }
 
     /**
@@ -75,7 +88,7 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule Expression() {
-        return FirstOf(AssignExpression(), Conditional(), RightExpression());
+        return FirstOf(AssignExpression(), RightExpression());
     }
 
     Rule AssignExpression() {
@@ -197,12 +210,16 @@ public class Expressions extends AbstractGrammar {
 
     /**
      * Construct function node with resolved function
-     * @param function function name
+     * @param name function name
      * @param args argument list
      * @return constructed node
      */
-    FunctionNode<Object, Object> makeFNode(String function, ImmutableList<Node<Object>> args) {
-        return new ImmutableFunctionNode<Object, Object>(functions.get(function), args);
+    FunctionNode<Object, Object> makeFNode(String name, ImmutableList<Node<Object>> args) {
+        ContextCurriedFunction<Function<List<Object>,Object>> function = functions.get(name);
+        if (function == null) {
+            throw new ParsingException("Function not found: " + name);
+        }
+        return new ImmutableFunctionNode<Object, Object>(function, args);
     }
 
     /**
@@ -268,7 +285,7 @@ public class Expressions extends AbstractGrammar {
      * @return rule
      */
     Rule String() {
-        return Sequence(literals.StringLiteral(), push(new ImmutableConstNode<Object>(matchTrim())));
+        return Sequence(literals.StringLiteral(), push(new ImmutableConstNode<Object>(stripQuotes(matchTrim()))));
     }
 
     /**
@@ -298,5 +315,15 @@ public class Expressions extends AbstractGrammar {
 
     Number matchNumber() {
         return numberFactory.getNumber(matchTrim());
+    }
+
+    /**
+     * Return input without first and last character.
+     * I.e. "str" -> str
+     * @param input input string
+     * @return truncated input
+     */
+    String stripQuotes(String input) {
+        return input.substring(1, input.length() - 1);
     }
 }

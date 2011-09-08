@@ -14,13 +14,11 @@ import static see.parser.ExpressionMatcher.returnExpression;
 @RunWith(Theories.class)
 public class ExpressionsComplexRecognitionTest {
     @DataPoints
-    public static final String[] returns = {"", "c || r; n <= 9; i && n != 42"};
+    public static final String[] returns = {"", "c || r; n <= 9; i && n != 42;"};
+
 
     @DataPoints
-    public static final String[] assigns = {"a = 4", "a = b = 42"};
-
-    @DataPoints
-    public static final String[] conditions = {"if (c != 9) then {1} else {2}", "if (c != 9) then {1}", "if (c!=9) then{} else{}"};
+    public static final String[] conditions = {"if (c != 9) then {1;} else {2;}", "if (c != 9) then {1;}"};
 
     /**
      * Test that all non-empty inputs are valid expression lists
@@ -31,12 +29,6 @@ public class ExpressionsComplexRecognitionTest {
     public void testExpressionRecognition(String expression) throws Exception {
         assumeTrue(!expression.isEmpty());
         assertThat(expression, expressionList());
-    }
-
-    @Theory
-    public void testAdditionalSemicolons(String expression) throws Exception {
-        assumeThat(expression, expressionList());
-        assertThat(expression + ";", expressionList());
     }
 
     @Theory
