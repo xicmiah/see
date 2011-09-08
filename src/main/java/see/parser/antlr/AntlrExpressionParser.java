@@ -7,6 +7,7 @@ import see.exceptions.ParseException;
 import see.parser.Parser;
 import see.parser.antlr.tree.SeeTreeAdaptor;
 import see.parser.antlr.tree.SeeTreeNode;
+import see.parser.config.GrammarConfiguration;
 import see.tree.Node;
 
 /**
@@ -19,28 +20,32 @@ public class AntlrExpressionParser<T> implements Parser<T> {
 
     private SeeTreeAdaptor adaptor;
 
+    private AntlrParserFactory parserFactory;
+    private GrammarConfiguration gc;
+
+    public AntlrExpressionParser(GrammarConfiguration configuration){
+        gc = configuration;
+        adaptor = new SeeTreeAdaptor(configuration.getNumberFactory(), configuration.getFunctions());
+
+    }
+
     @Override
     public Node<T> parse(String input) throws ParseException {
-        ANTLRStringStream stringStream = new ANTLRStringStream(input);
-        SeeAntlrLexer lexer = new SeeAntlrLexer(stringStream);
-        SeeAntlrParser parser = new SeeAntlrParser(new CommonTokenStream(lexer));
-
+        AbstractAntlrGrammarParser parser = parserFactory.getParser(gc, input);
         parser.setTreeAdaptor(adaptor);
 
         return runParser(parser);
     }
 
     @SuppressWarnings({"unchecked"})
-    private SeeTreeNode<T> runParser(SeeAntlrParser parser) {
+    private SeeTreeNode<T> runParser(AbstractAntlrGrammarParser parser) {
         try {
             if (parseMultipleExpressions){
-                SeeAntlrParser.calculationExpression_return parseResult = parser.calculationExpression();
-                return (SeeTreeNode<T>) parseResult.getTree();
+                return parser.multipleExpressions();
             }else{
-                SeeAntlrParser.conditionalExpression_return parserResult = parser.conditionalExpression();
-                return (SeeTreeNode<T>) parserResult.getTree();
+                return parser.singleExpression();
             }
-        } catch (RecognitionException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -49,7 +54,7 @@ public class AntlrExpressionParser<T> implements Parser<T> {
         this.parseMultipleExpressions = parseMultipleExpressions;
     }
 
-    public void setAdaptor(SeeTreeAdaptor adaptor) {
-        this.adaptor = adaptor;
+    public void setParserFactory(AntlrParserFactory parserFactory) {
+        this.parserFactory = parserFactory;
     }
 }

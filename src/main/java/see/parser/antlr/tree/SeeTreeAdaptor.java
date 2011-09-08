@@ -4,8 +4,7 @@ import org.antlr.runtime.ClassicToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.BaseTreeAdaptor;
 import org.antlr.runtime.tree.Tree;
-import see.parser.antlr.SeeAntlrParser;
-import see.parser.antlr.tree.*;
+import see.parser.antlr.StdSeparatorsParser;
 import see.parser.config.FunctionResolver;
 import see.parser.numbers.NumberFactory;
 
@@ -38,22 +37,22 @@ public class SeeTreeAdaptor extends BaseTreeAdaptor {
 
     private Object createNodeForToken(Token token) {
         switch (token.getType()) {
-            case SeeAntlrParser.STRING:
+            case StdSeparatorsParser.STRING:
                 String text = token.getText();
                 return new ConstantTreeNode<String>(token, text.substring(1, text.length()-1));
-            case SeeAntlrParser.NUMBER:
+            case StdSeparatorsParser.NUMBER:
                 return new ConstantTreeNode<Number>(token, numberFactory.getNumber(token.getText()));
-            case SeeAntlrParser.VARIABLE:
+            case StdSeparatorsParser.VARIABLE:
                 return new VarTreeNode(token);
-            case SeeAntlrParser.UNAR:
+            case StdSeparatorsParser.UNAR:
                 return new OperatorNode<Object, Object>(token, functions.get(getUnarFunctionName(token.getText())));
-            case SeeAntlrParser.ASSIGN:
-            case SeeAntlrParser.OPERATOR:
-            case SeeAntlrParser.IF_ST:
+            case StdSeparatorsParser.ASSIGN:
+            case StdSeparatorsParser.OPERATOR:
+            case StdSeparatorsParser.IF_ST:
                 return new OperatorNode<Object, Object>(token, functions.get(token.getText()));
-            case SeeAntlrParser.FUNCTION_CALL:
+            case StdSeparatorsParser.FUNCTION_CALL:
                 return new SimpleFunctionNode<Object, Object>(token, functions.get(token.getText()));
-            case SeeAntlrParser.BLOCK:
+            case StdSeparatorsParser.BLOCK:
                 return new OperatorNode<Object, Object>(token, functions.get("seq"));
             default:
                 //todo think about using single dummy node instead of creating them

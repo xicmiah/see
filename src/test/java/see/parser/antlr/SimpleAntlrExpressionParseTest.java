@@ -23,20 +23,17 @@ public class SimpleAntlrExpressionParseTest {
 
     private AntlrExpressionParser<Object> parser;
     private static GrammarConfiguration gc;
-    private static SeeTreeAdaptor adaptor;
 
     @BeforeClass
     public static void setUpClass() {
-        gc = ConfigBuilder.defaultConfig().setNumberFactory(new LocalizedBigDecimalFactory(Locale.getDefault())).build();
-        adaptor = new SeeTreeAdaptor(gc.getNumberFactory(), gc.getFunctions());
+        gc = ConfigBuilder.defaultConfig().build();
     }
 
     @Before
     public void setUp() throws Exception {
-        parser = new AntlrExpressionParser<Object>();
+        parser = new AntlrExpressionParser<Object>(gc);
         parser.setParseMultipleExpressions(false);
-
-        parser.setAdaptor(adaptor);
+        parser.setParserFactory(new AntlrParserFactoryImpl());
     }
 
     @Test
@@ -50,8 +47,8 @@ public class SimpleAntlrExpressionParseTest {
         Node<Object> node = parser.parse("40");
         assertThat(num("40"), is(node));
 
-        node = parser.parse("40,45");
-        assertThat(num("40,45"), is(node));
+        node = parser.parse("40.45");
+        assertThat(num("40.45"), is(node));
 
         assertThat(str("test string for test"), is(parser.parse("\"test string for test\"")));
     }
@@ -77,9 +74,9 @@ public class SimpleAntlrExpressionParseTest {
 
     @Test
     public void testFunctionCall() throws Exception {
-        assertThat(fun("sum", var("a"), var("b")), is(parser.parse("sum(a;b)")));
-        assertThat(fun("trace", var("a"), var("b"), num("5"), str("hello")), is(parser.parse("trace(a;b;5;\"hello\")")));
-        assertThat(fun("sum", op("+", var("a"), var("c")), op("-", var("b"), var("a"))), is(parser.parse("sum(a + c;b - a)")));
+        assertThat(fun("sum", var("a"), var("b")), is(parser.parse("sum(a,b)")));
+        assertThat(fun("trace", var("a"), var("b"), num("5"), str("hello")), is(parser.parse("trace(a,b,5,\"hello\")")));
+        assertThat(fun("sum", op("+", var("a"), var("c")), op("-", var("b"), var("a"))), is(parser.parse("sum(a + c,b - a)")));
     }
 
     public SimpleFunctionNode<Object, Object> fun(String functionName, SeeTreeNode<Object>... args){
