@@ -20,7 +20,7 @@ public class ExpressionsComplexRecognitionTest {
     public static final String[] assigns = {"a = 4", "a = b = 42"};
 
     @DataPoints
-    public static final String[] conditions = {"if (c != 9) then {1} else {2}", "if (c != 9) then {1}"};
+    public static final String[] conditions = {"if (c != 9) then {1} else {2}", "if (c != 9) then {1}", "if (c!=9) then{} else{}"};
 
     /**
      * Test that all non-empty inputs are valid expression lists

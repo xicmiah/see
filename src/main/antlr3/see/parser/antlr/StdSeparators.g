@@ -23,11 +23,11 @@ package see.parser.antlr;
 @parser::members{
 
     public <T> SeeTreeNode<T> singleExpression() throws Exception {
-        return (SeeTreeNode<T>) calculationExpression().getTree();
+        return (SeeTreeNode<T>) conditionalExpression().getTree();
     }
 
     public <T> SeeTreeNode<T> multipleExpressions() throws Exception {
-        return (SeeTreeNode<T>) conditionalExpression().getTree();
+        return (SeeTreeNode<T>) calculationExpression().getTree();
     }
 
 }
