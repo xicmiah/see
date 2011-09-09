@@ -1,5 +1,6 @@
 package see.functions.arithmetic;
 
+import com.google.common.base.Supplier;
 import see.functions.Function;
 
 import java.math.BigDecimal;
@@ -8,15 +9,29 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * Divide function for BigDecimals.
+ */
 public class Divide implements Function<List<BigDecimal>, BigDecimal> {
+
+    private final Supplier<MathContext> mathContext;
+
+    /**
+     * Construct instance from by-name math context.
+     * @param mathContext math context instance, passed by-name
+     */
+    public Divide(Supplier<MathContext> mathContext) {
+        this.mathContext = mathContext;
+    }
+
     @Override
     public BigDecimal apply(List<BigDecimal> input) {
         checkArgument(input.size() == 2, "Divide takes only two arguments");
 
         BigDecimal decimal = input.get(0);
         BigDecimal divisor = input.get(1);
-        // TODO: Unhardcode math context
-        return decimal.divide(divisor, MathContext.DECIMAL64);
+        
+        return decimal.divide(divisor, mathContext.get());
     }
     @Override
     public String toString() {

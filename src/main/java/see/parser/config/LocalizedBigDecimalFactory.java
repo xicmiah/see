@@ -3,6 +3,7 @@ package see.parser.config;
 import see.parser.numbers.BigDecimalFactory;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Locale;
@@ -11,6 +12,11 @@ public class LocalizedBigDecimalFactory extends BigDecimalFactory {
     private final Locale locale;
 
     public LocalizedBigDecimalFactory(Locale locale) {
+        this.locale = locale;
+    }
+
+    public LocalizedBigDecimalFactory(MathContext mathContext, Locale locale) {
+        super(mathContext);
         this.locale = locale;
     }
 

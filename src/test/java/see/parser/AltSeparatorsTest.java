@@ -7,9 +7,10 @@ import see.See;
 import see.parser.config.ConfigBuilder;
 import see.parser.config.LocalizedBigDecimalFactory;
 
-import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Locale;
 
+import static java.math.BigDecimal.valueOf;
 import static org.junit.Assert.assertEquals;
 
 public class AltSeparatorsTest {
@@ -19,7 +20,7 @@ public class AltSeparatorsTest {
     @Before
     public void setUp() throws Exception {
         Locale locale = new Locale("ru", "RU");
-        LocalizedBigDecimalFactory numberFactory = new LocalizedBigDecimalFactory(locale);
+        LocalizedBigDecimalFactory numberFactory = new LocalizedBigDecimalFactory(MathContext.DECIMAL32, locale);
         see = new See(ConfigBuilder.defaultConfig().setNumberFactory(numberFactory).build());
     }
 
@@ -29,16 +30,21 @@ public class AltSeparatorsTest {
 
     @Test
     public void testBigDecimals() throws Exception {
-        assertEquals(BigDecimal.valueOf(1.5), eval("1,5"));
+        assertEquals(valueOf(1.5), eval("1,5"));
     }
 
     @Test
     public void testExpressionParsing() throws Exception {
-        assertEquals(BigDecimal.valueOf(42.0), eval("31,7 + 10,3"));
+        assertEquals(valueOf(42.0), eval("31,7 + 10,3"));
+    }
+
+    @Test
+    public void testMathContextInjection() throws Exception {
+        assertEquals(valueOf(1).divide(valueOf(3), MathContext.DECIMAL32), eval("1/3"));
     }
 
     @Test
     public void testFunctionParameters() throws Exception {
-        assertEquals(BigDecimal.valueOf(42.0), eval("sum(31,7;10,3)"));
+        assertEquals(valueOf(42.0), eval("sum(31,7;10,3)"));
     }
 }

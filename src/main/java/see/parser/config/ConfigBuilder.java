@@ -1,5 +1,6 @@
 package see.parser.config;
 
+import com.google.common.base.Supplier;
 import see.functions.ContextCurriedFunction;
 import see.functions.Function;
 import see.functions.PureFunction;
@@ -16,6 +17,7 @@ import see.parser.numbers.BigDecimalFactory;
 import see.parser.numbers.NumberFactory;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,49 +36,49 @@ public class ConfigBuilder {
     }
 
     public static ConfigBuilder defaultConfig() {
-        Map<String, String> aliases = new HashMap<String, String>();
-        aliases.put(";", "seq");
-        aliases.put("=", "assign");
+        final ConfigBuilder builder = ConfigBuilder.emptyConfig();
+        builder.setNumberFactory(new BigDecimalFactory());
 
-        aliases.put("!", "not");
-        aliases.put("&&", "and");
-        aliases.put("||", "or");
+        builder.addAlias(";", "seq");
+        builder.addAlias("=", "assign");
 
-        aliases.put("+", "sum");
-        aliases.put("-", "minus");
-        aliases.put("*", "product");
-        aliases.put("/", "divide");
-        aliases.put("^", "pow");
+        builder.addAlias("!", "not");
+        builder.addAlias("&&", "and");
+        builder.addAlias("||", "or");
+        
+        builder.addAlias("+", "sum");
+        builder.addAlias("-", "minus");
+        builder.addAlias("*", "product");
+        builder.addAlias("/", "divide");
+        builder.addAlias("^", "pow");
 
-        Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions =
-                new HashMap<String, ContextCurriedFunction<Function<List<Object>, Object>>>();
+        builder.addFunction("seq", wrap(new Sequence<Object>()));
+        builder.addFunction("assign", wrap(new Assign<Object>()));
+        builder.addFunction("isDefined", (new IsDefined()));
+        builder.addPureFunction("if", (new If<Object>()));
+        builder.addPureFunction("not", (new Not()));
+        builder.addPureFunction("and", (new And()));
+        builder.addPureFunction("or", (new Or()));
+        builder.addPureFunction("==", (new Eq()));
+        builder.addPureFunction("!=", (new Neq()));
+        builder.addPureFunction(">", (new Gt()));
+        builder.addPureFunction(">=", (new Geq()));
+        builder.addPureFunction("<", (new Lt()));
+        builder.addPureFunction("<=", (new Leq()));
+        builder.addPureFunction("min", (new Min<BigDecimal>()));
+        builder.addPureFunction("max", (new Max<BigDecimal>()));
+        builder.addPureFunction("sum", (new Sum()));
+        builder.addPureFunction("minus", (new Minus()));
+        builder.addPureFunction("product", (new Product()));
+        builder.addPureFunction("divide", (new Divide(new Supplier<MathContext>() {
+            @Override
+            public MathContext get() {
+                return ((BigDecimalFactory) builder.numberFactory).getMathContext();
+            }
+        }))); // Math context is passed by-name, will adapt to setNumberFactory() calls on builder
+        builder.addPureFunction("pow", (new Power()));
 
-        functions.put("seq", wrap(new Sequence<Object>()));
-        functions.put("assign", wrap(new Assign<Object>()));
-        functions.put("if", wrap(new If<Object>()));
-        functions.put("isDefined", wrap(new IsDefined()));
-
-        functions.put("not", wrap(new Not()));
-        functions.put("and", wrap(new And()));
-        functions.put("or", wrap(new Or()));
-
-        functions.put("==", wrap(new Eq()));
-        functions.put("!=", wrap(new Neq()));
-        functions.put(">", wrap(new Gt()));
-        functions.put(">=", wrap(new Geq()));
-        functions.put("<", wrap(new Lt()));
-        functions.put("<=", wrap(new Leq()));
-
-        functions.put("min", wrap(new Min<BigDecimal>()));
-        functions.put("max", wrap(new Max<BigDecimal>()));
-
-        functions.put("sum", wrap(new Sum()));
-        functions.put("minus", wrap(new Minus()));
-        functions.put("product", wrap(new Product()));
-        functions.put("divide", wrap(new Divide()));
-        functions.put("pow", wrap(new Power()));
-
-        return new ConfigBuilder(aliases, functions, new BigDecimalFactory());
+        return builder;
     }
 
     public static ConfigBuilder emptyConfig() {
