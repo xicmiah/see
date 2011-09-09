@@ -4,7 +4,6 @@ import org.antlr.runtime.Parser;
 import org.antlr.runtime.RecognizerSharedState;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.TreeAdaptor;
-import see.parser.antlr.tree.SeeTreeNode;
 import see.tree.Node;
 
 /**

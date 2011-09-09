@@ -8,7 +8,6 @@ options {
 @parser::header{
 package see.parser.antlr;
 
-import see.parser.antlr.tree.SeeTreeNode;
 import see.tree.Node;
 import java.util.List;
 import java.util.LinkedList;
