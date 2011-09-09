@@ -84,9 +84,7 @@ public class SeeTreeAdaptor extends BaseTreeAdaptor {
         if ("!".equals(text)) {
             return "not";
         } else if ("-".equals(text)) {
-            return "uminus";
-        } else if ("+".equals(text)) {
-            return "uplus";
+            return "minus";
         } else {
             throw new RuntimeException("unknown unar function " + text);
         }

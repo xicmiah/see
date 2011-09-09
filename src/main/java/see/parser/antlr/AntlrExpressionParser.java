@@ -38,7 +38,7 @@ public class AntlrExpressionParser<T> implements Parser<T> {
     }
 
     @SuppressWarnings({"unchecked"})
-    private SeeTreeNode<T> runParser(AbstractAntlrGrammarParser parser) {
+    private Node<T> runParser(AbstractAntlrGrammarParser parser) {
         try {
             if (parseMultipleExpressions){
                 return parser.multipleExpressions();

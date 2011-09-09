@@ -21,11 +21,11 @@ public abstract class AbstractAntlrGrammarParser extends Parser {
         super(input, state);
     }
 
-    public <T> SeeTreeNode<T> singleExpression() throws Exception{
+    public <T> Node<T> singleExpression() throws Exception{
         throw new UnsupportedOperationException();
     }
 
-    public <T> SeeTreeNode<T> multipleExpressions() throws Exception{
+    public <T> Node<T> multipleExpressions() throws Exception{
         throw new UnsupportedOperationException();
     }
 
