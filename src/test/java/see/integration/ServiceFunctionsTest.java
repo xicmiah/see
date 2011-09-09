@@ -2,7 +2,6 @@ package see.integration;
 
 import org.junit.Test;
 import see.See;
-import see.exceptions.EvaluationException;
 import see.tree.Node;
 
 import java.math.BigDecimal;
@@ -48,14 +47,22 @@ public class ServiceFunctionsTest {
     }
 
     @Test
+    public void testIncompleteIf() throws Exception {
+        assertNull(eval("if (1) then {} else {9;}"));
+        assertNull(eval("if (0) then {9;} else {}"));
+        assertNull(eval("if (1) then {} else {}"));
+        assertNull(eval("if (0) then {} else {}"));
+    }
+
+    @Test
     public void testSequence() throws Exception {
         assertEquals(valueOf(9), eval("seq(9);"));
         assertEquals(valueOf(9), eval("seq(42, 9);"));
         assertEquals(valueOf(9), eval("42;9;"));
     }
 
-    @Test(expected = EvaluationException.class)
+    @Test
     public void testEmptySequence() throws Exception {
-        eval("seq();");
+        assertNull(eval("seq();"));
     }
 }

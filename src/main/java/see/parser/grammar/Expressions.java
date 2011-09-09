@@ -53,17 +53,23 @@ public class Expressions extends AbstractGrammar {
 
     Rule ReturnExpression() {
         NodeListVar statements = new NodeListVar();
-        return Sequence(Optional(ExpressionList(), statements.append(pop())),
+        return Sequence(
+                ExpressionList(), statements.append(pop()),
                 "return", RightExpression(), Optional(";"), statements.append(pop()),
-                push(makeSeqNode(statements.get())));
+                push(makeSeqNode(statements.get()))
+        );
     }
 
+    /**
+     * List of zero or more terms. Pushes one node.
+     * @return rule
+     */
     Rule ExpressionList() {
         NodeListVar statements = new NodeListVar();
         return Sequence(
-                Term(), statements.append(pop()),
                 ZeroOrMore(Term(), statements.append(pop())),
-                push(makeSeqNode(statements.get())));
+                push(makeSeqNode(statements.get()))
+        );
     }
 
     /**
@@ -78,12 +84,13 @@ public class Expressions extends AbstractGrammar {
     /**
      * Wraps list of expressions in FunctionNode with Sequence function
      * Short-circuits if list has only one element.
+     * Returns seq node with empty arguments if expressions are empty.
      * Expects sequence function to map to operator ';'
      * @param statements list of expressions to wrap
      * @return constructed node
      */
     Node<Object> makeSeqNode(ImmutableList<Node<Object>> statements) {
-        return statements.size() > 1 ? makeFNode(";", statements): statements.get(0);
+        return statements.size() == 1 ? statements.get(0) : makeFNode(";", statements);
     }
 
     Rule Expression() {
@@ -103,23 +110,13 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule Conditional() {
-        return FirstOf(
-                Sequence(IfThenClause(), ElseClause(),
-                        swap3() && push(makeFNode("if", ImmutableList.of(pop(), pop(), pop())))),
-                Sequence(IfThenClause(),
-                        swap() && push(makeFNode("if", ImmutableList.of(pop(), pop()))))
-        );
-    }
-
-    Rule IfThenClause() {
+        NodeListVar args = new NodeListVar();
         return Sequence(
-                "if", "(", RightExpression(), ")",
-                "then", "{", ExpressionList(), "}"
+                "if", "(", RightExpression(), args.append(pop()), ")",
+                "then", "{", ExpressionList(), args.append(pop()), "}",
+                Optional("else", "{", ExpressionList(), args.append(pop()), "}"),
+                push(makeFNode("if", args.get()))
         );
-    }
-
-    Rule ElseClause() {
-        return Sequence("else", "{", ExpressionList(), "}");
     }
 
     Rule RightExpression() {

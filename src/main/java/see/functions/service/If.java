@@ -10,7 +10,7 @@ import static see.functions.bool.BooleanCastHelper.toBoolean;
 public class If<T> implements Function<List<T>, T> {
     @Override
     public T apply(List<T> args) {
-        checkArgument(args.size() == 2 || args.size() == 3, "If takes two or three arguments");
+        checkArgument(args.size() >= 1 || args.size() <= 3, "If takes one, two or three arguments");
 
         T condition = args.get(0);
 

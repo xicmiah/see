@@ -5,19 +5,15 @@ import see.functions.Function;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 /**
- * Eagerly evaluate all elements in list and return last value
+ * Eagerly evaluate all elements in list and return last value, or null if list is empty.
  * @param <T>
  */
 public class Sequence<T> implements Function<List<T>, T> {
 	@Override
 	public T apply(List<T> input) {
-		checkArgument(!input.isEmpty(), "Cannot evaluate empty list");
-
 		Iterator<T> iterator = input.iterator();
-		T lastValue = iterator.next();
+		T lastValue = null;
 
 		while (iterator.hasNext()) {
 			lastValue = iterator.next();

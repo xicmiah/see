@@ -10,18 +10,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class SequenceTest {
 	Sequence<Integer> sequence = new Sequence<Integer>();
 
 	/**
-	 * Sequence should throw IllegalArgumentException on empty list
+	 * Sequence should return null on empty list
 	 * @throws Exception
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testEmptyArgs() throws Exception {
-		sequence.apply(ImmutableList.<Integer>of());
-	}
+        assertNull(sequence.apply(ImmutableList.<Integer>of()));
+    }
 
 	/**
 	 * Sequence should return last value from passed list
