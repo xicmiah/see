@@ -65,7 +65,7 @@ public class ManualNodeBuilderSequentialExpressionParseTest {
 
     @Test
     public void testEmptyIfStatement() throws Exception {
-        Node<Object> emptyIf = op(gc, "if", num(gc, "1.009"));
+        Node<Object> emptyIf = op(gc, "if", num(gc, "1.009"), seq(gc), seq(gc));
         assumeThat(parser.parse("if (1.009) then {} else {}"), is(emptyIf));
     }
 
@@ -82,7 +82,8 @@ public class ManualNodeBuilderSequentialExpressionParseTest {
                                 )
                         ),
                         var("a")
-                )
+                ),
+                seq(gc)
         );
         assumeThat(parser.parse("if (1) then {a = sum(1,var); a;}"), is(ifNodeWithoutElse));
     }

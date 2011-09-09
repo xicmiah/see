@@ -12,10 +12,7 @@ import see.tree.immutable.ImmutableConstNode;
 import see.tree.immutable.ImmutableFunctionNode;
 import see.tree.immutable.ImmutableVarNode;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author pavlov
@@ -78,22 +75,19 @@ public class NodesFactoryImpl implements SeeNodesFactory{
     public FunctionNode<Object, Object> createIfNode(Token ifToken, Node<Object> condition, Node<Object> thenNode, Node<Object> elseNode) {
         ContextCurriedFunction<Function<List<Object>, Object>> func = getFunctionOrThrow(ifToken);
 
-        List<Node<Object>> ifArgs = new ArrayList<Node<Object>>(3);
-        ifArgs.add(0,condition);
-        if (thenNode != null){
-            ifArgs.add(1, thenNode);
-        }
-        if (elseNode != null){
-            ifArgs.add(2, elseNode);
-        }
-
-        return new ImmutableFunctionNode<Object, Object>(func, ifArgs);
+        return new ImmutableFunctionNode<Object, Object>(func, Arrays.asList(condition, thenNode, elseNode));
     }
 
     @Override
     public FunctionNode<Object, Object> createSequence(List<Node<Object>> nodes) {
         ContextCurriedFunction<Function<List<Object>, Object>> func = getFunctionOrThrow("seq");
-        return new ImmutableFunctionNode<Object, Object>(func, nodes);
+
+        if (nodes == null){
+            return new ImmutableFunctionNode<Object, Object>(func);
+        }else {
+            return new ImmutableFunctionNode<Object, Object>(func, nodes);
+        }
+
     }
 
     @Override

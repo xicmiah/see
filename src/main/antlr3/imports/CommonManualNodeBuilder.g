@@ -67,14 +67,8 @@ common_statement returns [Node node]
 		th=THEN LEFT_BRACE thexpr=script? RIGHT_BRACE
 		( el=ELSE LEFT_BRACE elexpr=script? RIGHT_BRACE {} )?
 		{
-		    Node<Object> thenNode = null;
-		    if ($thexpr.exprList != null && !$thexpr.exprList.isEmpty()){
-		        thenNode = nodesFactory.createSequence($thexpr.exprList);
-		    }
-		    Node<Object> elseNode = null;
-		    if ( $elexpr.exprList != null && !$elexpr.exprList.isEmpty()){
-		        elseNode = nodesFactory.createSequence($elexpr.exprList);
-		    }
+		    Node<Object> thenNode = nodesFactory.createSequence($thexpr.exprList);
+		    Node<Object> elseNode = nodesFactory.createSequence($elexpr.exprList);
 		    $node = nodesFactory.createIfNode($ifSt, $cond.node, thenNode, elseNode);
 		}
 	;
