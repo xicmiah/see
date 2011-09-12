@@ -3,16 +3,21 @@ package see.exceptions;
 import org.parboiled.errors.ParseError;
 import org.parboiled.support.ParsingResult;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * An exception which happened during expression parsing
  */
 public class ParseException extends SeeException {
-    private final List<ParseError> errors;
+    private final List<ParseErrorDescription> errors;
 
-    public ParseException(ParsingResult<?> result) {
-        errors = result.parseErrors;
+    public ParseException(ParseErrorDescription error) {
+        errors = Collections.singletonList(error);
+    }
+
+    public ParseException(List<ParseErrorDescription> errors) {
+        this.errors = errors;
     }
 
     @Override
