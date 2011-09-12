@@ -40,6 +40,12 @@ public class ArithmeticTest {
     }
 
     @Test
+    public void testPower() throws Exception {
+        assertEquals(nine, see.eval("3^2"));
+        assertEquals(9, ((Number) see.eval("81^0.5")).intValue());
+    }
+
+    @Test
     public void testDivision() throws Exception {
         assertEquals(1.0D/3, ((Number) see.eval("1/3")).doubleValue(), 1e-9);
     }
