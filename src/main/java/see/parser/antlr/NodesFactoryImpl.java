@@ -1,6 +1,7 @@
 package see.parser.antlr;
 
 import org.antlr.runtime.Token;
+import see.exceptions.FunctionNotFoundException;
 import see.functions.ContextCurriedFunction;
 import see.functions.Function;
 import see.parser.config.GrammarConfiguration;
@@ -13,6 +14,8 @@ import see.tree.immutable.ImmutableFunctionNode;
 import see.tree.immutable.ImmutableVarNode;
 
 import java.util.*;
+
+import static see.parser.antlr.ExceptionConverter.extractTokenPosition;
 
 /**
  * @author pavlov
@@ -54,15 +57,15 @@ public class NodesFactoryImpl implements SeeNodesFactory{
     }
 
     private ContextCurriedFunction<Function<List<Object>, Object>> getFunctionOrThrow(Token functionName) {
-        return getFunctionOrThrow(functionName.getText());
+        final ContextCurriedFunction<Function<List<Object>, Object>> function = getFunction(functionName.getText());
+        if (function == null){
+            throw new FunctionNotFoundException(functionName.getText(), extractTokenPosition(functionName));
+        }
+        return function;
     }
 
-    private ContextCurriedFunction<Function<List<Object>,Object>> getFunctionOrThrow(String functionName){
-        ContextCurriedFunction<Function<List<Object>, Object>> func = gc.getFunctions().get(functionName);
-        if (func == null){
-            throw new RuntimeException("Function not found: "+functionName);
-        }
-        return func;
+    private ContextCurriedFunction<Function<List<Object>,Object>> getFunction(String functionName){
+        return gc.getFunctions().get(functionName);
     }
 
     @Override
@@ -80,7 +83,7 @@ public class NodesFactoryImpl implements SeeNodesFactory{
 
     @Override
     public FunctionNode<Object, Object> createSequence(List<Node<Object>> nodes) {
-        ContextCurriedFunction<Function<List<Object>, Object>> func = getFunctionOrThrow("seq");
+        ContextCurriedFunction<Function<List<Object>, Object>> func = getFunction("seq");
 
         if (nodes == null){
             return new ImmutableFunctionNode<Object, Object>(func);

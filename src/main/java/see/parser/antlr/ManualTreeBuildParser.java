@@ -3,6 +3,7 @@ package see.parser.antlr;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.Lexer;
+import org.antlr.runtime.RecognitionException;
 import see.exceptions.ParseException;
 import see.parser.Parser;
 import see.parser.config.GrammarConfiguration;
@@ -57,7 +58,7 @@ public class ManualTreeBuildParser<T> implements Parser<T> {
             } else {
                 return (Node<T>) parser.singleExpression();
             }
-        } catch (Exception ex) {
+        } catch (RecognitionException ex) {
             throw new RuntimeException(ex);
         }
     }

@@ -10,6 +10,7 @@ import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 import see.exceptions.ParseErrorDescription;
 import see.exceptions.ParseException;
+import see.exceptions.TokenPosition;
 import see.tree.Node;
 
 import java.util.List;
@@ -40,9 +41,11 @@ public class BasicParser<T> implements Parser<T> {
             public ParseErrorDescription apply(ParseError parseError) {
                 InputBuffer buffer = parseError.getInputBuffer();
                 String token  = buffer.extract(parseError.getStartIndex(), parseError.getEndIndex());
+
                 return new ParseErrorDescription(
-                        parseError.getStartIndex(), parseError.getEndIndex(),
-                        token, parseError.getErrorMessage()
+                        new TokenPosition(parseError.getStartIndex(), parseError.getEndIndex()),
+                        token,
+                        parseError.getErrorMessage()
                 );
             }
         });

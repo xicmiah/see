@@ -16,8 +16,30 @@ public class ParseException extends SeeException {
         errors = Collections.singletonList(error);
     }
 
+    public ParseException(ParseErrorDescription error, Throwable cause) {
+        super(cause);
+        this.errors = Collections.singletonList(error);
+    }
+
     public ParseException(List<ParseErrorDescription> errors) {
         this.errors = errors;
+    }
+
+    public ParseException(List<ParseErrorDescription> errors, Throwable cause) {
+        super(cause);
+        this.errors = errors;
+    }
+
+    public ParseErrorDescription getFirstError(){
+        if (errors != null && errors.size() > 0){
+            return errors.get(0);
+        }else{
+            return null;
+        }
+    }
+
+    public List<ParseErrorDescription> getErrors() {
+        return errors;
     }
 
     @Override

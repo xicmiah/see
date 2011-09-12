@@ -1,6 +1,7 @@
 package see.parser.antlr;
 
 import org.antlr.runtime.Parser;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.RecognizerSharedState;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.TreeAdaptor;
@@ -20,11 +21,11 @@ public abstract class AbstractAntlrGrammarParser extends Parser {
         super(input, state);
     }
 
-    public <T> Node<T> singleExpression() throws Exception{
+    public <T> Node<T> singleExpression() throws RecognitionException{
         throw new UnsupportedOperationException();
     }
 
-    public <T> Node<T> multipleExpressions() throws Exception{
+    public <T> Node<T> multipleExpressions() throws RecognitionException{
         throw new UnsupportedOperationException();
     }
 
