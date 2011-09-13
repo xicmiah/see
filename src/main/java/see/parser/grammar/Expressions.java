@@ -12,10 +12,11 @@ import see.functions.Function;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
-import see.tree.ConstNode;
 import see.tree.FunctionNode;
 import see.tree.Node;
-import see.tree.VarNode;
+import see.tree.immutable.ImmutableConstNode;
+import see.tree.immutable.ImmutableFunctionNode;
+import see.tree.immutable.ImmutableVarNode;
 
 import java.util.List;
 import java.util.Set;
@@ -106,7 +107,7 @@ public class Expressions extends AbstractGrammar {
      * @return rule
      */
     Rule VarName() {
-        return Sequence(Variable(), drop() && push(new ConstNode<Object>(matchTrim())));
+        return Sequence(Variable(), drop() && push(new ImmutableConstNode<Object>(matchTrim())));
     }
 
     Rule Conditional() {
@@ -215,11 +216,11 @@ public class Expressions extends AbstractGrammar {
         if (function == null) {
             throw new ParsingException("Function not found: " + name);
         }
-        return new FunctionNode<Object, Object>(function, args);
+        return new ImmutableFunctionNode<Object, Object>(function, args);
     }
 
     /**
-     * Constant. Pushes ConstNode(value)
+     * Constant. Pushes ImmutableConstNode(value)
      * @return rule
      */
     @SuppressSubnodes
@@ -273,7 +274,7 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule Variable() {
-        return Sequence(Identifier(), push(new VarNode<Object>(matchTrim())));
+        return Sequence(Identifier(), push(new ImmutableVarNode<Object>(matchTrim())));
     }
 
     /**
@@ -281,7 +282,7 @@ public class Expressions extends AbstractGrammar {
      * @return rule
      */
     Rule String() {
-        return Sequence(literals.StringLiteral(), push(new ConstNode<Object>(stripQuotes(matchTrim()))));
+        return Sequence(literals.StringLiteral(), push(new ImmutableConstNode<Object>(stripQuotes(matchTrim()))));
     }
 
     /**
@@ -289,7 +290,7 @@ public class Expressions extends AbstractGrammar {
      * @return rule
      */
     Rule Float() {
-        return Sequence(literals.FloatLiteral(), push(new ConstNode<Object>(matchNumber())));
+        return Sequence(literals.FloatLiteral(), push(new ImmutableConstNode<Object>(matchNumber())));
     }
 
     /**
@@ -297,7 +298,7 @@ public class Expressions extends AbstractGrammar {
      * @return constructed rule
      */
     Rule Int() {
-        return Sequence(literals.IntLiteral(), push(new ConstNode<Object>(matchNumber())));
+        return Sequence(literals.IntLiteral(), push(new ImmutableConstNode<Object>(matchNumber())));
     }
 
     @SuppressSubnodes

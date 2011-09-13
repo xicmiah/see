@@ -9,6 +9,7 @@ import see.functions.VarArgFunction;
 import see.parser.numbers.BigDecimalFactory;
 import see.tree.FunctionNode;
 import see.tree.Node;
+import see.tree.immutable.ImmutableFunctionNode;
 
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class SimpleEvaluatorTest {
      */
     @Test(expected = EvaluationException.class)
     public void testExceptionTranslationForRuntime() throws Exception {
-        Node<Object> tree = new FunctionNode<Object, Object>(new PureFunction<Function<List<Object>, Object>>(fail));
+        Node<Object> tree = new ImmutableFunctionNode<Object, Object>(new PureFunction<Function<List<Object>, Object>>(fail));
 
         evaluator.evaluate(tree, ImmutableMap.<String, Object>of());
     }
@@ -48,7 +49,7 @@ public class SimpleEvaluatorTest {
     @Test(expected = EpicFailException.class)
     public void testExceptionTranslation() throws Exception {
         PureFunction<Function<List<Object>, Object>> pureFail = new PureFunction<Function<List<Object>, Object>>(epicFail);
-        Node<Object> tree = new FunctionNode<Object, Object>(pureFail);
+        Node<Object> tree = new ImmutableFunctionNode<Object, Object>(pureFail);
 
         evaluator.evaluate(tree, ImmutableMap.<String, Object>of());
     }

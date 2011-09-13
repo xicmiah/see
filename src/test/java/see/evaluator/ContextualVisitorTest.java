@@ -9,9 +9,10 @@ import see.functions.Function;
 import see.functions.PureFunction;
 import see.parser.numbers.IntegerFactory;
 import see.tree.ConstNode;
-import see.tree.FunctionNode;
 import see.tree.Node;
-import see.tree.VarNode;
+import see.tree.immutable.ImmutableConstNode;
+import see.tree.immutable.ImmutableFunctionNode;
+import see.tree.immutable.ImmutableVarNode;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,8 +61,8 @@ public class ContextualVisitorTest {
 
     @Test
     public void testEvaluation() throws Exception {
-        List<Node<Integer>> arguments = ImmutableList.<Node<Integer>>of(new ConstNode<Integer>(1), new ConstNode<Integer>(2));
-        Node<Integer> tree = new FunctionNode<Integer, Integer>(plus, arguments);
+        List<Node<Integer>> arguments = ImmutableList.<Node<Integer>>of(new ImmutableConstNode<Integer>(1), new ImmutableConstNode<Integer>(2));
+        Node<Integer> tree = new ImmutableFunctionNode<Integer, Integer>(plus, arguments);
 
         int result = evaluator.evaluate(tree, new HashMap<String, Object>());
 
@@ -70,13 +71,13 @@ public class ContextualVisitorTest {
 
     @Test
     public void testLazy() throws Exception {
-        Node<Integer> failNode = new FunctionNode<Integer, Integer>(fail);
+        Node<Integer> failNode = new ImmutableFunctionNode<Integer, Integer>(fail);
         ImmutableList<Node<Integer>> conditionArgs = ImmutableList.of(
-                new ConstNode<Integer>(1),
-                new ConstNode<Integer>(42),
+                new ImmutableConstNode<Integer>(1),
+                new ImmutableConstNode<Integer>(42),
                 failNode
         );
-        Node<Integer> tree = new FunctionNode<Integer, Integer>(cond, conditionArgs);
+        Node<Integer> tree = new ImmutableFunctionNode<Integer, Integer>(cond, conditionArgs);
 
         int result = evaluator.evaluate(tree, Collections.<String, Object>emptyMap());
         assertEquals(42, result);
@@ -84,8 +85,8 @@ public class ContextualVisitorTest {
 
     @Test
     public void testVariables() throws Exception {
-        List<Node<Integer>> plusArgs = ImmutableList.of(new VarNode<Integer>("a"), new ConstNode<Integer>(5));
-        Node<Integer> tree = new FunctionNode<Integer, Integer>(plus, plusArgs);
+        List<Node<Integer>> plusArgs = ImmutableList.of(new ImmutableVarNode<Integer>("a"), new ImmutableConstNode<Integer>(5));
+        Node<Integer> tree = new ImmutableFunctionNode<Integer, Integer>(plus, plusArgs);
 
         ImmutableMap<String, Object> context = ImmutableMap.<String, Object>of("a", 4);
 
