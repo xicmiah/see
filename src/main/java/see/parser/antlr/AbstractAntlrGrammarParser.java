@@ -1,10 +1,8 @@
 package see.parser.antlr;
 
-import org.antlr.runtime.Parser;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.RecognizerSharedState;
-import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeAdaptor;
+import see.exceptions.ParseException;
 import see.tree.Node;
 
 /**
@@ -21,17 +19,25 @@ public abstract class AbstractAntlrGrammarParser extends Parser {
         super(input, state);
     }
 
-    public <T> Node<T> singleExpression() throws RecognitionException{
+    public <T> Node<T> singleExpression() throws RecognitionException {
         throw new UnsupportedOperationException();
     }
 
-    public <T> Node<T> multipleExpressions() throws RecognitionException{
+    public <T> Node<T> multipleExpressions() throws RecognitionException {
         throw new UnsupportedOperationException();
     }
 
-    public void setTreeAdaptor(TreeAdaptor adaptor){
+    public void setTreeAdaptor(TreeAdaptor adaptor) {
         throw new UnsupportedOperationException();
     }
 
 
+    public Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet allow) throws MismatchedTokenException {
+        throw new MismatchedTokenException(ttype, input);
+    }
+
+    @Override
+    public void reportError(RecognitionException e) {
+        throw new ParseException(ExceptionConverter.createParserErrorDescription(e, this, state));
+    }
 }

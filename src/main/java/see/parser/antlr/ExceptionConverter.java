@@ -14,12 +14,9 @@ public class ExceptionConverter {
         int start = -1;
         int end = -1;
         if (token instanceof CommonToken) {
-            end = start = ((CommonToken) token).getStartIndex();
-
-            String text = token.getText();
-            if (!isEmpty(text)){
-                end = start + text.length() - 1;
-            }
+            CommonToken commonToken = (CommonToken) token;
+            start = commonToken.getStartIndex();
+            end = commonToken.getStopIndex();
         }
         int line = token.getLine();
         int positionInLine = token.getCharPositionInLine();
@@ -38,10 +35,25 @@ public class ExceptionConverter {
 
         TokenPosition position = extractTokenPosition(token);
 
-        String message = lexer.getErrorHeader(e) + " " + lexer.getErrorMessage(e, lexer.getTokenNames());
+        String message = createErrorMessage(e, lexer);
 
         String tokenText = Character.toString((char) e.c);
         if (!isEmpty(token.getText())){
+            tokenText = token.getText();
+        }
+        return new ParseErrorDescription(position, tokenText, message);
+    }
+
+    private static String createErrorMessage(RecognitionException e, BaseRecognizer baseRecognizer) {
+        return baseRecognizer.getErrorHeader(e) + " " + baseRecognizer.getErrorMessage(e, baseRecognizer.getTokenNames());
+    }
+
+    public static ParseErrorDescription createParserErrorDescription(RecognitionException e, Parser parser, RecognizerSharedState state) {
+        Token token = e.token;
+        TokenPosition position = extractTokenPosition(token);
+        String message = createErrorMessage(e, parser);
+        String tokenText = null;
+        if (token != null){
             tokenText = token.getText();
         }
         return new ParseErrorDescription(position, tokenText, message);

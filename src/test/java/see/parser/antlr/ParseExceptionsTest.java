@@ -65,9 +65,30 @@ public class ParseExceptionsTest {
         }
     }
 
-    @Test(expected = ParseException.class)
+    @Test
     public void testParserParseException() throws Exception {
-        parser.parse("sum() + ");
+        testParserParseException("sum() + ", 8,8);
+        testParserParseException("1 + )", 4,4);
+        testParserParseException("1 + 2a3cde3", 5,10);
+        testParserParseException("a + (1-3!3)", 8,8);
+    }
+
+    private void testParserParseException(String input, int start, int end){
+        testParserParseException(input, start, end, 1, start);
+    }
+
+    private void testParserParseException(String input, int start, int end, int line, int charInLine){
+        try{
+            parser.parse(input);
+        }catch (ParseException ex){
+            ParseErrorDescription ped = ex.getFirstError();
+            assertNotNull("Parsing error description should not be null", ped);
+            TokenPosition tp = ped.getTokenPosition();
+            assertEquals("wrong start postion", start, tp.getStartPosition());
+            assertEquals("wrong end position", end, tp.getEndPosition());
+            assertEquals("wrong line number", line, tp.getLineNumber());
+            assertEquals("wrong charIndex in line", charInLine, tp.getCharPositionInLine());
+        }
     }
 
     @Test(expected = FunctionNotFoundException.class)
