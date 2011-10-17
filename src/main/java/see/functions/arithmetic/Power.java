@@ -7,6 +7,10 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * Power function. Returns first argument raised to the power of the second argument.
+ * Special case: if base is less than zero and exponent is fractional, apply throws IllegalArgumentException.
+ */
 public class Power implements Function<List<BigDecimal>, Number> {
     @Override
     public Number apply(List<BigDecimal> input) {
@@ -19,6 +23,9 @@ public class Power implements Function<List<BigDecimal>, Number> {
         if (isInteger(exponent)) {
             return base.pow(exponent.intValue());
         } else {
+            if (base.compareTo(BigDecimal.ZERO) < 0)
+                throw new IllegalArgumentException("Cannot raise negative number to fractional power");
+            
             return Math.pow(base.doubleValue(), exponent.doubleValue());
         }
     }
