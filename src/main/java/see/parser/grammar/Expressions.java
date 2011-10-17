@@ -162,7 +162,21 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule UnaryExpressionNotPlusMinus() {
-        return FirstOf(Constant(), SpecialForm(), Function(), Variable(), Sequence("(", Expression(), ")"));
+        return FirstOf(
+                Constant(),
+                SpecialForm(),
+                Function(),
+                PropertyAccess(),
+                Sequence("(", Expression(), ")")
+        );
+    }
+
+    Rule PropertyAccess() {
+        return Sequence(Variable(), ZeroOrMore(".", PropertyName(), pushBinOp(".")));
+    }
+
+    Rule PropertyName() {
+        return Sequence(Identifier(), push(new ImmutableConstNode<Object>(matchTrim())));
     }
 
     /**

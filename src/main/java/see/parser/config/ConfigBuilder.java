@@ -9,10 +9,7 @@ import see.functions.bool.And;
 import see.functions.bool.Not;
 import see.functions.bool.Or;
 import see.functions.compare.*;
-import see.functions.service.Assign;
-import see.functions.service.If;
-import see.functions.service.IsDefined;
-import see.functions.service.Sequence;
+import see.functions.service.*;
 import see.parser.numbers.BigDecimalFactory;
 import see.parser.numbers.NumberFactory;
 
@@ -52,10 +49,14 @@ public class ConfigBuilder {
         builder.addAlias("/", "divide");
         builder.addAlias("^", "pow");
 
+        builder.addAlias(".", "getProperty");
+
         builder.addFunction("seq", wrap(new Sequence<Object>()));
         builder.addFunction("assign", wrap(new Assign<Object>()));
         builder.addFunction("isDefined", (new IsDefined()));
         builder.addPureFunction("if", (new If<Object>()));
+        builder.addPureFunction("getProperty", new PropertyGet());
+
         builder.addPureFunction("not", (new Not()));
         builder.addPureFunction("and", (new And()));
         builder.addPureFunction("or", (new Or()));
