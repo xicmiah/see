@@ -16,18 +16,28 @@
 
 package see.integration;
 
+import org.junit.Before;
 import org.junit.Test;
 import see.See;
 import see.tree.Node;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class PropertyTraversalTest {
     See see = new See();
+    
+    TestBean bean;
+    Map<String, ?> context;
+
+    @Before
+    public void setUp() throws Exception {
+        bean = new TestBean("second", new TestBean("first", null));
+        context = of("a", bean);
+    }
 
     /**
      * Test that 
@@ -35,20 +45,36 @@ public class PropertyTraversalTest {
      */
     @Test
     public void testTraversal() throws Exception {
-        TestBean bean = new TestBean("asd", null);
-        Map<String, Object> context = of("a", (Object) bean);
 
-        assertEquals("asd", see.eval("a.name", context));
-        assertNull(see.eval("a.next", context));
+        assertEquals("second", see.eval("a.name", context));
+        assertEquals(bean.getNext(), see.eval("a.next", context));
     }
 
     @Test
     public void testNestedTraversal() throws Exception {
-        TestBean first = new TestBean("first", null);
-        TestBean second = new TestBean("second", first);
+        Node<?> tree = see.parseExpression("a.next.name");
+        assertEquals("first", see.evaluate(tree, context));
+    }
 
-        Node<Object> tree = see.parseExpression("a.next.name");
-        assertEquals("first", see.evaluate(tree, of("a", (Object) second)));
+    @Test
+    public void testAssignment() throws Exception {
+        Node<?> tree = see.parseExpressionList("a.next.name = \"omg\";");
+        
+        see.evaluate(tree, context);
+        
+        assertEquals("omg", bean.getNext().getName());
+    }
+
+    @Test
+    public void testChainedAssignment() throws Exception {
+        Node<?> tree = see.parseExpressionList("a.name = a.next.name = \"omg\";");
+
+        context = new HashMap<String, Object>(context); // Make context mutable
+        
+        see.evaluate(tree, context);
+
+        assertEquals("omg", bean.getName());
+        assertEquals("omg", bean.getNext().getName());
     }
 
     public static class TestBean {

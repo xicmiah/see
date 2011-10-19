@@ -49,13 +49,16 @@ public class ConfigBuilder {
         builder.addAlias("/", "divide");
         builder.addAlias("^", "pow");
 
-        builder.addAlias(".", "getProperty");
+        builder.addAlias(".", "get");
+        builder.addAlias(".=", "set");
 
         builder.addFunction("seq", wrap(new Sequence<Object>()));
         builder.addFunction("assign", wrap(new Assign<Object>()));
         builder.addFunction("isDefined", (new IsDefined()));
         builder.addPureFunction("if", (new If<Object>()));
-        builder.addPureFunction("getProperty", new PropertyGet());
+
+        builder.addPureFunction("get", new GetProperty());
+        builder.addPureFunction("set", new SetProperty());
 
         builder.addPureFunction("not", (new Not()));
         builder.addPureFunction("and", (new And()));

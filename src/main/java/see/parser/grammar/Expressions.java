@@ -95,11 +95,25 @@ public class Expressions extends AbstractGrammar {
     }
 
     Rule Expression() {
-        return FirstOf(AssignExpression(), RightExpression());
+        return FirstOf(PropertyAssignment(), VariableAssignment(), RightExpression());
     }
 
-    Rule AssignExpression() {
+    /**
+     * Assignment to variable. Pushes one node.
+     * @return constructed rule
+     */
+    Rule VariableAssignment() {
         return Sequence(VarName(), "=", Expression(), pushBinOp("="));
+    }
+
+    /**
+     * Assignment to property. Pushes one node.
+     * Treated differently from variable assignment, as it doesn't require context access.
+     * @return constructed rule
+     */
+    Rule PropertyAssignment() {
+        return Sequence(PropertyAccess(), "=", Expression(),
+                swap3() && push(makeFNode(".=", ImmutableList.of(pop(), pop(), pop()))));
     }
 
     /**
@@ -166,17 +180,27 @@ public class Expressions extends AbstractGrammar {
                 Constant(),
                 SpecialForm(),
                 Function(),
-                PropertyAccess(),
+                PropertyRead(),
+                Variable(),
                 Sequence("(", Expression(), ")")
         );
     }
 
-    Rule PropertyAccess() {
-        return Sequence(Variable(), ZeroOrMore(".", PropertyName(), pushBinOp(".")));
+    Rule PropertyRead() {
+        return Sequence(PropertyAccess(), pushBinOp("."));
     }
 
-    Rule PropertyName() {
-        return Sequence(Identifier(), push(new ImmutableConstNode<Object>(matchTrim())));
+    Rule PropertyAccess() {
+        return Sequence(Variable(), ".", PropertyChain());
+    }
+
+    /**
+     * A sequence of identifiers, joined with ".".
+     * Pushes itself as const string node.
+     * @return constructed rule
+     */
+    Rule PropertyChain() {
+        return Sequence(rep1sep(Identifier(), "."), push(new ImmutableConstNode<Object>(matchTrim())));
     }
 
     /**
@@ -271,7 +295,6 @@ public class Expressions extends AbstractGrammar {
      * @return rule
      */
     Rule IsDefined() {
-        NodeListVar args = new NodeListVar();
         return Sequence(
                 "isDefined",
                 "(", VarName(), ")",

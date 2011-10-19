@@ -23,7 +23,7 @@ import see.functions.VarArgFunction;
 
 import java.util.List;
 
-public class PropertyGet implements VarArgFunction<Object, Object> {
+public class GetProperty implements VarArgFunction<Object, Object> {
     @Override
     public Object apply(List<Object> input) {
         Preconditions.checkArgument(input.size() == 2, "PropertyRead takes two arguments");
@@ -32,7 +32,7 @@ public class PropertyGet implements VarArgFunction<Object, Object> {
         String property = (String) input.get(1);
 
         try {
-            return PropertyUtils.getSimpleProperty(value, property);
+            return PropertyUtils.getProperty(value, property);
         } catch (Exception e) {
             throw new EvaluationException("Couldn't read property", e);
         }
