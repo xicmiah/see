@@ -16,6 +16,7 @@ import java.util.Map;
 /**
  * Facade to parse/evaluate operations.
  * All operations are thread-safe. Parse results are immutable and can be reused/cached between different instances.
+ * Warning: evaluation can modify passed context. If that is undesirable, you can 
  */
 public class See {
 

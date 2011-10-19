@@ -13,7 +13,7 @@ import java.util.Map;
  * @param <F> curried remainder
  * @see PureFunction
  */
-public interface ContextCurriedFunction<F extends Function<?, ?>> extends Function<Map<String, Object>, F> {
+public interface ContextCurriedFunction<F extends Function<?, ?>> extends Function<Map<String, ?>, F> {
     @Override
-    F apply(final Map<String, Object> context);
+    F apply(final Map<String, ?> context);
 }

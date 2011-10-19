@@ -1,7 +1,6 @@
 package see.evaluator;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import see.functions.Function;
 import see.parser.numbers.NumberFactory;
 import see.tree.*;
@@ -10,12 +9,12 @@ import java.util.List;
 import java.util.Map;
 
 public class ContextualVisitor implements Visitor {
-	private final Map<String, Object> context;
+	private final Map<String, ?> context;
     private final NumberFactory numberFactory;
 
 	public ContextualVisitor(NumberFactory numberFactory, Map<String, ?> context) {
         this.numberFactory = numberFactory;
-        this.context = Maps.newHashMap(context);
+        this.context = context;
 	}
 
 	@Override

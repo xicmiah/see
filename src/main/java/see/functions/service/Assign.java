@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class Assign<T> implements ContextCurriedFunction<Function<List<Object>, T>> {
     @Override
-    public Function<List<Object>, T> apply(final Map<String, Object> context) {
+    public Function<List<Object>, T> apply(final Map<String, ?> context) {
         return new Function<List<Object>, T>() {
             @Override
             public T apply(List<Object> args) {
@@ -25,7 +25,8 @@ public class Assign<T> implements ContextCurriedFunction<Function<List<Object>, 
                 String variable = (String) args.get(0);
                 @SuppressWarnings("unchecked") T value = (T) args.get(1);
 
-                context.put(variable, value);
+                Map<String, ? super T> assignableContext = (Map<String, ? super T>) context;
+                assignableContext.put(variable, value);
 
                 return value;
             }

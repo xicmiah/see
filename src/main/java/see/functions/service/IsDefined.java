@@ -13,7 +13,7 @@ import static see.functions.bool.BooleanCastHelper.fromBoolean;
 
 public class IsDefined implements ContextCurriedFunction<Function<List<String>, BigDecimal>> {
     @Override
-    public Function<List<String>, BigDecimal> apply(final Map<String, Object> context) {
+    public Function<List<String>, BigDecimal> apply(final Map<String, ?> context) {
         return new Function<List<String>, BigDecimal>() {
             @Override
             public BigDecimal apply(List<String> strings) {
