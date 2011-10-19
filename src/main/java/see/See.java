@@ -89,7 +89,7 @@ public class See {
      * @param context variable->value mapping
      * @return evaluated value
      */
-    public Object eval(String expression, Map<String, Object> context) {
+    public Object eval(String expression, Map<String, ?> context) {
         return evaluate(parseExpression(expression), context);
     }
 
