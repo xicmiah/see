@@ -18,7 +18,7 @@ public class ExpressionsComplexRecognitionTest {
 
 
     @DataPoints
-    public static final String[] conditions = {"if (c != 9) then {1;} else {2;}", "if (c != 9) then {1;}"};
+    public static final String[] conditions = {"if (c != 9) {1;} else {2;}", "if (c != 9) {1;}"};
 
     /**
      * Test that all non-empty inputs are valid expression lists

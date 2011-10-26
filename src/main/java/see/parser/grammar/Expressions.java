@@ -116,9 +116,16 @@ class Expressions extends AbstractGrammar {
         NodeListVar args = new NodeListVar();
         return Sequence(
                 "if", "(", RightExpression(), args.append(pop()), ")",
-                "then", "{", ExpressionList(), args.append(pop()), "}",
-                Optional("else", "{", ExpressionList(), args.append(pop()), "}"),
+                Block(), args.append(pop()),
+                Optional("else", Block(), args.append(pop())),
                 push(makeFNode("if", args.get()))
+        );
+    }
+    
+    Rule Block() {
+        return FirstOf(
+                Sequence("{", ExpressionList(), "}"),
+                Term()
         );
     }
 

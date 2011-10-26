@@ -48,10 +48,16 @@ public class ServiceFunctionsTest {
 
     @Test
     public void testIncompleteIf() throws Exception {
-        assertNull(eval("if (1) then {} else {9;}"));
-        assertNull(eval("if (0) then {9;} else {}"));
-        assertNull(eval("if (1) then {} else {}"));
-        assertNull(eval("if (0) then {} else {}"));
+        assertNull(eval("if (1) {} else {9;}"));
+        assertNull(eval("if (0) {9;} else {}"));
+        assertNull(eval("if (1) {} else {}"));
+        assertNull(eval("if (0) {} else {}"));
+    }
+
+    @Test
+    public void testNonCurlyIf() throws Exception {
+        assertEquals(valueOf(9), eval("if(1) 9; else 42;"));
+        assertEquals(valueOf(9), eval("if(0) 42; 9;"));
     }
 
     @Test
