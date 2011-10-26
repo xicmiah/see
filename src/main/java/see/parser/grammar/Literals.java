@@ -20,7 +20,7 @@ class Literals extends AbstractGrammar {
 
     Rule FloatLiteral(){
         return Sequence(FirstOf(
-                Sequence(OneOrMore(Digit()), decimalSeparator, ZeroOrMore(Digit()), Optional(Exponent())),
+                Sequence(OneOrMore(Digit()), decimalSeparator, OneOrMore(Digit()), Optional(Exponent())),
                 Sequence(decimalSeparator, OneOrMore(Digit()), Optional(Exponent())),
                 Sequence(OneOrMore(Digit()), Exponent())
         ), Whitespace());

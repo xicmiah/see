@@ -159,8 +159,19 @@ class Expressions extends AbstractGrammar {
     }
 
     Rule PowerExpression() {
-        return Sequence(UnaryExpressionNotPlusMinus(),
+        return Sequence(PropertyRead(),
                 Optional("^", UnaryExpression(), pushBinOp("^")));
+    }
+
+    Rule PropertyRead() {
+        return FirstOf(
+                Sequence(PropertyAccess(), pushBinOp(".")),
+                UnaryExpressionNotPlusMinus()
+        );
+    }
+
+    Rule PropertyAccess() {
+        return Sequence(UnaryExpressionNotPlusMinus(), ".", PropertyChain());
     }
 
     Rule UnaryExpressionNotPlusMinus() {
@@ -168,18 +179,9 @@ class Expressions extends AbstractGrammar {
                 Constant(),
                 SpecialForm(),
                 Function(),
-                PropertyRead(),
                 Variable(),
                 Sequence("(", Expression(), ")")
         );
-    }
-
-    Rule PropertyRead() {
-        return Sequence(PropertyAccess(), pushBinOp("."));
-    }
-
-    Rule PropertyAccess() {
-        return Sequence(Variable(), ".", PropertyChain());
     }
 
     /**

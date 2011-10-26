@@ -38,7 +38,7 @@ public class ExpressionsRecognitionTest {
     public static final String[] parens = {"1*(2+3)", "(9 + 42)", "1 + (2 + (3+4)) "};
 
     @DataPoints
-    public static final String[] floats = {"0.9", "9.0e6", "42.", ".9", "42.e9"};
+    public static final String[] floats = {"0.9", "9.0e6", ".9", "42.e9"};
 
     @DataPoints
     public static final String[] strings = {"\"\"", "\"c\"", "\"bk\""};
