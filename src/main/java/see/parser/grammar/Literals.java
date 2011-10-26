@@ -2,7 +2,7 @@ package see.parser.grammar;
 
 import org.parboiled.Rule;
 
-public class Literals extends AbstractGrammar {
+class Literals extends AbstractGrammar {
     final Character decimalSeparator;
 
     public Literals(Character decimalSeparator) {

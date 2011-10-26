@@ -5,7 +5,7 @@ import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressNode;
 import see.tree.Node;
 
-public abstract class AbstractGrammar extends BaseParser<Node<Object>> {
+abstract class AbstractGrammar extends BaseParser<Node<Object>> {
     public static final String WHITESPACE = " \t\f\r\n";
 
     @SuppressNode

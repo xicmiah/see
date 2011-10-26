@@ -10,7 +10,7 @@ import org.parboiled.parserunners.ParseRunner;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 import see.parser.config.ConfigBuilder;
-import see.parser.grammar.Expressions;
+import see.parser.grammar.EntryPoints;
 
 /**
  * Matcher for expressions
@@ -30,12 +30,13 @@ public class ExpressionMatcher extends TypeSafeMatcher<String> {
         return result.matched;
     }
 
+    @Override
     public void describeTo(Description description) {
         description.appendText(this.description);
     }
 
-    private static Expressions getDefaultGrammar() {
-        return Parboiled.createParser(Expressions.class, ConfigBuilder.defaultConfig().build());
+    private static EntryPoints getDefaultGrammar() {
+        return Parboiled.createParser(EntryPoints.class, ConfigBuilder.defaultConfig().build());
     }
 
     @Factory

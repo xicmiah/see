@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings({"InfiniteRecursion"})
-public class Expressions extends AbstractGrammar {
+class Expressions extends AbstractGrammar {
     final Literals literals;
 
     final NumberFactory numberFactory;
@@ -32,24 +32,12 @@ public class Expressions extends AbstractGrammar {
 
     final Set<String> keywords = ImmutableSet.of("if", "then", "else", "return");
 
-    public Expressions(GrammarConfiguration config) {
+    Expressions(GrammarConfiguration config) {
         numberFactory = config.getNumberFactory();
         functions = config.getFunctions();
         
         argumentSeparator = numberFactory.getDecimalSeparator() == ',' ? ';' : ',';
         literals = Parboiled.createParser(Literals.class, numberFactory.getDecimalSeparator());
-    }
-
-    public Rule CalcExpression() {
-        return Sequence(Whitespace(), ReturnExpression(), EOI);
-    }
-
-    public Rule Condition() {
-        return Sequence(Whitespace(), Expression(), EOI);
-    }
-
-    public Rule Statements() {
-        return Sequence(Whitespace(), ExpressionList(), EOI);
     }
 
     Rule ReturnExpression() {

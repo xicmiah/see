@@ -7,7 +7,7 @@ import see.parser.BasicParser;
 import see.parser.Parser;
 import see.parser.config.ConfigBuilder;
 import see.parser.config.GrammarConfiguration;
-import see.parser.grammar.Expressions;
+import see.parser.grammar.EntryPoints;
 import see.tree.Node;
 
 import java.util.HashMap;
@@ -104,8 +104,8 @@ public class See {
         return parser.parse(expression);
     }
 
-    private Expressions getGrammar() {
-        return Parboiled.createParser(Expressions.class, config);
+    private EntryPoints getGrammar() {
+        return Parboiled.createParser(EntryPoints.class, config);
     }
 
 }
