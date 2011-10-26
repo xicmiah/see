@@ -10,6 +10,10 @@
     <!--Name subject to change-->
     <name>see</name>
 
+    <scm>
+        <connection>scm:git:https://xicmiah@github.com/xicmiah/see.git</connection>
+    </scm>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -53,6 +57,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.2.1</version>
+                <configuration>
+                    <pushChanges>false</pushChanges>
+                </configuration>
             </plugin>
         </plugins>
     </build>
