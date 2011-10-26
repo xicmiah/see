@@ -29,6 +29,7 @@ public class ServiceFunctionsTest {
         assertEquals(valueOf(1), eval("1;"));
         assertEquals(new BigDecimal("1.5"), eval("1.5;"));
         assertEquals("omg", eval("\"omg\";"));
+        assertEquals("omg", eval("'omg';"));
     }
 
     @Test

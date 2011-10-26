@@ -10,13 +10,21 @@ class Literals extends AbstractGrammar {
     }
 
     Rule StringLiteral() {
-        return Sequence(Ch('"'), ZeroOrMore(Sequence(TestNot("\""), ANY)).suppressSubnodes(), Ch('"'), Whitespace());
+        return FirstOf(DelimitedString('"'), DelimitedString('\''));
+    }
+
+    Rule DelimitedString(char delimiter) {
+        return Sequence(
+                Ch(delimiter),
+                ZeroOrMore(Sequence(TestNot(delimiter), ANY)).suppressSubnodes(),
+                Ch(delimiter),
+                Whitespace()
+        );
     }
 
     Rule IntLiteral() {
         return OneOrMore(Digit(), Whitespace());
     }
-
 
     Rule FloatLiteral(){
         return Sequence(FirstOf(
