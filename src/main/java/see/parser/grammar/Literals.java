@@ -17,21 +17,20 @@ class Literals extends AbstractGrammar {
         return Sequence(
                 Ch(delimiter),
                 ZeroOrMore(Sequence(TestNot(delimiter), ANY)).suppressSubnodes(),
-                Ch(delimiter),
-                Whitespace()
+                Ch(delimiter)
         );
     }
 
     Rule IntLiteral() {
-        return OneOrMore(Digit(), Whitespace());
+        return OneOrMore(Digit());
     }
 
     Rule FloatLiteral(){
-        return Sequence(FirstOf(
+        return FirstOf(
                 Sequence(OneOrMore(Digit()), decimalSeparator, OneOrMore(Digit()), Optional(Exponent())),
                 Sequence(decimalSeparator, OneOrMore(Digit()), Optional(Exponent())),
                 Sequence(OneOrMore(Digit()), Exponent())
-        ), Whitespace());
+        );
     }
 
 

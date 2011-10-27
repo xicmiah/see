@@ -10,17 +10,25 @@ abstract class AbstractGrammar extends BaseParser<Node<Object>> {
 
     @SuppressNode
     Rule Whitespace() {
-        return ZeroOrMore(AnyOf(WHITESPACE));
-    }
+        return ZeroOrMore(FirstOf(
+                // whitespace
+                OneOrMore(AnyOf(WHITESPACE)),
 
-    @Override
-    protected Rule fromStringLiteral(String string) {
-        return Sequence(String(string.trim()), Whitespace()).suppressNode();
+                // block comment
+                Sequence("/*", ZeroOrMore(TestNot("*/"), ANY), "*/"),
+
+                // end of line comment
+                Sequence(
+                        "//",
+                        ZeroOrMore(TestNot(AnyOf("\r\n")), ANY),
+                        FirstOf("\r\n", '\r', '\n', EOI)
+                )
+        ));
     }
 
     /**
      * Returns match() with removed trailing whitespace.
-     * @return mached input text
+     * @return matched input text
      */
     protected String matchTrim() {
         return match().trim();
@@ -48,5 +56,15 @@ abstract class AbstractGrammar extends BaseParser<Node<Object>> {
      */
     Rule repsep(Object rule, Object separator) {
         return Optional(rep1sep(rule, separator));
+    }
+
+    /**
+     * A Terminal symbol. Matches supplied rules and whitespace/comment after them.
+     * @param children child rules to match
+     * @return constructed rule
+     */
+    @Terminal
+    Rule T(Object... children) {
+        return Sequence(Sequence(children), Whitespace());
     }
 }

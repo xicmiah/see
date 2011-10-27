@@ -14,6 +14,7 @@ import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
 import see.tree.FunctionNode;
 import see.tree.Node;
+import see.tree.VarNode;
 import see.tree.immutable.ImmutableConstNode;
 import see.tree.immutable.ImmutableFunctionNode;
 import see.tree.immutable.ImmutableVarNode;
@@ -40,11 +41,12 @@ class Expressions extends AbstractGrammar {
         literals = Parboiled.createParser(Literals.class, numberFactory.getDecimalSeparator());
     }
 
+    @Terminal
     Rule ReturnExpression() {
         NodeListVar statements = new NodeListVar();
         return Sequence(
                 ExpressionList(), statements.append(pop()),
-                "return", RightExpression(), Optional(";"), statements.append(pop()),
+                T("return"), RightExpression(), Optional(T(";")), statements.append(pop()),
                 push(makeSeqNode(statements.get()))
         );
     }
@@ -53,6 +55,7 @@ class Expressions extends AbstractGrammar {
      * List of zero or more terms. Pushes one node.
      * @return rule
      */
+    @Terminal
     Rule ExpressionList() {
         NodeListVar statements = new NodeListVar();
         return Sequence(
@@ -66,8 +69,9 @@ class Expressions extends AbstractGrammar {
      * Pushes it's value to stack
      * @return rule
      */
+    @Terminal
     Rule Term() {
-        return FirstOf(Conditional(), Sequence(Expression(), ";"));
+        return FirstOf(Conditional(), Sequence(Expression(), T(";")));
     }
 
     /**
@@ -82,6 +86,7 @@ class Expressions extends AbstractGrammar {
         return statements.size() == 1 ? statements.get(0) : makeFNode(";", statements);
     }
 
+    @Terminal
     Rule Expression() {
         return FirstOf(PropertyAssignment(), VariableAssignment(), RightExpression());
     }
@@ -90,8 +95,9 @@ class Expressions extends AbstractGrammar {
      * Assignment to variable. Pushes one node.
      * @return constructed rule
      */
+    @Terminal
     Rule VariableAssignment() {
-        return Sequence(VarName(), "=", Expression(), pushBinOp("="));
+        return Sequence(VarName(), T("="), Expression(), pushBinOp("="));
     }
 
     /**
@@ -99,8 +105,9 @@ class Expressions extends AbstractGrammar {
      * Treated differently from variable assignment, as it doesn't require context access.
      * @return constructed rule
      */
+    @Terminal
     Rule PropertyAssignment() {
-        return Sequence(PropertyAccess(), "=", Expression(),
+        return Sequence(PropertyAccess(), T("="), Expression(),
                 swap3() && push(makeFNode(".=", ImmutableList.of(pop(), pop(), pop()))));
     }
 
@@ -108,68 +115,86 @@ class Expressions extends AbstractGrammar {
      * Special form. Matches variable, pushes variable name.
      * @return rule
      */
+    @Terminal
     Rule VarName() {
-        return Sequence(Variable(), drop() && push(new ImmutableConstNode<Object>(matchTrim())));
+        return Sequence(Variable(), push(new ImmutableConstNode<Object>(getVarName((VarNode<?>) pop()))));
+    }
+
+    String getVarName(VarNode<?> node) {
+        return node.getName();
     }
 
     Rule Conditional() {
         NodeListVar args = new NodeListVar();
         return Sequence(
-                "if", "(", RightExpression(), args.append(pop()), ")",
+                T("if"), T("("), RightExpression(), args.append(pop()), T(")"),
                 Block(), args.append(pop()),
-                Optional("else", Block(), args.append(pop())),
+                Optional(T("else"), Block(), args.append(pop())),
                 push(makeFNode("if", args.get()))
         );
     }
-    
+
+    @Terminal
     Rule Block() {
         return FirstOf(
-                Sequence("{", ExpressionList(), "}"),
+                Sequence(T("{"), ExpressionList(), T("}")),
                 Term()
         );
     }
 
+    @Terminal
     Rule RightExpression() {
         return OrExpression();
     }
 
+    @Terminal
     Rule OrExpression() {
         return repeatWithOperator(AndExpression(), "||");
     }
 
+    @Terminal
     Rule AndExpression() {
         return repeatWithOperator(EqualExpression(), "&&");
     }
 
+    @Terminal
     Rule EqualExpression() {
         return repeatWithOperator(RelationalExpression(), FirstOf("!=", "=="));
     }
 
+    @Terminal
     Rule RelationalExpression() {
         return repeatWithOperator(AdditiveExpression(), FirstOf("<=", ">=", "<", ">"));
     }
 
+    @Terminal
     Rule AdditiveExpression() {
         return repeatWithOperator(MultiplicativeExpression(), FirstOf("+", "-"));
     }
 
+    @Terminal
     Rule MultiplicativeExpression() {
         return repeatWithOperator(UnaryExpression(), FirstOf("*", "/"));
     }
 
+    @Terminal
     Rule UnaryExpression() {
         Var<String> op = new Var<String>("");
         return FirstOf(
-                Sequence(AnyOf("+-!"), op.set(matchTrim()), UnaryExpression(), push(makeUNode(op.get(), pop()))),
+                Sequence(
+                        T(AnyOf("+-!"), op.set(match())),
+                        UnaryExpression(),
+                        push(makeUNode(op.get(), pop()))),
                 PowerExpression()
         );
     }
 
     Rule PowerExpression() {
         return Sequence(PropertyRead(),
-                Optional("^", UnaryExpression(), pushBinOp("^")));
+                Optional(T("^"), UnaryExpression(), pushBinOp("^")));
     }
 
+    @Terminal
     Rule PropertyRead() {
         return FirstOf(
                 Sequence(PropertyAccess(), pushBinOp(".")),
@@ -177,17 +202,19 @@ class Expressions extends AbstractGrammar {
         );
     }
 
+    @Terminal
     Rule PropertyAccess() {
-        return Sequence(UnaryExpressionNotPlusMinus(), ".", PropertyChain());
+        return T(UnaryExpressionNotPlusMinus(), T("."), PropertyChain());
     }
 
+    @Terminal
     Rule UnaryExpressionNotPlusMinus() {
         return FirstOf(
                 Constant(),
                 SpecialForm(),
                 Function(),
                 Variable(),
-                Sequence("(", Expression(), ")")
+                Sequence(T("("), Expression(), T(")"))
         );
     }
 
@@ -197,7 +224,7 @@ class Expressions extends AbstractGrammar {
      * @return constructed rule
      */
     Rule PropertyChain() {
-        return Sequence(rep1sep(Identifier(), "."), push(new ImmutableConstNode<Object>(matchTrim())));
+        return Sequence(rep1sep(Identifier(), "."), push(new ImmutableConstNode<Object>(match())));
     }
 
     /**
@@ -207,12 +234,15 @@ class Expressions extends AbstractGrammar {
      * @param separator separator between rules
      * @return rule
      */
+    @Terminal
     Rule repeatWithOperator(Rule rule, Object separator) {
         Var<String> operator = new Var<String>("");
         return Sequence(rule,
-                ZeroOrMore(separator, operator.set(matchTrim()),
+                ZeroOrMore(
+                        T(separator, operator.set(match())),
                         rule,
-                        pushBinOp(operator.get()))
+                        pushBinOp(operator.get())
+                )
         );
     }
 
@@ -258,6 +288,7 @@ class Expressions extends AbstractGrammar {
      * Constant. Pushes ImmutableConstNode(value)
      * @return rule
      */
+    @Terminal
     @SuppressSubnodes
     Rule Constant() {
         return FirstOf(String(), Float(), Int());
@@ -271,8 +302,7 @@ class Expressions extends AbstractGrammar {
         Var<String> function = new Var<String>("");
         NodeListVar args = new NodeListVar();
         return Sequence(
-                FirstOf(Identifier(), "if"),
-                function.set(matchTrim()),
+                T(FirstOf(Identifier(), "if"), function.set(matchTrim())),
                 ArgumentList(args),
                 push(makeFNode(function.get(), args.get()))
         );
@@ -282,6 +312,7 @@ class Expressions extends AbstractGrammar {
      * A special form.
      * @return rule
      */
+    @Terminal
     Rule SpecialForm() {
         return IsDefined();
     }
@@ -291,61 +322,68 @@ class Expressions extends AbstractGrammar {
      * Matches like function application, but requires one Variable inside.
      * @return rule
      */
+    @Terminal
     Rule IsDefined() {
         return Sequence(
-                "isDefined",
-                "(", VarName(), ")",
+                T("isDefined"),
+                T("("), VarName(), T(")"),
                 push(makeFNode("isDefined", ImmutableList.of(pop())))
         );
     }
 
+    @Terminal
     Rule ArgumentList(NodeListVar args) {
-        return Sequence("(", repsep(Sequence(Expression(), args.append(pop())), ArgumentSeparator()), ")");
+        return Sequence(T("("), repsep(Sequence(Expression(), args.append(pop())), ArgumentSeparator()), T(")"));
     }
 
+    @Terminal
     Rule ArgumentSeparator() {
-        return Sequence(Ch(argumentSeparator), Whitespace());
+        return T(argumentSeparator);
     }
 
+    @Terminal
     Rule Variable() {
-        return Sequence(Identifier(), push(new ImmutableVarNode<Object>(matchTrim())));
+        return T(Identifier(), push(new ImmutableVarNode<Object>(match())));
     }
 
     /**
      * String literal. Expected to push it's value/
      * @return rule
      */
+    @Terminal
     Rule String() {
-        return Sequence(literals.StringLiteral(), push(new ImmutableConstNode<Object>(stripQuotes(matchTrim()))));
+        return T(literals.StringLiteral(), push(new ImmutableConstNode<Object>(stripQuotes(match()))));
     }
 
     /**
      * Floating point literal. Expected to push it's value
      * @return rule
      */
+    @Terminal
     Rule Float() {
-        return Sequence(literals.FloatLiteral(), push(new ImmutableConstNode<Object>(matchNumber())));
+        return T(literals.FloatLiteral(), push(new ImmutableConstNode<Object>(matchNumber())));
     }
 
     /**
      * Integer literal. Expected to push it's value.
      * @return constructed rule
      */
+    @Terminal
     Rule Int() {
-        return Sequence(literals.IntLiteral(), push(new ImmutableConstNode<Object>(matchNumber())));
+        return T(literals.IntLiteral(), push(new ImmutableConstNode<Object>(matchNumber())));
     }
 
     @SuppressSubnodes
     Rule Identifier() {
-        return Sequence(Name(), !keywords.contains(matchTrim()));
+        return Sequence(Name(), !keywords.contains(match()));
     }
 
     Rule Name() {
-        return Sequence(literals.Letter(), ZeroOrMore(literals.LetterOrDigit()), Whitespace());
+        return Sequence(literals.Letter(), ZeroOrMore(literals.LetterOrDigit()));
     }
 
     Number matchNumber() {
-        return numberFactory.getNumber(matchTrim());
+        return numberFactory.getNumber(match());
     }
 
     /**
@@ -357,4 +395,5 @@ class Expressions extends AbstractGrammar {
     String stripQuotes(String input) {
         return input.substring(1, input.length() - 1);
     }
+
 }
