@@ -36,7 +36,7 @@ public class SetProperty implements VarArgFunction<PropertyAccess, Object> {
         Object bean = new GetProperty().apply(last(beanPath));
         PropertyAccess lastProperty = getLast(beanPath);
 
-        lastProperty.accept(new SetVisitor(bean, value));
+        lastProperty.accept(new SetVisitor(value), bean);
 
         return value;
     }
@@ -54,22 +54,20 @@ public class SetProperty implements VarArgFunction<PropertyAccess, Object> {
         return toAssign.getTarget();
     }
 
-    public static class SetVisitor implements PropertyAccess.Visitor<Object> {
-        private final Object target;
+    public static class SetVisitor implements PropertyAccess.Visitor<Object, Object> {
         private final Object value;
 
-        public SetVisitor(Object target, Object value) {
-            this.target = target;
+        public SetVisitor(Object value) {
             this.value = value;
         }
 
         @Override
-        public Object accept(PropertyAccess.Target target) {
+        public Object visit(PropertyAccess.Target target, Object prev) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public Object accept(PropertyAccess.Simple simple) {
+        public Object visit(PropertyAccess.Simple simple, Object target) {
             String property = simple.getName();
             try {
                 PropertyUtils.setSimpleProperty(target, property, value);
@@ -81,7 +79,7 @@ public class SetProperty implements VarArgFunction<PropertyAccess, Object> {
         }
 
         @Override
-        public Object accept(PropertyAccess.Indexed indexed) {
+        public Object visit(PropertyAccess.Indexed indexed, Object target) {
             Object index = indexed.getIndex();
             try {
                 if (index instanceof Number) {

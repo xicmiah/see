@@ -21,38 +21,36 @@ import org.apache.commons.beanutils.PropertyUtils;
 import see.exceptions.EvaluationException;
 import see.functions.VarArgFunction;
 import see.parser.grammar.PropertyAccess;
+import see.util.Reduce;
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import static see.util.Reduce.fold;
 
 public class GetProperty implements VarArgFunction<PropertyAccess, Object> {
     @Override
     public Object apply(List<PropertyAccess> input) {
         Preconditions.checkArgument(input.size() >= 1, "GetProperty takes one or more arguments");
-        
-        Object result = null;
 
-        for (PropertyAccess propertyAccess : input) {
-            result = propertyAccess.accept(new GetVisitor(result));
-        }
+        final GetVisitor getVisitor = new GetVisitor();
 
-        return result;
+        return fold(null, input, new Reduce.FoldFunction<PropertyAccess, Object>() {
+            @Override
+            public Object apply(Object prev, PropertyAccess arg) {
+                return arg.accept(getVisitor, prev);
+            }
+        });
     }
 
-    public static class GetVisitor implements PropertyAccess.Visitor<Object> {
-        private final Object target;
-
-        private GetVisitor(Object target) {
-            this.target = target;
-        }
-
+    private static class GetVisitor implements PropertyAccess.Visitor<Object, Object> {
         @Override
-        public Object accept(PropertyAccess.Target target) {
+        public Object visit(PropertyAccess.Target target, Object prev) {
             return target.getTarget();
         }
 
         @Override
-        public Object accept(PropertyAccess.Simple simple) {
+        public Object visit(PropertyAccess.Simple simple, Object target) {
             String property = simple.getName();
             try {
                 return PropertyUtils.getProperty(target, property);
@@ -62,7 +60,7 @@ public class GetProperty implements VarArgFunction<PropertyAccess, Object> {
         }
 
         @Override
-        public Object accept(PropertyAccess.Indexed indexed) {
+        public Object visit(PropertyAccess.Indexed indexed, Object target) {
             Object index = indexed.getIndex();
             try {
                 if (index instanceof Number) {

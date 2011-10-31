@@ -19,7 +19,7 @@ package see.parser.grammar;
 public abstract class PropertyAccess {
     private PropertyAccess() {}
 
-    public abstract <T> T accept(Visitor<T> visitor);
+    public abstract <T, D> T accept(Visitor<T, D> visitor, D intermediate);
 
     public static class Target extends PropertyAccess {
         private final Object target;
@@ -33,8 +33,8 @@ public abstract class PropertyAccess {
         }
 
         @Override
-        public <T> T accept(Visitor<T> visitor) {
-            return visitor.accept(this);
+        public <T, D> T accept(Visitor<T, D> visitor, D intermediate) {
+            return visitor.visit(this, intermediate);
         }
     }
 
@@ -50,8 +50,8 @@ public abstract class PropertyAccess {
         }
 
         @Override
-        public <T> T accept(Visitor<T> visitor) {
-            return visitor.accept(this);
+        public <T, D> T accept(Visitor<T, D> visitor, D intermediate) {
+            return visitor.visit(this, intermediate);
         }
     }
 
@@ -67,16 +67,23 @@ public abstract class PropertyAccess {
         }
 
         @Override
-        public <T> T accept(Visitor<T> visitor) {
-            return visitor.accept(this);
+        public <T, D> T accept(Visitor<T, D> visitor, D intermediate) {
+            return visitor.visit(this, intermediate);
         }
     }
 
-    public static interface Visitor<T> {
-        T accept(Target target);
+    /**
+     * Visitor for PropertyAccess subclasses.
+     * Supports return values and intermediate data.
+     *
+     * @param <T> return type
+     * @param <D> intermediate data type
+     */
+    public static interface Visitor<T, D> {
+        T visit(Target target, D intermediate);
 
-        T accept(Simple simple);
+        T visit(Simple simple, D intermediate);
 
-        T accept(Indexed indexed);
+        T visit(Indexed indexed, D intermediate);
     }
 }
