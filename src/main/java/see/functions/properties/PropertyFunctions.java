@@ -48,9 +48,11 @@ public class PropertyFunctions {
         return setInstance;
     }
 
-    private Object getBean(List<PropertyAccess> input) {
-        PropertyAccess.Value target = (PropertyAccess.Value) input.get(0);
-        return target.getTarget();
+    private Object getBean(PropertyAccess input) {
+        Preconditions.checkArgument(input instanceof PropertyAccess.Value, "Cannot get value from " + input);
+
+        PropertyAccess.Value value = (PropertyAccess.Value) input;
+        return value.getTarget();
     }
 
     public class Get implements VarArgFunction<PropertyAccess, Object> {
@@ -60,8 +62,8 @@ public class PropertyFunctions {
         public Object apply(List<PropertyAccess> input) {
             Preconditions.checkArgument(input.size() >= 1, "GetProperty takes one or more arguments");
 
-            Object bean = getBean(input);
-            return resolver.get(bean, input.subList(0, input.size() - 1));
+            Object bean = getBean(input.get(0));
+            return resolver.get(bean, input.subList(1, input.size()));
         }
         @Override
         public String toString() {
@@ -77,13 +79,18 @@ public class PropertyFunctions {
         public Object apply(List<PropertyAccess> input) {
             Preconditions.checkArgument(input.size() >= 3, "SetProperty takes three or more arguments");
 
-            Object bean = getBean(input);
+            Object bean = getBean(input.get(0));
             List<PropertyAccess> properties = input.subList(1, input.size() - 1);
-            PropertyAccess value = input.get(input.size() - 1);
+            Object value = getBean(input.get(input.size() - 1));
 
             resolver.set(bean, properties, value);
             
             return value;
+        }
+
+        @Override
+        public String toString() {
+            return "set";
         }
     }
 }
