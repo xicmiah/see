@@ -26,14 +26,14 @@ import java.util.Map;
 public class ConfigBuilder {
     private Map<String, String> aliases;
     private Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions;
-    private NumberFactory numberFactory;
+
+    private NumberFactory numberFactory = new BigDecimalFactory();
+    private PropertyResolver propertyResolver = new PropertyUtilsResolver();
 
     private ConfigBuilder(Map<String, String> aliases,
-                          Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions,
-                          NumberFactory numberFactory) {
+                          Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions) {
         this.aliases = aliases;
         this.functions = functions;
-        this.numberFactory = numberFactory;
     }
 
     public static ConfigBuilder defaultConfig() {
@@ -44,7 +44,7 @@ public class ConfigBuilder {
         addLogic(builder);
         addArithmetic(builder);
         addCompare(builder);
-        addProperty(builder, new PropertyUtilsResolver());
+        addProperty(builder, builder.propertyResolver);
 
         return builder;
     }
@@ -113,9 +113,10 @@ public class ConfigBuilder {
     }
 
     public static ConfigBuilder emptyConfig() {
-        return new ConfigBuilder(new HashMap<String, String>(),
-                new HashMap<String, ContextCurriedFunction<Function<List<Object>, Object>>>(),
-                new BigDecimalFactory());
+        return new ConfigBuilder(
+                new HashMap<String, String>(),
+                new HashMap<String, ContextCurriedFunction<Function<List<Object>, Object>>>()
+        );
     }
 
     public ConfigBuilder addAlias(String name, String alias) {
@@ -155,6 +156,16 @@ public class ConfigBuilder {
         return this;
     }
 
+    /**
+     * Set custom property resolver. Dependant functions are updated automatically.
+     * @param propertyResolver new property resolver
+     * @return this instance
+     */
+    public ConfigBuilder setPropertyResolver(PropertyResolver propertyResolver) {
+        this.propertyResolver = propertyResolver;
+        addProperty(this, propertyResolver); // Update set/get functions
+        return this;
+    }
 
     public GrammarConfiguration build() {
         return new GrammarConfiguration(new FunctionResolver(functions, aliases), numberFactory);
