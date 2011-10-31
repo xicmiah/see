@@ -9,7 +9,14 @@ import see.functions.bool.And;
 import see.functions.bool.Not;
 import see.functions.bool.Or;
 import see.functions.compare.*;
-import see.functions.service.*;
+import see.functions.properties.GetProperty;
+import see.functions.properties.MakeIndexed;
+import see.functions.properties.MakeTarget;
+import see.functions.properties.SetProperty;
+import see.functions.service.Assign;
+import see.functions.service.If;
+import see.functions.service.IsDefined;
+import see.functions.service.Sequence;
 import see.parser.numbers.BigDecimalFactory;
 import see.parser.numbers.NumberFactory;
 
@@ -50,6 +57,7 @@ public class ConfigBuilder {
         builder.addAlias("^", "pow");
 
         builder.addAlias(".", "get");
+        builder.addAlias("[]", "props.indexed");
         builder.addAlias(".=", "set");
 
         builder.addFunction("seq", wrap(new Sequence<Object>()));
@@ -59,6 +67,8 @@ public class ConfigBuilder {
 
         builder.addPureFunction("get", new GetProperty());
         builder.addPureFunction("set", new SetProperty());
+        builder.addPureFunction("props.target", new MakeTarget());
+        builder.addPureFunction("props.indexed", new MakeIndexed());
 
         builder.addPureFunction("not", (new Not()));
         builder.addPureFunction("and", (new And()));

@@ -14,35 +14,23 @@
  * limitations under the License.
  */
 
-package see.functions.service;
+package see.functions.properties;
 
 import com.google.common.base.Preconditions;
-import org.apache.commons.beanutils.PropertyUtils;
-import see.exceptions.EvaluationException;
 import see.functions.VarArgFunction;
+import see.parser.grammar.PropertyAccess;
 
 import java.util.List;
 
-public class SetProperty implements VarArgFunction<Object, Object> {
+public class MakeTarget implements VarArgFunction<Object, PropertyAccess.Target> {
     @Override
-    public Object apply(List<Object> input) {
-        Preconditions.checkArgument(input.size() == 3, "SetProperty takes three arguments");
-
-        Object bean = input.get(0);
-        String property = (String) input.get(1);
-        Object value = input.get(2);
-
-        try {
-            PropertyUtils.setProperty(bean, property, value);
-        } catch (Exception e) {
-            throw new EvaluationException("Couldn't write property", e);
-        }
-
-        return value;
+    public PropertyAccess.Target apply(List<Object> input) {
+        Preconditions.checkArgument(input.size() == 1, "MakeTarget takes one argument");
+        return new PropertyAccess.Target(input.get(0));
     }
 
     @Override
     public String toString() {
-        return "set";
+        return "prop.target";
     }
 }

@@ -14,32 +14,23 @@
  * limitations under the License.
  */
 
-package see.functions.service;
+package see.functions.properties;
 
 import com.google.common.base.Preconditions;
-import org.apache.commons.beanutils.PropertyUtils;
-import see.exceptions.EvaluationException;
 import see.functions.VarArgFunction;
+import see.parser.grammar.PropertyAccess;
 
 import java.util.List;
 
-public class GetProperty implements VarArgFunction<Object, Object> {
+public class MakeIndexed implements VarArgFunction<Object, PropertyAccess.Indexed> {
     @Override
-    public Object apply(List<Object> input) {
-        Preconditions.checkArgument(input.size() == 2, "PropertyRead takes two arguments");
-        
-        Object value = input.get(0);
-        String property = (String) input.get(1);
-
-        try {
-            return PropertyUtils.getProperty(value, property);
-        } catch (Exception e) {
-            throw new EvaluationException("Couldn't read property", e);
-        }
+    public PropertyAccess.Indexed apply(List<Object> input) {
+        Preconditions.checkArgument(input.size() == 1, "MakeIndexed takes one argument");
+        return new PropertyAccess.Indexed(input.get(0));
     }
 
     @Override
     public String toString() {
-        return "get";
+        return "prop.indexed";
     }
 }

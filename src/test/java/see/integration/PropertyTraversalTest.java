@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;
+import static com.google.common.collect.Maps.newHashMap;
 import static org.junit.Assert.assertEquals;
 
 public class PropertyTraversalTest {
@@ -95,6 +96,19 @@ public class PropertyTraversalTest {
         see.evaluate(tree, context);
 
         assertEquals("omg", bean.getName());
+    }
+
+    @Test
+    public void testIndexed() throws Exception {
+        assertEquals("second", see.eval("a['name']", context));
+        assertEquals("first", see.eval("a['next']['name']", context));
+        assertEquals("first", see.eval("bean()['next'].name", context));
+    }
+
+    @Test
+    public void testVariableIndexes() throws Exception {
+        Node<?> tree = see.parseExpressionList("p = 'next'; a[p].name;");
+        assertEquals("first", see.evaluate(tree, newHashMap(context)));
     }
 
     @Test

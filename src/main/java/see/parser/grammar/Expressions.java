@@ -22,6 +22,8 @@ import see.tree.immutable.ImmutableVarNode;
 import java.util.List;
 import java.util.Set;
 
+import static see.parser.grammar.PropertyAccess.Simple;
+
 @SuppressWarnings({"InfiniteRecursion"})
 class Expressions extends AbstractGrammar {
     final Literals literals;
@@ -43,7 +45,7 @@ class Expressions extends AbstractGrammar {
 
     @Terminal
     Rule ReturnExpression() {
-        NodeListVar statements = new NodeListVar();
+        ListVar<Node<Object>> statements = new ListVar<Node<Object>>();
         return Sequence(
                 ExpressionList(), statements.append(pop()),
                 T("return"), RightExpression(), Optional(T(";")), statements.append(pop()),
@@ -57,7 +59,7 @@ class Expressions extends AbstractGrammar {
      */
     @Terminal
     Rule ExpressionList() {
-        NodeListVar statements = new NodeListVar();
+        ListVar<Node<Object>> statements = new ListVar<Node<Object>>();
         return Sequence(
                 ZeroOrMore(Term(), statements.append(pop())),
                 push(makeSeqNode(statements.get()))
@@ -82,7 +84,7 @@ class Expressions extends AbstractGrammar {
      * @param statements list of expressions to wrap
      * @return constructed node
      */
-    Node<Object> makeSeqNode(ImmutableList<Node<Object>> statements) {
+    Node<Object> makeSeqNode(List<Node<Object>> statements) {
         return statements.size() == 1 ? statements.get(0) : makeFNode(";", statements);
     }
 
@@ -107,8 +109,9 @@ class Expressions extends AbstractGrammar {
      */
     @Terminal
     Rule PropertyAssignment() {
-        return Sequence(PropertyAccess(), T("="), Expression(),
-                swap3() && push(makeFNode(".=", ImmutableList.of(pop(), pop(), pop()))));
+        ListVar<Node<?>> props = new ListVar<Node<?>>();
+        return Sequence(PropertyAccess(props), T("="), Expression(), props.append(makeUNode("props.target", pop())),
+                push(makeFNode(".=", props.get())));
     }
 
     /**
@@ -124,8 +127,9 @@ class Expressions extends AbstractGrammar {
         return node.getName();
     }
 
+    @Terminal
     Rule Conditional() {
-        NodeListVar args = new NodeListVar();
+        ListVar<Node<Object>> args = new ListVar<Node<Object>>();
         return Sequence(
                 T("if"), T("("), RightExpression(), args.append(pop()), T(")"),
                 Block(), args.append(pop()),
@@ -196,19 +200,25 @@ class Expressions extends AbstractGrammar {
 
     @Terminal
     Rule PropertyRead() {
+        ListVar<Node<?>> props = new ListVar<Node<?>>();
         return FirstOf(
-                Sequence(PropertyAccess(), pushBinOp(".")),
-                UnaryExpressionNotPlusMinus()
+                Sequence(PropertyAccess(props), push(makeFNode(".", props.get()))),
+                Atom()
         );
     }
 
     @Terminal
-    Rule PropertyAccess() {
-        return T(UnaryExpressionNotPlusMinus(), T("."), PropertyChain());
+    Rule PropertyAccess(ListVar<? super Node<?>> props) {
+        return Sequence(Atom(), props.append(makeUNode("props.target", pop())),
+                OneOrMore(FirstOf(
+                        T(".", Identifier(), props.append(new ImmutableConstNode<Simple>(new Simple(match())))),
+                        Sequence(T("["), RightExpression(), props.append(makeUNode("[]", pop())), T("]"))
+                ))
+        );
     }
 
     @Terminal
-    Rule UnaryExpressionNotPlusMinus() {
+    Rule Atom() {
         return FirstOf(
                 Constant(),
                 SpecialForm(),
@@ -216,15 +226,6 @@ class Expressions extends AbstractGrammar {
                 Variable(),
                 Sequence(T("("), Expression(), T(")"))
         );
-    }
-
-    /**
-     * A sequence of identifiers, joined with ".".
-     * Pushes itself as const string node.
-     * @return constructed rule
-     */
-    Rule PropertyChain() {
-        return Sequence(rep1sep(Identifier(), "."), push(new ImmutableConstNode<Object>(match())));
     }
 
     /**
@@ -276,12 +277,12 @@ class Expressions extends AbstractGrammar {
      * @param args argument list
      * @return constructed node
      */
-    FunctionNode<Object, Object> makeFNode(String name, ImmutableList<Node<Object>> args) {
+    FunctionNode<Object, Object> makeFNode(String name, List<? extends Node<?>> args) {
         ContextCurriedFunction<Function<List<Object>,Object>> function = functions.get(name);
         if (function == null) {
             throw new ParsingException("Function not found: " + name);
         }
-        return new ImmutableFunctionNode<Object, Object>(function, args);
+        return new ImmutableFunctionNode<Object, Object>(function, (List<Node<Object>>) args);
     }
 
     /**
@@ -298,9 +299,10 @@ class Expressions extends AbstractGrammar {
      * Function application. Pushes FunctionNode(f, args).
      * @return rule
      */
+    @Terminal
     Rule Function() {
         Var<String> function = new Var<String>("");
-        NodeListVar args = new NodeListVar();
+        ListVar<Node<Object>> args = new ListVar<Node<Object>>();
         return Sequence(
                 T(FirstOf(Identifier(), "if"), function.set(matchTrim())),
                 ArgumentList(args),
@@ -332,7 +334,7 @@ class Expressions extends AbstractGrammar {
     }
 
     @Terminal
-    Rule ArgumentList(NodeListVar args) {
+    Rule ArgumentList(ListVar<Node<Object>> args) {
         return Sequence(T("("), repsep(Sequence(Expression(), args.append(pop())), ArgumentSeparator()), T(")"));
     }
 
