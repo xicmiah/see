@@ -50,7 +50,7 @@ public class SetProperty implements VarArgFunction<PropertyAccess, Object> {
     }
 
     private Object getValue(List<PropertyAccess> input) {
-        PropertyAccess.Target toAssign = (PropertyAccess.Target) getLast(input);
+        PropertyAccess.Value toAssign = (PropertyAccess.Value) getLast(input);
         return toAssign.getTarget();
     }
 
@@ -62,7 +62,7 @@ public class SetProperty implements VarArgFunction<PropertyAccess, Object> {
         }
 
         @Override
-        public Object visit(PropertyAccess.Target target, Object prev) {
+        public Object visit(PropertyAccess.Value value, Object prev) {
             throw new UnsupportedOperationException();
         }
 

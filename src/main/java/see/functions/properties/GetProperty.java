@@ -45,8 +45,8 @@ public class GetProperty implements VarArgFunction<PropertyAccess, Object> {
 
     private static class GetVisitor implements PropertyAccess.Visitor<Object, Object> {
         @Override
-        public Object visit(PropertyAccess.Target target, Object prev) {
-            return target.getTarget();
+        public Object visit(PropertyAccess.Value value, Object prev) {
+            return value.getTarget();
         }
 
         @Override

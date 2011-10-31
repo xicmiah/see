@@ -22,11 +22,11 @@ import see.parser.grammar.PropertyAccess;
 
 import java.util.List;
 
-public class MakeTarget implements VarArgFunction<Object, PropertyAccess.Target> {
+public class MakeTarget implements VarArgFunction<Object, PropertyAccess.Value> {
     @Override
-    public PropertyAccess.Target apply(List<Object> input) {
+    public PropertyAccess.Value apply(List<Object> input) {
         Preconditions.checkArgument(input.size() == 1, "MakeTarget takes one argument");
-        return new PropertyAccess.Target(input.get(0));
+        return new PropertyAccess.Value(input.get(0));
     }
 
     @Override

@@ -21,10 +21,10 @@ public abstract class PropertyAccess {
 
     public abstract <T, D> T accept(Visitor<T, D> visitor, D intermediate);
 
-    public static class Target extends PropertyAccess {
+    public static class Value extends PropertyAccess {
         private final Object target;
 
-        public Target(Object target) {
+        public Value(Object target) {
             this.target = target;
         }
 
@@ -80,7 +80,7 @@ public abstract class PropertyAccess {
      * @param <D> intermediate data type
      */
     public static interface Visitor<T, D> {
-        T visit(Target target, D intermediate);
+        T visit(Value value, D intermediate);
 
         T visit(Simple simple, D intermediate);
 
