@@ -75,7 +75,7 @@ public class PropertyUtilsResolver implements PropertyResolver {
                 if (index instanceof Number) {
                     return PropertyUtils.getIndexedProperty(target, "", parseIndex((Number) index));
                 } else if (index instanceof String) {
-                    return PropertyUtils.getSimpleProperty(target, (String) index);
+                    return PropertyUtils.getProperty(target, (String) index);
                 }
             } catch (Exception e) {
                 throw new EvaluationException("Couldn't read indexed property " + index, e);
@@ -102,7 +102,7 @@ public class PropertyUtilsResolver implements PropertyResolver {
         public Object visit(PropertyAccess.Simple simple, Object target) {
             String property = simple.getName();
             try {
-                PropertyUtils.setSimpleProperty(target, property, value);
+                PropertyUtils.setProperty(target, property, value);
             } catch (Exception e) {
                 throw new EvaluationException("Couldn't set simple property " + property, e);
             }
@@ -118,7 +118,7 @@ public class PropertyUtilsResolver implements PropertyResolver {
                     PropertyUtils.setIndexedProperty(target, "", parseIndex((Number) index), value);
                     return value;
                 } else if (index instanceof String) {
-                    PropertyUtils.setSimpleProperty(target, (String) index, value);
+                    PropertyUtils.setProperty(target, (String) index, value);
                     return value;
                 }
             } catch (Exception e) {

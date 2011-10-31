@@ -9,10 +9,10 @@ import see.functions.bool.And;
 import see.functions.bool.Not;
 import see.functions.bool.Or;
 import see.functions.compare.*;
-import see.functions.properties.GetProperty;
 import see.functions.properties.MakeIndexed;
 import see.functions.properties.MakeTarget;
-import see.functions.properties.SetProperty;
+import see.functions.properties.PropertyFunctions;
+import see.functions.properties.PropertyUtilsResolver;
 import see.functions.service.Assign;
 import see.functions.service.If;
 import see.functions.service.IsDefined;
@@ -65,8 +65,10 @@ public class ConfigBuilder {
         builder.addFunction("isDefined", (new IsDefined()));
         builder.addPureFunction("if", (new If<Object>()));
 
-        builder.addPureFunction("get", new GetProperty());
-        builder.addPureFunction("set", new SetProperty());
+        PropertyFunctions propertyFunctions = new PropertyFunctions(new PropertyUtilsResolver());
+        builder.addPureFunction("get", propertyFunctions.getGetFunction());
+        builder.addPureFunction("set", propertyFunctions.getSetFunction());
+
         builder.addPureFunction("props.target", new MakeTarget());
         builder.addPureFunction("props.indexed", new MakeIndexed());
 
