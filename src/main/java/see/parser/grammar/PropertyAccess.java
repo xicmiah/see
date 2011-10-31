@@ -36,6 +36,14 @@ public abstract class PropertyAccess {
         public <T, D> T accept(Visitor<T, D> visitor, D intermediate) {
             return visitor.visit(this, intermediate);
         }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("Value");
+            sb.append("(").append(target).append(")");
+            return sb.toString();
+        }
     }
 
     public static class Simple extends PropertyAccess {
@@ -52,6 +60,14 @@ public abstract class PropertyAccess {
         @Override
         public <T, D> T accept(Visitor<T, D> visitor, D intermediate) {
             return visitor.visit(this, intermediate);
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("Simple");
+            sb.append("(").append(name).append(")");
+            return sb.toString();
         }
     }
 
@@ -70,6 +86,15 @@ public abstract class PropertyAccess {
         public <T, D> T accept(Visitor<T, D> visitor, D intermediate) {
             return visitor.visit(this, intermediate);
         }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("Indexed");
+            sb.append("(").append(index).append(")");
+            return sb.toString();
+        }
+
     }
 
     /**
