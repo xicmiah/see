@@ -1,10 +1,13 @@
 package see.integration;
 
+import com.google.common.collect.Maps;
+import org.aspectj.weaver.patterns.ThrowsPattern;
 import org.junit.Test;
 import see.See;
 import see.tree.Node;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import static java.math.BigDecimal.valueOf;
 import static org.junit.Assert.assertEquals;
@@ -57,8 +60,8 @@ public class ServiceFunctionsTest {
 
     @Test
     public void testNonCurlyIf() throws Exception {
-        assertEquals(valueOf(9), eval("if(1) 9; else 42;"));
-        assertEquals(valueOf(9), eval("if(0) 42; 9;"));
+        assertEquals(valueOf(9), eval("if(true) 9; else 42;"));
+        assertEquals(valueOf(9), eval("if(false) 42; 9;"));
     }
 
     @Test
@@ -71,5 +74,18 @@ public class ServiceFunctionsTest {
     @Test
     public void testEmptySequence() throws Exception {
         assertNull(eval("seq();"));
+    }
+
+    @Test
+    public void testIfLogic() throws Exception {
+        Map<String, Object> context = Maps.newHashMap();
+
+        Node<Object> tree = see.parseExpressionList("if (true && false) {a=9;} else {a=10;}");
+        see.evaluate(tree, context);
+        assertEquals(valueOf(10), context.get("a"));
+
+        tree = see.parseExpressionList("if (true || false) {a=9;} else {a=10;}");
+        see.evaluate(tree, context);
+        assertEquals(valueOf(9), context.get("a"));
     }
 }

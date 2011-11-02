@@ -11,13 +11,13 @@ import static see.functions.bool.BooleanCastHelper.toBoolean;
 /**
  * Logical Or function. Short-circuits.
  */
-public class Or implements Function<List<BigDecimal>, BigDecimal> {
+public class Or implements Function<List<Boolean>, Boolean> {
     @Override
-    public BigDecimal apply(List<BigDecimal> input) {
-        for (BigDecimal value : input) {
-            if (toBoolean(value)) return fromBoolean(true);
+    public Boolean apply(List<Boolean> input) {
+        for (Boolean value : input) {
+            if (value) return true;
         }
-        return fromBoolean(false);
+        return false;
     }
 
     @Override

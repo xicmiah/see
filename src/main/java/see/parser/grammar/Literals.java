@@ -46,6 +46,10 @@ class Literals extends AbstractGrammar {
         return FirstOf(Letter(), Digit());
     }
 
+    Rule BooleanLiteral() {
+        return FirstOf(String("true"),String("false"));
+    }
+
     Rule Digit() {
         return CharRange('0', '9');
     }

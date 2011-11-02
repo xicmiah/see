@@ -292,7 +292,7 @@ class Expressions extends AbstractGrammar {
     @Terminal
     @SuppressSubnodes
     Rule Constant() {
-        return FirstOf(String(), Float(), Int());
+        return FirstOf(String(), Float(), Int(), Boolean());
     }
 
     /**
@@ -373,6 +373,11 @@ class Expressions extends AbstractGrammar {
     @Terminal
     Rule Int() {
         return T(literals.IntLiteral(), push(new ImmutableConstNode<Object>(matchNumber())));
+    }
+
+    @Terminal
+    Rule Boolean(){
+        return T(literals.BooleanLiteral(), push(new ImmutableConstNode<Object>(Boolean.valueOf(match()))));
     }
 
     @SuppressSubnodes
