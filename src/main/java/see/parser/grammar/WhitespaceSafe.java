@@ -19,11 +19,11 @@ package see.parser.grammar;
 import java.lang.annotation.*;
 
 /**
- * Indicates that rule is a terminal and matches whitespace/comments after it.
- * It is unsafe to call match() for such rules.
+ * Indicates what it's safe to call match() for this rule.
+ * The rule doesn't match any whitespace/comments after it.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
 @Documented
-public @interface Terminal {
+public @interface WhitespaceSafe {
 }

@@ -9,10 +9,12 @@ class Literals extends AbstractGrammar {
         this.decimalSeparator = decimalSeparator;
     }
 
+    @WhitespaceSafe
     Rule StringLiteral() {
         return FirstOf(DelimitedString('"'), DelimitedString('\''));
     }
 
+    @WhitespaceSafe
     Rule DelimitedString(char delimiter) {
         return Sequence(
                 Ch(delimiter),
@@ -21,10 +23,12 @@ class Literals extends AbstractGrammar {
         );
     }
 
+    @WhitespaceSafe
     Rule IntLiteral() {
         return OneOrMore(Digit());
     }
 
+    @WhitespaceSafe
     Rule FloatLiteral(){
         return FirstOf(
                 Sequence(OneOrMore(Digit()), decimalSeparator, OneOrMore(Digit()), Optional(Exponent())),
@@ -33,19 +37,22 @@ class Literals extends AbstractGrammar {
         );
     }
 
-
+    @WhitespaceSafe
     Rule Exponent() {
         return Sequence(AnyOf("eE"), Optional(AnyOf("+-")), OneOrMore(Digit()));
     }
 
+    @WhitespaceSafe
     Rule Letter() {
         return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), '_');
     }
 
+    @WhitespaceSafe
     Rule LetterOrDigit() {
         return FirstOf(Letter(), Digit());
     }
 
+    @WhitespaceSafe
     Rule Digit() {
         return CharRange('0', '9');
     }
