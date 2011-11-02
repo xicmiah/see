@@ -10,10 +10,7 @@ import see.functions.bool.Not;
 import see.functions.bool.Or;
 import see.functions.compare.*;
 import see.functions.properties.*;
-import see.functions.service.Assign;
-import see.functions.service.If;
-import see.functions.service.IsDefined;
-import see.functions.service.Sequence;
+import see.functions.service.*;
 import see.parser.numbers.BigDecimalFactory;
 import see.parser.numbers.NumberFactory;
 
@@ -45,8 +42,14 @@ public class ConfigBuilder {
         addArithmetic(builder);
         addCompare(builder);
         addProperty(builder, builder.propertyResolver);
+        addIteration(builder);
 
         return builder;
+    }
+
+    private static void addIteration(ConfigBuilder builder) {
+        builder.addAlias("for", "iterate");
+        builder.addFunction("iterate", new Iterate());
     }
 
     private static void addProperty(ConfigBuilder builder, PropertyResolver resolver) {

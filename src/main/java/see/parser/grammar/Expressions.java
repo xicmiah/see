@@ -22,6 +22,7 @@ import see.tree.immutable.ImmutableVarNode;
 import java.util.List;
 import java.util.Set;
 
+import static com.google.common.collect.ImmutableList.of;
 import static see.parser.grammar.PropertyAccess.Simple;
 
 @SuppressWarnings({"InfiniteRecursion"})
@@ -70,7 +71,27 @@ class Expressions extends AbstractGrammar {
      * @return rule
      */
     Rule Term() {
-        return FirstOf(Conditional(), Sequence(Expression(), T(";")));
+        return FirstOf(Conditional(), Iteration(), TerminatedExpression());
+    }
+
+    /**
+     * An expression ending with semicolon.
+     * @return constructed rule
+     */
+    Rule TerminatedExpression() {
+        return Sequence(Expression(), T(";"));
+    }
+
+    /**
+     * For loop, like one in Java 5, but without type declaration.
+     * @return constructed rule
+     */
+    Rule Iteration() {
+        return Sequence(
+                T("for"), T("("), VarName(), T(":"), Atom(), T(")"),
+                Block(),
+                swap3() && push(makeFNode("for", of(pop(), pop(), pop())))
+                );
     }
 
     /**
