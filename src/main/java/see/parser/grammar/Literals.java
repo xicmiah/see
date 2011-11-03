@@ -53,6 +53,11 @@ class Literals extends AbstractGrammar {
     }
 
     @WhitespaceSafe
+    Rule BooleanLiteral() {
+        return FirstOf(String("true"),String("false"));
+    }
+
+    @WhitespaceSafe
     Rule Digit() {
         return CharRange('0', '9');
     }

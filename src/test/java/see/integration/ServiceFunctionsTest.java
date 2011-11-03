@@ -34,9 +34,9 @@ public class ServiceFunctionsTest {
 
     @Test
     public void testIsDefined() throws Exception {
-        assertEquals(BigDecimal.ZERO, eval("isDefined(a);"));
-        assertEquals(BigDecimal.ONE, eval("a = 5; isDefined(a);"));
-        assertEquals(BigDecimal.ZERO, eval("a = 5; isDefined(b);"));
+        assertEquals(Boolean.FALSE, eval("isDefined(a);"));
+        assertEquals(Boolean.TRUE, eval("a = 5; isDefined(a);"));
+        assertEquals(Boolean.FALSE, eval("a = 5; isDefined(b);"));
     }
 
     @Test
@@ -57,8 +57,8 @@ public class ServiceFunctionsTest {
 
     @Test
     public void testNonCurlyIf() throws Exception {
-        assertEquals(valueOf(9), eval("if(1) 9; else 42;"));
-        assertEquals(valueOf(9), eval("if(0) 42; 9;"));
+        assertEquals(valueOf(9), eval("if(true) 9; else 42;"));
+        assertEquals(valueOf(9), eval("if(false) 42; 9;"));
     }
 
     @Test
@@ -71,5 +71,11 @@ public class ServiceFunctionsTest {
     @Test
     public void testEmptySequence() throws Exception {
         assertNull(eval("seq();"));
+    }
+
+    @Test
+    public void testIfLogic() throws Exception {
+        assertEquals(valueOf(9), see.eval("if(true, 9, 42)"));
+        assertEquals(valueOf(9), see.eval("if(false, 42, 9)"));
     }
 }

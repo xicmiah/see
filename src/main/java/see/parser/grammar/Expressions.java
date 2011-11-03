@@ -303,7 +303,7 @@ class Expressions extends AbstractGrammar {
      */
     @SuppressSubnodes
     Rule Constant() {
-        return FirstOf(String(), Float(), Int());
+        return FirstOf(String(), Float(), Int(), Boolean());
     }
 
     /**
@@ -378,6 +378,10 @@ class Expressions extends AbstractGrammar {
     }
 
     @WhitespaceSafe
+    Rule Boolean(){
+        return T(literals.BooleanLiteral(), push(new ImmutableConstNode<Object>(Boolean.valueOf(match()))));
+    }
+
     @SuppressSubnodes
     Rule Identifier() {
         return Sequence(Name(), !keywords.contains(match()));

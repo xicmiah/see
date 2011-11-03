@@ -3,26 +3,24 @@ package see.functions.compare;
 import com.google.common.base.Objects;
 import see.functions.VarArgFunction;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static see.functions.bool.BooleanCastHelper.fromBoolean;
 
 /**
  * Equality. Returns if it's arguments are equal.
  * This implementation
  */
-public class Eq implements VarArgFunction<Object, BigDecimal> {
+public class Eq implements VarArgFunction<Object, Boolean> {
 
     @Override
-    public BigDecimal apply(List<Object> input) {
+    public Boolean apply(List<Object> input) {
         checkArgument(input.size() == 2, "Eq takes two arguments");
 
         Object arg1 = input.get(0);
         Object arg2 = input.get(1);
 
-        return fromBoolean(unwrappedApply(arg1, arg2));
+        return unwrappedApply(arg1, arg2);
     }
 
     public boolean unwrappedApply(Object arg1, Object arg2) {

@@ -15,14 +15,16 @@ import static org.junit.Assert.assertEquals;
 
 public class ArithmeticTest {
     final BigDecimal nine = valueOf(9);
-    
+    final Boolean positive = true;
+    final Boolean negative = false;
+
     See see;
 
     @Before
     public void setUp() throws Exception {
-        see = new See(ConfigBuilder.defaultConfig().addPureFunction("fail", new Function<List<Object>, Object>() {
+        see = new See(ConfigBuilder.defaultConfig().addPureFunction("fail", new Function<List<Object>, Boolean>() {
             @Override
-            public Object apply(List<Object> input) {
+            public Boolean apply(List<Object> input) {
                 throw new IllegalStateException("Fail evaluated");
             }
         }).build());
@@ -34,7 +36,7 @@ public class ArithmeticTest {
         assertEquals(nine, see.eval("42-33"));
         assertEquals(nine, see.eval("3*3"));
         assertEquals(nine, see.eval("54/6"));
-        
+
         assertEquals(nine, see.eval("4 + 2 * 3 - 5 / 5"));
         assertEquals(nine, see.eval("((4 + (2*3)) - (5/5))"));
     }
@@ -47,7 +49,7 @@ public class ArithmeticTest {
 
     @Test
     public void testDivision() throws Exception {
-        assertEquals(1.0D/3, ((Number) see.eval("1/3")).doubleValue(), 1e-9);
+        assertEquals(1.0D / 3, ((Number) see.eval("1/3")).doubleValue(), 1e-9);
     }
 
     @Test
@@ -59,25 +61,24 @@ public class ArithmeticTest {
 
     @Test
     public void testLogicalOps() throws Exception {
-        assertEquals(valueOf(0), see.eval("!9"));
-        assertEquals(valueOf(0), see.eval("!1"));
-        assertEquals(valueOf(1), see.eval("!0"));
+        assertEquals(negative, see.eval("!true"));
+        assertEquals(positive, see.eval("!false"));
 
-        assertEquals(valueOf(0), see.eval("0 || 0"));
-        assertEquals(valueOf(1), see.eval("1 || 0"));
-        assertEquals(valueOf(1), see.eval("0 || 1"));
-        assertEquals(valueOf(1), see.eval("1 || 1"));
- 
-        assertEquals(valueOf(0), see.eval("0 && 0"));
-        assertEquals(valueOf(0), see.eval("1 && 0"));
-        assertEquals(valueOf(0), see.eval("0 && 1"));
-        assertEquals(valueOf(1), see.eval("1 && 1"));
+        assertEquals(positive, see.eval("true || true"));
+        assertEquals(positive, see.eval("true || false"));
+        assertEquals(positive, see.eval("false || true"));
+        assertEquals(negative, see.eval("false || false"));
+
+        assertEquals(positive, see.eval("true && true"));
+        assertEquals(negative, see.eval("true && false"));
+        assertEquals(negative, see.eval("false && true"));
+        assertEquals(negative, see.eval("false && false"));
     }
 
     @Test
     public void testLogicalShortCircuit() throws Exception {
-        assertEquals(valueOf(0), see.eval("0 && fail()"));
-        assertEquals(valueOf(1), see.eval("1 || fail()"));
+        assertEquals(negative, see.eval("false && fail()"));
+        assertEquals(positive, see.eval("true || fail()"));
     }
 
     @Test
