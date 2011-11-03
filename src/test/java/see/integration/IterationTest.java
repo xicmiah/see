@@ -17,10 +17,12 @@
 package see.integration;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.Before;
 import org.junit.Test;
 import see.See;
 import see.tree.Node;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -33,17 +35,30 @@ public class IterationTest {
 
     final List<?> testList = of(new StringBean("nine"), new StringBean("crno"), new StringBean("bka"));
     final Map<String, ?> baseContext = ImmutableMap.of("list", testList);
+    Map<String,?> context;
+
+    @Before
+    public void setUp() throws Exception {
+        context = newHashMap(baseContext);
+    }
 
     @Test
-    public void testIteration() throws Exception {
-        Map<String, ?> context = newHashMap(baseContext);
-
+    public void testForLoop() throws Exception {
         Node<?> tree = see.parseExpressionList("a = 0; for(s : list) a = a + s.length;");
         see.evaluate(tree, context);
 
         assertEquals("11.0", context.get("a").toString());
     }
-    
+
+    @Test
+    public void testWhileLoop() throws Exception {
+        Node<?> tree = see.parseExpressionList("a = 3; b = 3; while(a > 0) { a = a - 1; b = b + 2; }");
+        see.evaluate(tree, context);
+
+        assertEquals(BigDecimal.ZERO, context.get("a"));
+        assertEquals(new BigDecimal(9), context.get("b"));
+    }
+
     public static class StringBean {
         private String content;
 

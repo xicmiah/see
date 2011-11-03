@@ -50,6 +50,7 @@ public class ConfigBuilder {
     private static void addIteration(ConfigBuilder builder) {
         builder.addAlias("for", "iterate");
         builder.addFunction("iterate", new Iterate());
+        builder.addPureFunction("while", new While());
     }
 
     private static void addProperty(ConfigBuilder builder, PropertyResolver resolver) {

@@ -71,7 +71,7 @@ class Expressions extends AbstractGrammar {
      * @return rule
      */
     Rule Term() {
-        return FirstOf(Conditional(), Iteration(), TerminatedExpression());
+        return FirstOf(Conditional(), ForLoop(), WhileLoop(), TerminatedExpression());
     }
 
     /**
@@ -86,12 +86,24 @@ class Expressions extends AbstractGrammar {
      * For loop, like one in Java 5, but without type declaration.
      * @return constructed rule
      */
-    Rule Iteration() {
+    Rule ForLoop() {
         return Sequence(
                 T("for"), T("("), VarName(), T(":"), Atom(), T(")"),
                 Block(),
                 swap3() && push(makeFNode("for", of(pop(), pop(), pop())))
                 );
+    }
+
+    /**
+     * While loop, C-like.
+     * @return constructed rule
+     */
+    Rule WhileLoop() {
+        return Sequence(
+                T("while"), T("("), Expression(), T(")"),
+                Block(),
+                pushBinOp("while")
+        );
     }
 
     /**
