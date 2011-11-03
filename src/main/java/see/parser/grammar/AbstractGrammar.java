@@ -63,7 +63,6 @@ abstract class AbstractGrammar extends BaseParser<Node<Object>> {
      * @param children child rules to match
      * @return constructed rule
      */
-    @Terminal
     Rule T(Object... children) {
         return Sequence(Sequence(children), Whitespace());
     }
