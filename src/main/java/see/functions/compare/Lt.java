@@ -2,20 +2,18 @@ package see.functions.compare;
 
 import see.functions.Function;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static see.functions.bool.BooleanCastHelper.fromBoolean;
 
-public class Lt implements Function<List<BigDecimal>, BigDecimal> {
+public class Lt implements Function<List<Comparable>, Boolean> {
     @Override
-    public BigDecimal apply(List<BigDecimal> input) {
+    public Boolean apply(List<Comparable> input) {
         checkArgument(input.size() == 2, "Lt takes only two arguments");
 
         boolean value = input.get(0).compareTo(input.get(1)) < 0;
 
-        return fromBoolean(value);
+        return value;
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 import see.See;
-import see.exceptions.EvaluationException;
 import see.functions.Function;
 import see.parser.config.ConfigBuilder;
 
@@ -23,9 +22,9 @@ public class ArithmeticTest {
 
     @Before
     public void setUp() throws Exception {
-        see = new See(ConfigBuilder.defaultConfig().addPureFunction("fail", new Function<List<Object>, Object>() {
+        see = new See(ConfigBuilder.defaultConfig().addPureFunction("fail", new Function<List<Object>, Boolean>() {
             @Override
-            public Object apply(List<Object> input) {
+            public Boolean apply(List<Object> input) {
                 throw new IllegalStateException("Fail evaluated");
             }
         }).build());
@@ -76,10 +75,10 @@ public class ArithmeticTest {
         assertEquals(negative, see.eval("false && false"));
     }
 
-    @Test(expected = EvaluationException.class)
+    @Test
     public void testLogicalShortCircuit() throws Exception {
-        assertEquals(negative, see.eval("true && fail()"));
-        assertEquals(positive, see.eval("false || fail()"));
+        assertEquals(negative, see.eval("false && fail()"));
+        assertEquals(positive, see.eval("true || fail()"));
     }
 
     @Test

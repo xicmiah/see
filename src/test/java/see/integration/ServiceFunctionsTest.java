@@ -1,7 +1,6 @@
 package see.integration;
 
 import com.google.common.collect.Maps;
-import org.aspectj.weaver.patterns.ThrowsPattern;
 import org.junit.Test;
 import see.See;
 import see.tree.Node;
@@ -37,9 +36,9 @@ public class ServiceFunctionsTest {
 
     @Test
     public void testIsDefined() throws Exception {
-        assertEquals(BigDecimal.ZERO, eval("isDefined(a);"));
-        assertEquals(BigDecimal.ONE, eval("a = 5; isDefined(a);"));
-        assertEquals(BigDecimal.ZERO, eval("a = 5; isDefined(b);"));
+        assertEquals(Boolean.FALSE, eval("isDefined(a);"));
+        assertEquals(Boolean.TRUE, eval("a = 5; isDefined(a);"));
+        assertEquals(Boolean.FALSE, eval("a = 5; isDefined(b);"));
     }
 
     @Test
@@ -79,13 +78,7 @@ public class ServiceFunctionsTest {
     @Test
     public void testIfLogic() throws Exception {
         Map<String, Object> context = Maps.newHashMap();
-
-        Node<Object> tree = see.parseExpressionList("if (true && false) {a=9;} else {a=10;}");
-        see.evaluate(tree, context);
-        assertEquals(valueOf(10), context.get("a"));
-
-        tree = see.parseExpressionList("if (true || false) {a=9;} else {a=10;}");
-        see.evaluate(tree, context);
-        assertEquals(valueOf(9), context.get("a"));
+        assertEquals(valueOf(9), see.eval("if(true, 9, 42)"));
+        assertEquals(valueOf(9), see.eval("if(false, 42, 9)"));
     }
 }
