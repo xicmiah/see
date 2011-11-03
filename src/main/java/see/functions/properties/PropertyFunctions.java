@@ -19,8 +19,11 @@ package see.functions.properties;
 import com.google.common.base.Preconditions;
 import see.functions.VarArgFunction;
 import see.parser.grammar.PropertyAccess;
+import see.util.Reduce;
 
 import java.util.List;
+
+import static see.util.Reduce.fold;
 
 public class PropertyFunctions {
     private final PropertyResolver resolver;
@@ -63,7 +66,14 @@ public class PropertyFunctions {
             Preconditions.checkArgument(input.size() >= 1, "GetProperty takes one or more arguments");
 
             Object bean = getBean(input.get(0));
-            return resolver.get(bean, input.subList(1, input.size()));
+            List<PropertyAccess> properties = input.subList(1, input.size());
+
+            return fold(bean, properties, new Reduce.FoldFunction<PropertyAccess, Object>() {
+                @Override
+                public Object apply(Object prev, PropertyAccess arg) {
+                    return resolver.get(prev, arg);
+                }
+            });
         }
         @Override
         public String toString() {
@@ -79,11 +89,13 @@ public class PropertyFunctions {
         public Object apply(List<PropertyAccess> input) {
             Preconditions.checkArgument(input.size() >= 3, "SetProperty takes three or more arguments");
 
-            Object bean = getBean(input.get(0));
-            List<PropertyAccess> properties = input.subList(1, input.size() - 1);
+            List<PropertyAccess> properties = input.subList(0, input.size() - 1);
             Object value = getBean(input.get(input.size() - 1));
 
-            resolver.set(bean, properties, value);
+            Object lastBean = getInstance.apply(properties.subList(0, properties.size() - 1));
+            PropertyAccess lastProperty = properties.get(properties.size() - 1);
+
+            resolver.set(lastBean, lastProperty, value);
             
             return value;
         }

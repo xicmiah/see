@@ -18,23 +18,21 @@ package see.functions.properties;
 
 import see.parser.grammar.PropertyAccess;
 
-import java.util.List;
-
 public interface PropertyResolver {
 
     /**
      * Get property via specified path
      * @param bean target bean
-     * @param properties property path
+     * @param property property descriptor
      * @return resolved property
      */
-    Object get(Object bean, List<? extends PropertyAccess> properties);
+    Object get(Object bean, PropertyAccess property);
 
     /**
      * Set property to target bean
      * @param bean target bean
-     * @param properties property path
+     * @param property property descriptor
      * @param value new property value
      */
-    void set(Object bean, List<? extends PropertyAccess> properties, Object value);
+    void set(Object bean, PropertyAccess property, Object value);
 }

@@ -19,31 +19,19 @@ package see.functions.properties;
 import org.apache.commons.beanutils.PropertyUtils;
 import see.exceptions.EvaluationException;
 import see.parser.grammar.PropertyAccess;
-import see.util.Reduce;
 
-import java.util.List;
-
-import static see.util.Reduce.fold;
-
+/**
+ * Property resolver via apache PropertyUtils.
+ */
 public class PropertyUtilsResolver implements PropertyResolver {
     @Override
-    public Object get(Object bean, List<? extends PropertyAccess> properties) {
-        final GetVisitor getVisitor = new GetVisitor();
-
-        return fold(bean, properties, new Reduce.FoldFunction<PropertyAccess, Object>() {
-            @Override
-            public Object apply(Object prev, PropertyAccess arg) {
-                return arg.accept(getVisitor, prev);
-            }
-        });
+    public Object get(Object bean, PropertyAccess property) {
+        return property.accept(new GetVisitor(), bean);
     }
 
     @Override
-    public void set(Object bean, List<? extends PropertyAccess> properties, Object value) {
-        Object lastBean = get(bean, properties.subList(0, properties.size() - 1));
-        PropertyAccess lastProperty = properties.get(properties.size() - 1);
-
-        lastProperty.accept(new SetVisitor(value), lastBean);
+    public void set(Object bean, PropertyAccess property, Object value) {
+        property.accept(new SetVisitor(value), bean);
     }
 
     private static int parseIndex(Number index) {
