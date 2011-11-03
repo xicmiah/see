@@ -1,12 +1,10 @@
 package see.integration;
 
-import com.google.common.collect.Maps;
 import org.junit.Test;
 import see.See;
 import see.tree.Node;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import static java.math.BigDecimal.valueOf;
 import static org.junit.Assert.assertEquals;
@@ -77,7 +75,6 @@ public class ServiceFunctionsTest {
 
     @Test
     public void testIfLogic() throws Exception {
-        Map<String, Object> context = Maps.newHashMap();
         assertEquals(valueOf(9), see.eval("if(true, 9, 42)"));
         assertEquals(valueOf(9), see.eval("if(false, 42, 9)"));
     }
