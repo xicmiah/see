@@ -1,4 +1,7 @@
 package see.functions;
 
-public interface Function<Arg, Result> extends com.google.common.base.Function<Arg, Result> {
+import javax.annotation.Nonnull;
+
+public interface Function<Arg, Result> {
+    Result apply(@Nonnull Arg input);
 }

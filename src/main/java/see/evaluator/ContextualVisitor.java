@@ -1,7 +1,7 @@
 package see.evaluator;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import see.functions.Function;
 import see.parser.numbers.NumberFactory;
 import see.tree.*;
 
@@ -27,7 +27,7 @@ public class ContextualVisitor implements Visitor {
 		});
 
 		// Note: evaluatedArgs are lazy
-        Function<List<Arg>, Result> partial = node.getFunction().apply(context);
+        see.functions.Function<List<Arg>, Result> partial = node.getFunction().apply(context);
         Result result = partial.apply(evaluatedArgs);
 
         return passThroughNumberFactory(result);
