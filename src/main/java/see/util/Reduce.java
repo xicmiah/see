@@ -54,7 +54,7 @@ public abstract class Reduce {
      * @return reduce result
      */
     public static <T> T reduce(Iterable<? extends T> values, FoldFunction<? super T, T> func) {
-        Preconditions.checkArgument(Iterables.isEmpty(values), "Cannot reduce empty list");
+        Preconditions.checkArgument(!Iterables.isEmpty(values), "Cannot reduce empty list");
 
         return fold(Iterables.getFirst(values, null), Iterables.skip(values, 1), func);
     }
