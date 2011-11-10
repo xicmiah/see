@@ -26,7 +26,7 @@ import static com.google.common.collect.ImmutableSet.of;
 import static java.lang.Integer.valueOf;
 import static junit.framework.Assert.assertEquals;
 
-public class AbstractDependencyTest {
+public class ReactiveTest {
 
     ReactiveFactory reactiveFactory;
 
@@ -99,5 +99,41 @@ public class AbstractDependencyTest {
         assertEquals(valueOf(3), b.now());
         assertEquals(3, counter.get());
 
+    }
+
+    @Test
+    public void testStatefulSignal() throws Exception {
+        final VariableSignal<String> a = reactiveFactory.var("crno");
+        final AtomicInteger lengthCounter = new AtomicInteger(0);
+
+        final Signal<Integer> length = reactiveFactory.bindWithState(of(a), new Supplier<Integer>() {
+            @Override
+            public Integer get() {
+                lengthCounter.incrementAndGet();
+                return a.now().length();
+            }
+        });
+
+        assertEquals(1, lengthCounter.get());
+
+        final AtomicInteger plusCounter = new AtomicInteger(0);
+        final Signal<Integer> plusOne = reactiveFactory.bindWithState(of(length), new Supplier<Integer>() {
+            @Override
+            public Integer get() {
+                plusCounter.incrementAndGet();
+                return length.now() + 1;
+            }
+        });
+
+        assertEquals(1, lengthCounter.get());
+        assertEquals(1, plusCounter.get());
+
+        a.update("bka");
+        assertEquals(2, lengthCounter.get());
+        assertEquals(2, plusCounter.get());
+
+        assertEquals(valueOf(4), plusOne.now());
+        assertEquals(2, lengthCounter.get());
+        assertEquals(2, plusCounter.get());
     }
 }
