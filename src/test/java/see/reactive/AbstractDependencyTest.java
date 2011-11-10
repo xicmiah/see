@@ -17,16 +17,25 @@
 package see.reactive;
 
 import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableSet;
+import org.junit.Before;
 import org.junit.Test;
 
+import static com.google.common.collect.ImmutableSet.of;
 import static junit.framework.Assert.assertEquals;
 
 public class AbstractDependencyTest {
+
+    ReactiveFactory reactiveFactory;
+
+    @Before
+    public void setUp() throws Exception {
+        reactiveFactory = new ReactiveFactory();
+    }
+
     @Test
-    public void testInterraction() throws Exception {
-        final Var<String> a = new Var<String>("asd");
-        Signal<Integer> b = new StatefulSignal<Integer>(ImmutableSet.of(a), new Supplier<Integer>() {
+    public void testInteraction() throws Exception {
+        final VariableSignal<String> a = reactiveFactory.var("asd");
+        Signal<Integer> b = reactiveFactory.bindWithState(of(a), new Supplier<Integer>() {
             @Override
             public Integer get() {
                 return a.now().length();
