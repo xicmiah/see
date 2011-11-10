@@ -18,7 +18,7 @@ package see.reactive;
 
 import com.google.common.collect.ImmutableSet;
 
-public class Var<T> extends AbstractDependency implements Signal<T> {
+public class Var<T> extends AbstractDependency implements Signal<T>, Updatable<T> {
 
     private T value;
 
@@ -27,6 +27,7 @@ public class Var<T> extends AbstractDependency implements Signal<T> {
         value = initial;
     }
 
+    @Override
     public void update(T newValue) {
         value = newValue;
         invalidate();

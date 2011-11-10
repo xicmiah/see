@@ -18,11 +18,13 @@ package see.reactive;
 
 import com.google.common.base.Supplier;
 
+import java.util.Collection;
+
 public class SimpleSignal<T> extends AbstractDependency implements Signal<T> {
 
     private Supplier<T> evaluation;
 
-    public SimpleSignal(Iterable<? extends Dependency> dependencies, Supplier<T> evaluation) {
+    public SimpleSignal(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
         super(dependencies);
         this.evaluation = evaluation;
     }

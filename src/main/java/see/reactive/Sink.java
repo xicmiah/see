@@ -16,11 +16,13 @@
 
 package see.reactive;
 
+import java.util.Collection;
+
 public class Sink extends AbstractDependency {
 
     private final Runnable actions;
 
-    public Sink(Iterable<? extends Dependency> dependencies, Runnable actions) {
+    public Sink(Collection<? extends Dependency> dependencies, Runnable actions) {
         super(dependencies);
         this.actions = actions;
     }

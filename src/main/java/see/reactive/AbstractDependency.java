@@ -20,12 +20,14 @@ import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
+import java.util.Collection;
+
 public abstract class AbstractDependency implements Dependency {
     private EventBus eventBus = new EventBus();
 
-    private Iterable<? extends Dependency> dependencies;
+    private Collection<? extends Dependency> dependencies;
 
-    protected AbstractDependency(Iterable<? extends Dependency> dependencies) {
+    protected AbstractDependency(Collection<? extends Dependency> dependencies) {
         this.dependencies = dependencies;
         eventBus.register(this);
     }
@@ -39,6 +41,11 @@ public abstract class AbstractDependency implements Dependency {
         if (Iterables.contains(dependencies, changeEvent.getTarget())) {
             updateInvalidate();
         }
+    }
+
+    @Override
+    public Collection<? extends Dependency> getDependencies() {
+        return dependencies;
     }
 
     protected abstract void updateInvalidate();

@@ -16,8 +16,6 @@
 
 package see.reactive;
 
-import java.util.Collection;
-
-public interface Dependency {
-    Collection<? extends Dependency> getDependencies();
+public interface Updatable<T> {
+    void update(T newValue);
 }

@@ -19,13 +19,15 @@ package see.reactive;
 import com.google.common.base.Objects;
 import com.google.common.base.Supplier;
 
+import java.util.Collection;
+
 public class StatefulSignal<T> extends AbstractDependency implements Signal<T> {
 
     private final Supplier<T> evaluation;
 
     private T currentValue;
 
-    public StatefulSignal(Supplier<T> evaluation, Iterable<? extends Dependency> dependencies) {
+    public StatefulSignal(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
         super(dependencies);
         this.evaluation = evaluation;
         currentValue = evaluation.get();
