@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package see.reactive;
+package see.reactive.impl;
 
 import com.google.common.base.Supplier;
 import com.google.common.eventbus.EventBus;
+import see.reactive.Dependency;
+import see.reactive.Signal;
+import see.reactive.Trigger;
+import see.reactive.VariableSignal;
 
 import java.util.Collection;
 
@@ -27,7 +31,7 @@ public class ReactiveFactory {
     public <T> Signal<T> val(T value) {
         return new Val<T>(value);
     }
-    
+
     public <T> VariableSignal<T> var(T initialValue) {
         return new Var<T>(eventBus, initialValue);
     }

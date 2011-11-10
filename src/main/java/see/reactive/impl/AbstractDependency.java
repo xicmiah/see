@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package see.reactive;
+package see.reactive.impl;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import see.reactive.Dependency;
 
 import java.util.Collection;
 import java.util.Set;
 
-public abstract class AbstractDependency implements Dependency {
+abstract class AbstractDependency implements Dependency {
     private final EventBus eventBus;
 
     private final Set<? extends Dependency> dependencies;

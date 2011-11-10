@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package see.reactive;
+package see.reactive.impl;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
+import see.reactive.Dependency;
+import see.reactive.Trigger;
 
-public class TriggerImpl extends AbstractDependency implements Trigger {
+class TriggerImpl extends AbstractDependency implements Trigger {
     protected TriggerImpl(EventBus eventBus) {
         super(eventBus, ImmutableSet.<Dependency>of());
     }

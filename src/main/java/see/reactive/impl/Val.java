@@ -14,24 +14,29 @@
  * limitations under the License.
  */
 
-package see.reactive;
+package see.reactive.impl;
 
-import com.google.common.eventbus.EventBus;
+import com.google.common.collect.ImmutableSet;
+import see.reactive.Dependency;
+import see.reactive.Signal;
 
 import java.util.Collection;
 
-public class Sink extends AbstractDependency {
-
-    private final Runnable actions;
-
-    public Sink(EventBus eventBus, Collection<? extends Dependency> dependencies, Runnable actions) {
-        super(eventBus, dependencies);
-        this.actions = actions;
+class Val<T> implements Signal<T> {
+    
+    private final T value;
+    
+    public Val(T value) {
+        this.value = value;
     }
 
     @Override
-    protected void updateInternalState() {
-        actions.run();
-        invalidate();
+    public T now() {
+        return value;
+    }
+
+    @Override
+    public Collection<? extends Dependency> getDependencies() {
+        return ImmutableSet.of();
     }
 }

@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package see.reactive;
+package see.reactive.impl;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
+import see.reactive.Dependency;
+import see.reactive.VariableSignal;
 
-public class Var<T> extends AbstractDependency implements VariableSignal<T> {
+class Var<T> extends AbstractDependency implements VariableSignal<T> {
 
     private T value;
 

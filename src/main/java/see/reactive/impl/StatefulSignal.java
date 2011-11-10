@@ -14,30 +14,40 @@
  * limitations under the License.
  */
 
-package see.reactive;
+package see.reactive.impl;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Supplier;
 import com.google.common.eventbus.EventBus;
+import see.reactive.Dependency;
+import see.reactive.Signal;
 
 import java.util.Collection;
 
-public class SimpleSignal<T> extends AbstractDependency implements Signal<T> {
+class StatefulSignal<T> extends AbstractDependency implements Signal<T> {
 
-    private Supplier<T> evaluation;
+    private final Supplier<T> evaluation;
 
-    public SimpleSignal(EventBus eventBus, Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
+    private T currentValue;
+
+    public StatefulSignal(EventBus eventBus, Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
         super(eventBus, dependencies);
         this.evaluation = evaluation;
+        currentValue = evaluation.get();
     }
 
     @Override
     public T now() {
-        return evaluation.get();
+        return currentValue;
     }
 
     @Override
     protected void updateInternalState() {
-        invalidate();
-        // No internal state
+        T newValue = evaluation.get();
+        if (!Objects.equal(currentValue, newValue)) {
+            currentValue = newValue;
+            invalidate();
+        }
     }
+
 }
