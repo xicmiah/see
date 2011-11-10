@@ -39,7 +39,7 @@ public class ReactiveTest {
     @Test
     public void testInteraction() throws Exception {
         final VariableSignal<String> a = reactiveFactory.var("asd");
-        Signal<Integer> b = reactiveFactory.bindWithState(of(a), new Supplier<Integer>() {
+        Signal<Integer> b = reactiveFactory.bind(of(a), new Supplier<Integer>() {
             @Override
             public Integer get() {
                 return a.now().length();
@@ -58,7 +58,7 @@ public class ReactiveTest {
         final VariableSignal<Integer> a = reactiveFactory.var(1);
         final VariableSignal<Integer> b = reactiveFactory.var(2);
 
-        Signal<Integer> sum = reactiveFactory.bindWithState(of(a, b), new Supplier<Integer>() {
+        Signal<Integer> sum = reactiveFactory.bind(of(a, b), new Supplier<Integer>() {
             @Override
             public Integer get() {
                 return a.now() + b.now();
@@ -79,7 +79,7 @@ public class ReactiveTest {
         final VariableSignal<String> a = reactiveFactory.var("crno");
         final AtomicInteger counter = new AtomicInteger(0);
 
-        Signal<Integer> b = reactiveFactory.bind(of(a), new Supplier<Integer>() {
+        Signal<Integer> b = reactiveFactory.bindLazy(of(a), new Supplier<Integer>() {
             @Override
             public Integer get() {
                 counter.incrementAndGet();
@@ -107,7 +107,7 @@ public class ReactiveTest {
         final VariableSignal<String> a = reactiveFactory.var("crno");
         final AtomicInteger lengthCounter = new AtomicInteger(0);
 
-        final Signal<Integer> length = reactiveFactory.bindWithState(of(a), new Supplier<Integer>() {
+        final Signal<Integer> length = reactiveFactory.bind(of(a), new Supplier<Integer>() {
             @Override
             public Integer get() {
                 lengthCounter.incrementAndGet();
@@ -118,7 +118,7 @@ public class ReactiveTest {
         assertEquals(1, lengthCounter.get());
 
         final AtomicInteger plusCounter = new AtomicInteger(0);
-        final Signal<Integer> plusOne = reactiveFactory.bindWithState(of(length), new Supplier<Integer>() {
+        final Signal<Integer> plusOne = reactiveFactory.bind(of(length), new Supplier<Integer>() {
             @Override
             public Integer get() {
                 plusCounter.incrementAndGet();

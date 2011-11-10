@@ -16,23 +16,29 @@
 
 package see.reactive.impl;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.base.Supplier;
 import com.google.common.eventbus.EventBus;
 import see.reactive.Dependency;
-import see.reactive.Trigger;
+import see.reactive.Signal;
 
-class TriggerImpl extends AbstractDependency implements Trigger {
-    protected TriggerImpl(EventBus eventBus) {
-        super(eventBus, ImmutableSet.<Dependency>of());
+import java.util.Collection;
+
+class StatelessSignal<T> extends AbstractDependency implements Signal<T> {
+
+    private Supplier<T> evaluation;
+
+    public StatelessSignal(EventBus eventBus, Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
+        super(eventBus, dependencies);
+        this.evaluation = evaluation;
     }
 
     @Override
-    public void invalidate() {
-        super.invalidate();
+    public T now() {
+        return evaluation.get();
     }
 
     @Override
     protected void updateInternalState() {
-        // No dependencies
+        invalidate(); // No internal state
     }
 }

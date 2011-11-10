@@ -37,14 +37,14 @@ public class ReactiveFactory {
     }
 
     public Trigger trigger() {
-        return new TriggerImpl(eventBus);
+        return new EndpointTrigger(eventBus);
+    }
+
+    public <T> Signal<T> bindLazy(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
+        return new StatelessSignal<T>(eventBus, dependencies, evaluation);
     }
 
     public <T> Signal<T> bind(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
-        return new SimpleSignal<T>(eventBus, dependencies, evaluation);
-    }
-
-    public <T> Signal<T> bindWithState(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
         return new StatefulSignal<T>(eventBus, dependencies, evaluation);
     }
 

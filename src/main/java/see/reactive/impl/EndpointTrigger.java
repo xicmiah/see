@@ -16,30 +16,23 @@
 
 package see.reactive.impl;
 
-import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import see.reactive.Dependency;
-import see.reactive.Signal;
+import see.reactive.Trigger;
 
-import java.util.Collection;
-
-class SimpleSignal<T> extends AbstractDependency implements Signal<T> {
-
-    private Supplier<T> evaluation;
-
-    public SimpleSignal(EventBus eventBus, Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
-        super(eventBus, dependencies);
-        this.evaluation = evaluation;
+class EndpointTrigger extends AbstractDependency implements Trigger {
+    protected EndpointTrigger(EventBus eventBus) {
+        super(eventBus, ImmutableSet.<Dependency>of());
     }
 
     @Override
-    public T now() {
-        return evaluation.get();
+    public void invalidate() {
+        super.invalidate();
     }
 
     @Override
     protected void updateInternalState() {
-        invalidate();
-        // No internal state
+        // No dependencies
     }
 }
