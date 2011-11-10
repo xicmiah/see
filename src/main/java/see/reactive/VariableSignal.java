@@ -16,30 +16,5 @@
 
 package see.reactive;
 
-import com.google.common.collect.ImmutableSet;
-
-public class Var<T> extends AbstractDependency implements VariableSignal<T> {
-
-    private T value;
-
-    public Var(T initial) {
-        super(ImmutableSet.<Dependency>of());
-        value = initial;
-    }
-
-    @Override
-    public void update(T newValue) {
-        value = newValue;
-        invalidate();
-    }
-
-    @Override
-    protected void updateInvalidate() {
-        // No dependencies
-    }
-
-    @Override
-    public T now() {
-        return value;
-    }
+public interface VariableSignal<T> extends Updatable<T>, Signal<T> {
 }
