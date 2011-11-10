@@ -20,7 +20,10 @@ import com.google.common.base.Supplier;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static com.google.common.collect.ImmutableSet.of;
+import static java.lang.Integer.valueOf;
 import static junit.framework.Assert.assertEquals;
 
 public class AbstractDependencyTest {
@@ -42,10 +45,59 @@ public class AbstractDependencyTest {
             }
         });
 
-        assertEquals(Integer.valueOf(3), b.now());
+        assertEquals(valueOf(3), b.now());
         a.update("omg");
-        assertEquals(Integer.valueOf(3), b.now());
+        assertEquals(valueOf(3), b.now());
         a.update("zxcv");
-        assertEquals(Integer.valueOf(4), b.now());
+        assertEquals(valueOf(4), b.now());
+    }
+
+    @Test
+    public void testMultipleDeps() throws Exception {
+        final VariableSignal<Integer> a = reactiveFactory.var(1);
+        final VariableSignal<Integer> b = reactiveFactory.var(2);
+
+        Signal<Integer> sum = reactiveFactory.bindWithState(of(a, b), new Supplier<Integer>() {
+            @Override
+            public Integer get() {
+                return a.now() + b.now();
+            }
+        });
+
+        assertEquals(valueOf(3), sum.now());
+
+        a.update(7);
+        assertEquals(valueOf(9), sum.now());
+        
+        b.update(35);
+        assertEquals(valueOf(42), sum.now());
+    }
+
+    @Test
+    public void testStatelessSignal() throws Exception {
+        final VariableSignal<String> a = reactiveFactory.var("crno");
+        final AtomicInteger counter = new AtomicInteger(0);
+
+        Signal<Integer> b = reactiveFactory.bind(of(a), new Supplier<Integer>() {
+            @Override
+            public Integer get() {
+                counter.incrementAndGet();
+                return a.now().length();
+            }
+        });
+
+        assertEquals(0, counter.get());
+
+        assertEquals(valueOf(4), b.now());
+        assertEquals(1, counter.get());
+
+        assertEquals(valueOf(4), b.now());
+        assertEquals(2, counter.get());
+        
+        a.update("bka");
+        assertEquals(2, counter.get());
+        assertEquals(valueOf(3), b.now());
+        assertEquals(3, counter.get());
+
     }
 }

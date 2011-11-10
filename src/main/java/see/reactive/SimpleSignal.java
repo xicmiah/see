@@ -17,6 +17,7 @@
 package see.reactive;
 
 import com.google.common.base.Supplier;
+import com.google.common.eventbus.EventBus;
 
 import java.util.Collection;
 
@@ -24,8 +25,8 @@ public class SimpleSignal<T> extends AbstractDependency implements Signal<T> {
 
     private Supplier<T> evaluation;
 
-    public SimpleSignal(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
-        super(dependencies);
+    public SimpleSignal(EventBus eventBus, Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
+        super(eventBus, dependencies);
         this.evaluation = evaluation;
     }
 
@@ -36,6 +37,7 @@ public class SimpleSignal<T> extends AbstractDependency implements Signal<T> {
 
     @Override
     protected void updateInvalidate() {
+        invalidate();
         // No internal state
     }
 }

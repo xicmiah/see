@@ -18,6 +18,7 @@ package see.reactive;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Supplier;
+import com.google.common.eventbus.EventBus;
 
 import java.util.Collection;
 
@@ -27,8 +28,8 @@ public class StatefulSignal<T> extends AbstractDependency implements Signal<T> {
 
     private T currentValue;
 
-    public StatefulSignal(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
-        super(dependencies);
+    public StatefulSignal(EventBus eventBus, Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
+        super(eventBus, dependencies);
         this.evaluation = evaluation;
         currentValue = evaluation.get();
     }
@@ -41,7 +42,7 @@ public class StatefulSignal<T> extends AbstractDependency implements Signal<T> {
     @Override
     protected void updateInvalidate() {
         T newValue = evaluation.get();
-        if (Objects.equal(currentValue, newValue)) {
+        if (!Objects.equal(currentValue, newValue)) {
             currentValue = newValue;
             invalidate();
         }

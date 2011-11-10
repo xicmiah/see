@@ -23,11 +23,12 @@ import com.google.common.eventbus.Subscribe;
 import java.util.Collection;
 
 public abstract class AbstractDependency implements Dependency {
-    private EventBus eventBus = new EventBus();
+    private final EventBus eventBus;
 
     private Collection<? extends Dependency> dependencies;
 
-    protected AbstractDependency(Collection<? extends Dependency> dependencies) {
+    protected AbstractDependency(EventBus eventBus, Collection<? extends Dependency> dependencies) {
+        this.eventBus = eventBus;
         this.dependencies = dependencies;
         eventBus.register(this);
     }

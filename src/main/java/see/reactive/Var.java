@@ -17,13 +17,14 @@
 package see.reactive;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
 
 public class Var<T> extends AbstractDependency implements VariableSignal<T> {
 
     private T value;
 
-    public Var(T initial) {
-        super(ImmutableSet.<Dependency>of());
+    public Var(EventBus eventBus, T initial) {
+        super(eventBus, ImmutableSet.<Dependency>of());
         value = initial;
     }
 

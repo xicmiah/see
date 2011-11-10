@@ -16,14 +16,16 @@
 
 package see.reactive;
 
+import com.google.common.eventbus.EventBus;
+
 import java.util.Collection;
 
 public class Sink extends AbstractDependency {
 
     private final Runnable actions;
 
-    public Sink(Collection<? extends Dependency> dependencies, Runnable actions) {
-        super(dependencies);
+    public Sink(EventBus eventBus, Collection<? extends Dependency> dependencies, Runnable actions) {
+        super(eventBus, dependencies);
         this.actions = actions;
     }
 

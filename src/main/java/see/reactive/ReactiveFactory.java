@@ -22,21 +22,21 @@ import com.google.common.eventbus.EventBus;
 import java.util.Collection;
 
 public class ReactiveFactory {
-    private EventBus eventBus = new EventBus();
+    private final EventBus eventBus = new EventBus();
 
     public <T> Signal<T> bind(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
-        return new SimpleSignal<T>(dependencies, evaluation);
+        return new SimpleSignal<T>(eventBus, dependencies, evaluation);
     }
 
     public <T> Signal<T> bindWithState(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
-        return new StatefulSignal<T>(dependencies, evaluation);
+        return new StatefulSignal<T>(eventBus, dependencies, evaluation);
     }
 
     public <T> VariableSignal<T> var(T initialValue) {
-        return new Var<T>(initialValue);
+        return new Var<T>(eventBus, initialValue);
     }
 
     public Dependency sink(Collection<? extends Dependency> dependencies, Runnable actions) {
-        return new Sink(dependencies, actions);
+        return new Sink(eventBus, dependencies, actions);
     }
 }
