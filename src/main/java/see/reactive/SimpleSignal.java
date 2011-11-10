@@ -36,7 +36,7 @@ public class SimpleSignal<T> extends AbstractDependency implements Signal<T> {
     }
 
     @Override
-    protected void updateInvalidate() {
+    protected void updateInternalState() {
         invalidate();
         // No internal state
     }

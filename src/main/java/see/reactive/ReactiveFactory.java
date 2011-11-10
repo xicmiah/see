@@ -24,16 +24,24 @@ import java.util.Collection;
 public class ReactiveFactory {
     private final EventBus eventBus = new EventBus();
 
+    public <T> Signal<T> val(T value) {
+        return new Val<T>(value);
+    }
+    
+    public <T> VariableSignal<T> var(T initialValue) {
+        return new Var<T>(eventBus, initialValue);
+    }
+
+    public Trigger trigger() {
+        return new TriggerImpl(eventBus);
+    }
+
     public <T> Signal<T> bind(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
         return new SimpleSignal<T>(eventBus, dependencies, evaluation);
     }
 
     public <T> Signal<T> bindWithState(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
         return new StatefulSignal<T>(eventBus, dependencies, evaluation);
-    }
-
-    public <T> VariableSignal<T> var(T initialValue) {
-        return new Var<T>(eventBus, initialValue);
     }
 
     public Dependency sink(Collection<? extends Dependency> dependencies, Runnable actions) {

@@ -16,20 +16,21 @@
 
 package see.reactive;
 
-import com.google.common.collect.Iterables;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 import java.util.Collection;
+import java.util.Set;
 
 public abstract class AbstractDependency implements Dependency {
     private final EventBus eventBus;
 
-    private Collection<? extends Dependency> dependencies;
+    private final Set<? extends Dependency> dependencies;
 
     protected AbstractDependency(EventBus eventBus, Collection<? extends Dependency> dependencies) {
         this.eventBus = eventBus;
-        this.dependencies = dependencies;
+        this.dependencies = ImmutableSet.copyOf(dependencies);
         eventBus.register(this);
     }
 
@@ -39,8 +40,8 @@ public abstract class AbstractDependency implements Dependency {
 
     @Subscribe
     public void handleDependencyChange(ChangeEvent changeEvent) {
-        if (Iterables.contains(dependencies, changeEvent.getTarget())) {
-            updateInvalidate();
+        if (dependencies.contains(changeEvent.getTarget())) {
+            updateInternalState();
         }
     }
 
@@ -49,5 +50,17 @@ public abstract class AbstractDependency implements Dependency {
         return dependencies;
     }
 
-    protected abstract void updateInvalidate();
+    protected abstract void updateInternalState();
+
+    private static class ChangeEvent {
+        private final Dependency target;
+
+        public ChangeEvent(Dependency target) {
+            this.target = target;
+        }
+
+        public Dependency getTarget() {
+            return target;
+        }
+    }
 }

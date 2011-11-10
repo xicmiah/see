@@ -19,28 +19,18 @@ package see.reactive;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 
-public class Var<T> extends AbstractDependency implements VariableSignal<T> {
-
-    private T value;
-
-    public Var(EventBus eventBus, T initial) {
+public class TriggerImpl extends AbstractDependency implements Trigger {
+    protected TriggerImpl(EventBus eventBus) {
         super(eventBus, ImmutableSet.<Dependency>of());
-        value = initial;
     }
 
     @Override
-    public void update(T newValue) {
-        value = newValue;
-        invalidate();
+    public void invalidate() {
+        super.invalidate();
     }
 
     @Override
     protected void updateInternalState() {
         // No dependencies
-    }
-
-    @Override
-    public T now() {
-        return value;
     }
 }

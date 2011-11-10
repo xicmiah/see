@@ -30,7 +30,7 @@ public class Sink extends AbstractDependency {
     }
 
     @Override
-    protected void updateInvalidate() {
+    protected void updateInternalState() {
         actions.run();
         invalidate();
     }

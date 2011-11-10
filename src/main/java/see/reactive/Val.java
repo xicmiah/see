@@ -16,14 +16,25 @@
 
 package see.reactive;
 
-public class ChangeEvent {
-    private final Object target;
+import com.google.common.collect.ImmutableSet;
 
-    public ChangeEvent(Object target) {
-        this.target = target;
+import java.util.Collection;
+
+public class Val<T> implements Signal<T> {
+    
+    private final T value;
+    
+    public Val(T value) {
+        this.value = value;
     }
 
-    public Object getTarget() {
-        return target;
+    @Override
+    public T now() {
+        return value;
+    }
+
+    @Override
+    public Collection<? extends Dependency> getDependencies() {
+        return ImmutableSet.of();
     }
 }

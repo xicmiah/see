@@ -40,7 +40,7 @@ public class StatefulSignal<T> extends AbstractDependency implements Signal<T> {
     }
 
     @Override
-    protected void updateInvalidate() {
+    protected void updateInternalState() {
         T newValue = evaluation.get();
         if (!Objects.equal(currentValue, newValue)) {
             currentValue = newValue;
