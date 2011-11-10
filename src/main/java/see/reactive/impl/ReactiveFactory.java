@@ -28,26 +28,67 @@ import java.util.Collection;
 public class ReactiveFactory {
     private final EventBus eventBus = new EventBus();
 
+    /**
+     * Create a constant signal.
+     * @param value signal value
+     * @param <T> value type
+     * @return constant signal
+     */
     public <T> Signal<T> val(T value) {
         return new Val<T>(value);
     }
 
+    /**
+     * Create a variable endpoint - signal without dependencies, can be updated.
+     * @param initialValue initial signal value
+     * @param <T> value type
+     * @return variable signal
+     */
     public <T> VariableSignal<T> var(T initialValue) {
         return new Var<T>(eventBus, initialValue);
     }
 
+    /**
+     * Create a trigger endpoint - dependency, can be invalidated manually.
+     * @return constructed trigger
+     */
     public Trigger trigger() {
         return new EndpointTrigger(eventBus);
     }
 
-    public <T> Signal<T> bindLazy(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
-        return new StatelessSignal<T>(eventBus, dependencies, evaluation);
-    }
-
+    /**
+     * Bind expression evaluation to specified dependencies.
+     * Evaluation will be triggered on dependency change.
+     * Then, if result is different, this signal will be invalidated.
+     * @param dependencies expression dependencies
+     * @param evaluation expression
+     * @param <T> expression return type
+     * @return constructed signal
+     */
     public <T> Signal<T> bind(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
         return new StatefulSignal<T>(eventBus, dependencies, evaluation);
     }
 
+    /**
+     * Bind expression evaluation to specified dependencies.
+     * Evaluation will be triggered on {@code Signal.now()} call.
+     * Invalidation will be triggered on dependency change.
+     * @param dependencies expression dependencies
+     * @param evaluation expression
+     * @param <T> expression return type
+     * @return constructed signal
+     */
+    public <T> Signal<T> bindLazy(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
+        return new StatelessSignal<T>(eventBus, dependencies, evaluation);
+    }
+
+    /**
+     * Bind a {@link Runnable} to specified dependencies.
+     * {@link Runnable} will be executed on dependency invalidation
+     * @param dependencies execution triggers
+     * @param actions actions to execute
+     * @return constructed dependency
+     */
     public Dependency sink(Collection<? extends Dependency> dependencies, Runnable actions) {
         return new Sink(eventBus, dependencies, actions);
     }
