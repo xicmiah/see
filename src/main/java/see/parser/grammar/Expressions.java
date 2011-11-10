@@ -119,7 +119,45 @@ class Expressions extends AbstractGrammar {
     }
 
     Rule Expression() {
-        return FirstOf(PropertyAssignment(), VariableAssignment(), RightExpression());
+        return FirstOf(Assignment(), Binding(), RightExpression());
+    }
+
+    Rule Binding() {
+        return FirstOf(VariableBinding(), PropertyBinding());
+    }
+
+    Rule VariableBinding() {
+        return Sequence(Variable(), T("<-"), Expression(),
+                push(makeBindNode(
+                        peek(),
+                        pop()
+                ))
+        );
+    }
+
+    Rule PropertyBinding() {
+        ListVar<Node<?>> props = new ListVar<Node<?>>();
+        return Sequence(PropertyAccess(props), T("<-"), Expression(),
+                push(makeBindNode(
+                        makeFNode(".=", props.get()),
+                        pop()
+                ))
+        );
+    }
+
+    FunctionNode<Object, Object> makeBindNode(Node<Object> expression, Node<Object> dependencies) {
+        return makeFNode("<-", of(
+                expression,
+                makeFNode("deps", of(dependencies, makeConstNode(dependencies)))
+        ));
+    }
+
+    <T> Node<T> makeConstNode(T dependencies) {
+        return new ImmutableConstNode<T>(dependencies);
+    }
+
+    Rule Assignment() {
+        return FirstOf(PropertyAssignment(), VariableAssignment());
     }
 
     /**
