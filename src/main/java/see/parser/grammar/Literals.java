@@ -44,7 +44,7 @@ class Literals extends AbstractGrammar {
 
     @WhitespaceSafe
     Rule Letter() {
-        return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), '_');
+        return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), '_', '$');
     }
 
     @WhitespaceSafe
