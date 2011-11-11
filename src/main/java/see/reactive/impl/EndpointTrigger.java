@@ -27,7 +27,7 @@ class EndpointTrigger extends AbstractDependency implements Trigger {
     }
 
     @Override
-    public void invalidate() {
+    public void trigger() {
         super.invalidate();
     }
 

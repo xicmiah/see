@@ -17,5 +17,5 @@
 package see.reactive;
 
 public interface Trigger extends Dependency {
-    void invalidate();
+    void trigger();
 }

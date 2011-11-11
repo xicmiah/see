@@ -35,7 +35,7 @@ abstract class AbstractDependency implements Dependency {
         eventBus.register(this);
     }
 
-    protected void invalidate() {
+    protected final void invalidate() {
         eventBus.post(new ChangeEvent(this));
     }
 
