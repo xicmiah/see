@@ -10,6 +10,7 @@ import see.functions.bool.Not;
 import see.functions.bool.Or;
 import see.functions.compare.*;
 import see.functions.properties.*;
+import see.functions.reactive.Bind;
 import see.functions.service.*;
 import see.parser.numbers.BigDecimalFactory;
 import see.parser.numbers.NumberFactory;
@@ -43,8 +44,14 @@ public class ConfigBuilder {
         addCompare(builder);
         addProperty(builder, builder.propertyResolver);
         addIteration(builder);
+        addBindings(builder);
 
         return builder;
+    }
+
+    private static void addBindings(ConfigBuilder builder) {
+        builder.addAlias("<-", "bind");
+        builder.addFunction("bind", new Bind());
     }
 
     private static void addIteration(ConfigBuilder builder) {
