@@ -17,31 +17,32 @@
 package see.functions.reactive;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Supplier;
-import see.reactive.Dependency;
+import see.functions.Settable;
 import see.reactive.Signal;
 import see.reactive.impl.ReactiveFactory;
 
-import java.util.Collection;
 import java.util.List;
 
-public class MakeSignal extends ReactiveFunction<Object, Signal<?>> {
+import static com.google.common.collect.ImmutableList.of;
+
+public class Bind extends ReactiveFunction<Object, Signal<?>> {
     @Override
     protected Signal<?> apply(ReactiveFactory factory, final List<Object> input) {
         Preconditions.checkArgument(input.size() == 2, "Bind takes two arguments");
 
-        Supplier<?> evaluation = new Supplier<Object>() {
+        final Settable<Object> target = (Settable<Object>) input.get(0);
+
+        final Signal<?> signal = (Signal<?>) input.get(1);
+
+        factory.sink(of(signal), new Runnable() {
             @Override
-            public Object get() {
-                return input.get(0);
+            public void run() {
+                target.set(signal.now());
             }
-        };
+        });
 
-        Collection<Dependency> dependencies = (Collection<Dependency>) input.get(1);
-
-        return factory.bind(dependencies, evaluation);
-    }
-
+        return signal;
+}
     @Override
     public String toString() {
         return "bind";
