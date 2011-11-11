@@ -17,10 +17,12 @@
 package see.functions.properties;
 
 import com.google.common.base.Preconditions;
+import see.functions.Settable;
 import see.functions.VarArgFunction;
 import see.parser.grammar.PropertyAccess;
 import see.util.Reduce;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 import static see.util.Reduce.fold;
@@ -29,7 +31,7 @@ public class PropertyFunctions {
     private final PropertyResolver resolver;
 
     private final Get getInstance = new Get();
-    private final Set setInstance = new Set();
+    private final PropertyAsSettable setInstance = new PropertyAsSettable();
 
     public PropertyFunctions(PropertyResolver resolver) {
         this.resolver = resolver;
@@ -47,7 +49,7 @@ public class PropertyFunctions {
      * Return instance of setter function
      * @return configured Set instance
      */
-    public Set getSetFunction() {
+    public PropertyAsSettable getSetFunction() {
         return setInstance;
     }
 
@@ -62,7 +64,7 @@ public class PropertyFunctions {
         private Get() {}
 
         @Override
-        public Object apply(List<PropertyAccess> input) {
+        public Object apply(@Nonnull List<PropertyAccess> input) {
             Preconditions.checkArgument(input.size() >= 1, "GetProperty takes one or more arguments");
 
             Object bean = getBean(input.get(0));
@@ -82,27 +84,30 @@ public class PropertyFunctions {
 
     }
 
-    public class Set implements VarArgFunction<PropertyAccess, Object> {
-        private Set() {}
+    /**
+     * Expose property access as {@link Settable} instance
+     */
+    public class PropertyAsSettable implements VarArgFunction<PropertyAccess, Settable<Object>> {
+        private PropertyAsSettable() {}
 
         @Override
-        public Object apply(List<PropertyAccess> input) {
-            Preconditions.checkArgument(input.size() >= 3, "SetProperty takes three or more arguments");
+        public Settable<Object> apply(@Nonnull List<PropertyAccess> input) {
+            Preconditions.checkArgument(input.size() >= 2, "PropertyAsSettable takes two or more arguments");
 
-            List<PropertyAccess> properties = input.subList(0, input.size() - 1);
-            Object value = getBean(input.get(input.size() - 1));
+            final Object lastBean = getInstance.apply(input.subList(0, input.size() - 1));
+            final PropertyAccess lastProperty = input.get(input.size() - 1);
 
-            Object lastBean = getInstance.apply(properties.subList(0, properties.size() - 1));
-            PropertyAccess lastProperty = properties.get(properties.size() - 1);
-
-            resolver.set(lastBean, lastProperty, value);
-            
-            return value;
+            return new Settable<Object>() {
+                @Override
+                public void set(Object value) {
+                    resolver.set(lastBean, lastProperty, value);
+                }
+            };
         }
 
         @Override
         public String toString() {
-            return "set";
+            return "pSettable";
         }
     }
 }

@@ -1,36 +1,29 @@
 package see.functions.service;
 
-import see.functions.ContextCurriedFunction;
-import see.functions.Function;
+import com.google.common.base.Preconditions;
+import see.functions.Settable;
+import see.functions.VarArgFunction;
 
+import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Assignment.
  *
- * Updates context and returns assigned value
+ * Sets new value via {@link Settable interface}
  * @param <T>
  */
-public class Assign<T> implements ContextCurriedFunction<Function<List<Object>, T>> {
+public class Assign<T> implements VarArgFunction<Object, Object> {
     @Override
-    public Function<List<Object>, T> apply(final Map<String, ?> context) {
-        return new Function<List<Object>, T>() {
-            @Override
-            public T apply(List<Object> args) {
-                checkArgument(args.size() == 2, "Assign takes variable name and value");
+    public Object apply(@Nonnull List<Object> input) {
+        Preconditions.checkArgument(input.size() == 2, "Assign takes two arguments");
 
-                String variable = (String) args.get(0);
-                @SuppressWarnings("unchecked") T value = (T) args.get(1);
+        Settable<Object> target = (Settable<Object>) input.get(0);
+        Object value = input.get(1);
 
-                Map<String, ? super T> assignableContext = (Map<String, ? super T>) context;
-                assignableContext.put(variable, value);
+        target.set(value);
 
-                return value;
-            }
-        };
+        return value;
     }
 
     @Override

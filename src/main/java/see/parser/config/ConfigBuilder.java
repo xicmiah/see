@@ -56,11 +56,11 @@ public class ConfigBuilder {
     private static void addProperty(ConfigBuilder builder, PropertyResolver resolver) {
         builder.addAlias(".", "get");
         builder.addAlias("[]", "props.indexed");
-        builder.addAlias(".=", "set");
+        builder.addAlias("p=", "pSet");
 
         PropertyFunctions propertyFunctions = new PropertyFunctions(resolver);
         builder.addPureFunction("get", propertyFunctions.getGetFunction());
-        builder.addPureFunction("set", propertyFunctions.getSetFunction());
+        builder.addPureFunction("pSet", propertyFunctions.getSetFunction());
 
         builder.addPureFunction("props.target", new MakeTarget());
         builder.addPureFunction("props.indexed", new MakeIndexed());
@@ -109,9 +109,11 @@ public class ConfigBuilder {
     private static void addServiceFunctions(ConfigBuilder builder) {
         builder.addAlias(";", "seq");
         builder.addAlias("=", "assign");
+        builder.addAlias("v=", "vSet");
 
         builder.addFunction("seq", wrap(new Sequence<Object>()));
-        builder.addFunction("assign", wrap(new Assign<Object>()));
+        builder.addPureFunction("assign", new Assign<Object>());
+        builder.addFunction("vSet", new VarAsSettable());
         builder.addFunction("isDefined", new IsDefined());
         builder.addPureFunction("if", new If<Object>());
     }

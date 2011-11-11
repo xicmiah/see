@@ -157,26 +157,28 @@ class Expressions extends AbstractGrammar {
     }
 
     Rule Assignment() {
-        return FirstOf(PropertyAssignment(), VariableAssignment());
+        return Sequence(Settable(), T("="), Expression(), pushBinOp("="));
+    }
+
+    Rule Settable() {
+        return FirstOf(SettableProperty(), SettableVariable());
     }
 
     /**
-     * Assignment to variable. Pushes one node.
+     * Expose property assignment as {@link see.functions.Settable} instance. Pushes one node.
      * @return constructed rule
      */
-    Rule VariableAssignment() {
-        return Sequence(VarName(), T("="), Expression(), pushBinOp("="));
-    }
-
-    /**
-     * Assignment to property. Pushes one node.
-     * Treated differently from variable assignment, as it doesn't require context access.
-     * @return constructed rule
-     */
-    Rule PropertyAssignment() {
+    Rule SettableProperty() {
         ListVar<Node<?>> props = new ListVar<Node<?>>();
-        return Sequence(PropertyAccess(props), T("="), Expression(), props.append(makeUNode("props.target", pop())),
-                push(makeFNode(".=", props.get())));
+        return Sequence(PropertyAccess(props), push(makeFNode("p=", props.get())));
+    }
+
+    /**
+     * Expose variable assignment as {@link see.functions.Settable} instance. Pushes one node.
+     * @return constructed rule
+     */
+    Rule SettableVariable() {
+        return Sequence(VarName(), push(makeUNode("v=", pop())));
     }
 
     /**
