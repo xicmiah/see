@@ -17,6 +17,7 @@
 package see.functions.reactive;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Supplier;
 import see.functions.Settable;
 import see.reactive.Signal;
 import see.reactive.impl.ReactiveFactory;
@@ -34,10 +35,12 @@ public class Bind extends ReactiveFunction<Object, Signal<?>> {
 
         final Signal<?> signal = (Signal<?>) input.get(1);
 
-        factory.sink(of(signal), new Runnable() {
+        factory.bind(of(signal), new Supplier<Object>() {
             @Override
-            public void run() {
-                target.set(signal.now());
+            public Object get() {
+                Object now = signal.now();
+                target.set(now);
+                return now;
             }
         });
 
