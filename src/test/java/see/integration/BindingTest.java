@@ -18,8 +18,7 @@ package see.integration;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
-import see.See;
-import see.functions.reactive.ReactiveFunction;
+import see.ReactiveSee;
 import see.reactive.VariableSignal;
 import see.reactive.impl.ReactiveFactory;
 
@@ -28,17 +27,17 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 public class BindingTest {
-    See see = new See();
     ReactiveFactory reactiveFactory = new ReactiveFactory();
+    ReactiveSee see = new ReactiveSee(reactiveFactory);
 
     @Test
     public void testBindings() throws Exception {
         VariableSignal<String> var = reactiveFactory.var("crno");
         PropertyTraversalTest.TestBean bean = new PropertyTraversalTest.TestBean("omg", null);
 
-        Map<String, Object> context = ImmutableMap.of("a", bean, "v", var, ReactiveFunction.REACTIVE_KEY, reactiveFactory);
+        Map<String, Object> context = ImmutableMap.of("a", bean, "v", var);
         
-        see.evaluate(see.parseExpressionList("a.name <- v;"), context);
+        see.eval("a.name <- v", context);
         assertEquals("crno", bean.getName());
 
         var.update("bka");
