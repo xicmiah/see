@@ -18,7 +18,6 @@ package see;
 
 import com.google.common.collect.Maps;
 import see.functions.reactive.ReactiveFunction;
-import see.parser.config.GrammarConfiguration;
 import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
 
@@ -34,26 +33,22 @@ public class ReactiveSee {
     private final See see;
     private final ReactiveFactory reactiveFactory;
 
-    private ReactiveSee(See see, ReactiveFactory reactiveFactory) {
-        this.see = see;
-        this.reactiveFactory = reactiveFactory;
-    }
-
     /**
-     * Create new instance, custom See config and reactive factory.
-     * @param configuration see configuration
+     * Create new instance, custom See instance and reactive factory.
+     * @param see see instance
      * @param factory reactive factory
      */
-    public ReactiveSee(GrammarConfiguration configuration, ReactiveFactory factory) {
-        this(new See(configuration), factory);
+    public ReactiveSee(See see, ReactiveFactory factory) {
+        this.see = see;
+        this.reactiveFactory = factory;
     }
 
     /**
      * Create new instance, See configured with supplied configuration.
-     * @param configuration see configuration
+     * @param see see instance
      */
-    public ReactiveSee(GrammarConfiguration configuration) {
-        this(new See(configuration), new ReactiveFactory());
+    public ReactiveSee(See see) {
+        this(see, new ReactiveFactory());
     }
 
     /**
