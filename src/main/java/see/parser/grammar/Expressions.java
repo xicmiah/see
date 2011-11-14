@@ -335,7 +335,16 @@ class Expressions extends AbstractGrammar {
      * @return rule
      */
     Rule SpecialForm() {
-        return IsDefined();
+        return FirstOf(IsDefined(), MakeSignal());
+    }
+
+    /**
+     * Special form for signal creation. Expression tree is passed as second argument.
+     * @return constructed rule
+     */
+    Rule MakeSignal() {
+        return Sequence(T("signal"), T("("), Expression(), T(")"),
+                push(makeFNode("signal", of(peek(), new ImmutableConstNode<Node<Object>>(pop())))));
     }
 
     /**
