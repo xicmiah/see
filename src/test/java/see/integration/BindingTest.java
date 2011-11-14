@@ -43,4 +43,34 @@ public class BindingTest {
         var.update("bka");
         assertEquals("bka", bean.getName());
     }
+
+    @Test
+    public void testMultipleBindings() throws Exception {
+        VariableSignal<Integer> a = reactiveFactory.var(1);
+        VariableSignal<Integer> b = reactiveFactory.var(2);
+        TestBean bean = new TestBean();
+
+        Map<String, Object> context = ImmutableMap.of("a", a, "b", b, "bean", bean);
+
+        see.eval("bean.value <- a + b", context);
+        assertEquals(3, bean.getValue());
+        
+        a.update(7);
+        assertEquals(9, bean.getValue());
+
+        b.update(35);
+        assertEquals(42, bean.getValue());
+    }
+    
+    public static class TestBean {
+        private int value;
+
+        public int getValue() {
+            return value;
+        }
+
+        public void setValue(int value) {
+            this.value = value;
+        }
+    }
 }

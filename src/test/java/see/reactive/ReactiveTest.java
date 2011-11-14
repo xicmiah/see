@@ -42,15 +42,15 @@ public class ReactiveTest {
         Signal<Integer> b = reactiveFactory.bind(of(a), new Supplier<Integer>() {
             @Override
             public Integer get() {
-                return a.now().length();
+                return a.getNow().length();
             }
         });
 
-        assertEquals(valueOf(3), b.now());
+        assertEquals(valueOf(3), b.getNow());
         a.update("omg");
-        assertEquals(valueOf(3), b.now());
+        assertEquals(valueOf(3), b.getNow());
         a.update("zxcv");
-        assertEquals(valueOf(4), b.now());
+        assertEquals(valueOf(4), b.getNow());
     }
 
     @Test
@@ -61,17 +61,17 @@ public class ReactiveTest {
         Signal<Integer> sum = reactiveFactory.bind(of(a, b), new Supplier<Integer>() {
             @Override
             public Integer get() {
-                return a.now() + b.now();
+                return a.getNow() + b.getNow();
             }
         });
 
-        assertEquals(valueOf(3), sum.now());
+        assertEquals(valueOf(3), sum.getNow());
 
         a.update(7);
-        assertEquals(valueOf(9), sum.now());
+        assertEquals(valueOf(9), sum.getNow());
         
         b.update(35);
-        assertEquals(valueOf(42), sum.now());
+        assertEquals(valueOf(42), sum.getNow());
     }
 
     @Test
@@ -83,21 +83,21 @@ public class ReactiveTest {
             @Override
             public Integer get() {
                 counter.incrementAndGet();
-                return a.now().length();
+                return a.getNow().length();
             }
         });
 
         assertEquals(0, counter.get());
 
-        assertEquals(valueOf(4), b.now());
+        assertEquals(valueOf(4), b.getNow());
         assertEquals(1, counter.get());
 
-        assertEquals(valueOf(4), b.now());
+        assertEquals(valueOf(4), b.getNow());
         assertEquals(2, counter.get());
         
         a.update("bka");
         assertEquals(2, counter.get());
-        assertEquals(valueOf(3), b.now());
+        assertEquals(valueOf(3), b.getNow());
         assertEquals(3, counter.get());
 
     }
@@ -111,7 +111,7 @@ public class ReactiveTest {
             @Override
             public Integer get() {
                 lengthCounter.incrementAndGet();
-                return a.now().length();
+                return a.getNow().length();
             }
         });
 
@@ -122,7 +122,7 @@ public class ReactiveTest {
             @Override
             public Integer get() {
                 plusCounter.incrementAndGet();
-                return length.now() + 1;
+                return length.getNow() + 1;
             }
         });
 
@@ -133,7 +133,7 @@ public class ReactiveTest {
         assertEquals(2, lengthCounter.get());
         assertEquals(2, plusCounter.get());
 
-        assertEquals(valueOf(4), plusOne.now());
+        assertEquals(valueOf(4), plusOne.getNow());
         assertEquals(2, lengthCounter.get());
         assertEquals(2, plusCounter.get());
     }

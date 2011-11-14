@@ -38,7 +38,7 @@ public class Bind extends ReactiveFunction<Object, Signal<?>> {
         factory.bind(of(signal), new Supplier<Object>() {
             @Override
             public Object get() {
-                Object now = signal.now();
+                Object now = signal.getNow();
                 target.set(now);
                 return now;
             }

@@ -31,7 +31,7 @@ class Val<T> implements Signal<T> {
     }
 
     @Override
-    public T now() {
+    public T getNow() {
         return value;
     }
 

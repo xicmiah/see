@@ -58,6 +58,7 @@ public class ReactiveFactory {
 
     /**
      * Create a dependency node, from specified dependencies.
+     * @param dependencies node dependencies
      * @return constructed trigger
      */
     public Trigger chain(Collection<? extends Dependency> dependencies) {
@@ -79,7 +80,7 @@ public class ReactiveFactory {
 
     /**
      * Bind expression evaluation to specified dependencies.
-     * Evaluation will be triggered on {@code Signal.now()} call.
+     * Evaluation will be triggered on {@code Signal.getNow()} call.
      * Invalidation will be triggered on dependency change.
      * @param dependencies expression dependencies
      * @param evaluation expression

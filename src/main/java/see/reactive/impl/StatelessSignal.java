@@ -33,7 +33,7 @@ class StatelessSignal<T> extends AbstractDependency implements Signal<T> {
     }
 
     @Override
-    public T now() {
+    public T getNow() {
         return evaluation.get();
     }
 

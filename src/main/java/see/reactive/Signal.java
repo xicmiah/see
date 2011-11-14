@@ -17,5 +17,5 @@
 package see.reactive;
 
 public interface Signal<T> extends Dependency {
-    T now();
+    T getNow();
 }
