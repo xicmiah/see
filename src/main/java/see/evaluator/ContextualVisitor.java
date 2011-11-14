@@ -1,23 +1,38 @@
 package see.evaluator;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import see.parser.numbers.NumberFactory;
 import see.tree.*;
+import see.util.Reduce;
 
 import java.util.List;
 import java.util.Map;
 
+import static see.util.Reduce.fold;
+
 public class ContextualVisitor implements Visitor {
 	private final Map<String, ?> context;
-    private final NumberFactory numberFactory;
 
-	public ContextualVisitor(NumberFactory numberFactory, Map<String, ?> context) {
-        this.numberFactory = numberFactory;
-        this.context = context;
+    private List<Function<Object, Object>> valueProcessors;
+
+	public ContextualVisitor(Map<String, ?> context) {
+        this(context, ImmutableList.<Function<Object, Object>>of());
 	}
 
-	@Override
+    /**
+     * Create a visitor from initial context and list of post-processors.
+     *
+     * @param context initial context
+     * @param valueProcessors value processors
+     */
+    public ContextualVisitor(Map<String, ?> context,
+                             List<Function<Object, Object>> valueProcessors) {
+        this.context = context;
+        this.valueProcessors = valueProcessors;
+    }
+
+    @Override
     public <Arg, Result> Result visit(FunctionNode<Arg, Result> node) {
 		List<Arg> evaluatedArgs = Lists.transform(node.getArguments(), new Function<Node<Arg>, Arg>() {
 			@Override
@@ -30,7 +45,7 @@ public class ContextualVisitor implements Visitor {
         see.functions.Function<List<Arg>, Result> partial = node.getFunction().apply(context);
         Result result = partial.apply(evaluatedArgs);
 
-        return passThroughNumberFactory(result);
+        return processValue(result);
 	}
 
     /**
@@ -47,7 +62,7 @@ public class ContextualVisitor implements Visitor {
     public <T> T visit(VarNode<T> node) {
         Object value = context.get(node.getName());
 
-        return (T) passThroughNumberFactory(value);
+        return (T) processValue(value);
 	}
 
 	@Override
@@ -56,16 +71,17 @@ public class ContextualVisitor implements Visitor {
 	}
 
     /**
-     * Pass value through number factory if value is number, return it otherwise.
-     * @param value value to pass
-     * @param <T> value type
-     * @return converted value
+     * Pass value through post-processors.
+     * @param value
+     * @param <T>
+     * @return
      */
-    private <T> T passThroughNumberFactory(T value) {
-        if (value instanceof Number) {
-            return (T) numberFactory.getNumber((Number) value);
-        } else {
-            return value;
-        }
+    private <T> T processValue(T value) {
+        return (T) fold(value, valueProcessors, new Reduce.FoldFunction<Function<Object, Object>, Object>() {
+            @Override
+            public Object apply(Object prev, Function<Object, Object> arg) {
+                return arg.apply(prev);
+            }
+        });
     }
 }

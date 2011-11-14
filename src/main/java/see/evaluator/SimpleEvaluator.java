@@ -1,10 +1,14 @@
 package see.evaluator;
 
+import com.google.common.base.Function;
+import com.google.common.base.Suppliers;
 import see.exceptions.EvaluationException;
 import see.parser.numbers.NumberFactory;
 import see.tree.Node;
 
 import java.util.Map;
+
+import static com.google.common.collect.ImmutableList.of;
 
 public class SimpleEvaluator implements Evaluator {
 
@@ -27,7 +31,8 @@ public class SimpleEvaluator implements Evaluator {
     @Override
     public <T> T evaluate(Node<T> tree, Map<String, ?> context) throws EvaluationException {
         try {
-            return tree.accept(new ContextualVisitor(numberFactory, context));
+            Function<Object, Object> numberLifter = new NumberLifter(Suppliers.ofInstance(numberFactory));
+            return tree.accept(new ContextualVisitor(context, of(numberLifter)));
         } catch (EvaluationException e) {
             throw e;
         } catch (Exception e) {
