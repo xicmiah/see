@@ -29,16 +29,16 @@ public abstract class ReactiveFunction<Arg, Result> implements ContextCurriedFun
     public static final String REACTIVE_KEY = "⑨reactive";
 
     @Override
-    public Function<List<Arg>, Result> apply(Map<String, ?> context) {
+    public Function<List<Arg>, Result> apply(final Map<String, ?> context) {
         final ReactiveFactory factory = (ReactiveFactory) context.get(REACTIVE_KEY);
 
         return new VarArgFunction<Arg, Result>() {
             @Override
             public Result apply(@Nonnull List<Arg> input) {
-                return ReactiveFunction.this.apply(factory, input);
+                return ReactiveFunction.this.apply(factory, input, context);
             }
         };
     }
 
-    protected abstract Result apply(ReactiveFactory factory, List<Arg> input);
+    protected abstract Result apply(ReactiveFactory factory, List<Arg> input, Map<String, ?> context);
 }

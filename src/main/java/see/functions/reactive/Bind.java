@@ -23,12 +23,13 @@ import see.reactive.Signal;
 import see.reactive.impl.ReactiveFactory;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.of;
 
 public class Bind extends ReactiveFunction<Object, Signal<?>> {
     @Override
-    protected Signal<?> apply(ReactiveFactory factory, final List<Object> input) {
+    protected Signal<?> apply(ReactiveFactory factory, final List<Object> input, Map<String, ?> context) {
         Preconditions.checkArgument(input.size() == 2, "Bind takes two arguments");
 
         final Settable<Object> target = (Settable<Object>) input.get(0);

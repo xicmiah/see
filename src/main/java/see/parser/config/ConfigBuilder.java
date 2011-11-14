@@ -11,6 +11,7 @@ import see.functions.bool.Or;
 import see.functions.compare.*;
 import see.functions.properties.*;
 import see.functions.reactive.Bind;
+import see.functions.reactive.MakeSignal;
 import see.functions.service.*;
 import see.parser.numbers.BigDecimalFactory;
 import see.parser.numbers.NumberFactory;
@@ -49,9 +50,15 @@ public class ConfigBuilder {
         return builder;
     }
 
-    private static void addBindings(ConfigBuilder builder) {
+    private static void addBindings(final ConfigBuilder builder) {
         builder.addAlias("<-", "bind");
         builder.addFunction("bind", new Bind());
+        builder.addFunction("signal", new MakeSignal(new Supplier<NumberFactory>() {
+            @Override
+            public NumberFactory get() {
+                return builder.numberFactory;
+            }
+        }));
     }
 
     private static void addIteration(ConfigBuilder builder) {

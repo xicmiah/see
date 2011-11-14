@@ -17,10 +17,12 @@
 package see.integration;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.junit.Test;
 import see.ReactiveSee;
 import see.reactive.VariableSignal;
 import see.reactive.impl.ReactiveFactory;
+import see.tree.Node;
 
 import java.util.Map;
 
@@ -52,24 +54,56 @@ public class BindingTest {
 
         Map<String, Object> context = ImmutableMap.of("a", a, "b", b, "bean", bean);
 
-        see.eval("bean.value <- a + b", context);
-        assertEquals(3, bean.getValue());
+        see.eval("bean.value <- signal(a + b)", context);
+        assertEquals("3.0", bean.getValue().toString());
         
         a.update(7);
-        assertEquals(9, bean.getValue());
+        assertEquals("9.0", bean.getValue().toString());
 
         b.update(35);
-        assertEquals(42, bean.getValue());
+        assertEquals("42.0", bean.getValue().toString());
     }
-    
-    public static class TestBean {
-        private int value;
 
-        public int getValue() {
+    @Test
+    public void testBindingContext() throws Exception {
+        VariableSignal<Integer> a = reactiveFactory.var(7);
+        TestBean bean = new TestBean();
+
+        Map<String, Object> context = Maps.newHashMap(ImmutableMap.of("a", a, "b", 2, "bean", bean));
+
+        see.eval("bean.value <- signal(a + b)", context);
+        assertEquals("9.0", bean.getValue().toString());
+
+        context.put("b", 42);
+        assertEquals("9.0", bean.getValue().toString());
+
+        a.update(40);
+        assertEquals("42.0", bean.getValue().toString()); // Signal is bound to old b == 42
+    }
+
+    @Test
+    public void testNowBindings() throws Exception {
+        VariableSignal<Integer> a = reactiveFactory.var(7);
+        TestBean bean = new TestBean();
+
+        Map<String, Object> context = ImmutableMap.of("a", a, "bean", bean);
+        Node<Object> tree = see.parseExpressionList("b = a.now; bean.value <- signal(b + 2);");
+        see.evaluate(tree, context);
+
+        assertEquals("9.0", bean.getValue().toString());
+
+        a.update(42);
+        assertEquals("9.0", bean.getValue().toString());
+    }
+
+    public static class TestBean {
+        private Number value;
+
+        public Number getValue() {
             return value;
         }
 
-        public void setValue(int value) {
+        public void setValue(Number value) {
             this.value = value;
         }
     }

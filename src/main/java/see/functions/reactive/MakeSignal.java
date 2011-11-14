@@ -16,41 +16,84 @@
 
 package see.functions.reactive;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import see.evaluator.ContextualVisitor;
+import see.evaluator.NumberLifter;
+import see.parser.numbers.NumberFactory;
 import see.reactive.Dependency;
 import see.reactive.Signal;
 import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import static com.google.common.collect.ImmutableList.of;
+
+/**
+ * Signal creation. Expects second argument to be a tree.
+ * Creates a
+ */
 public class MakeSignal extends ReactiveFunction<Object, Signal<?>> {
-    @Override
-    public Signal<?> apply(ReactiveFactory factory, final List<Object> input) {
-        Preconditions.checkArgument(input.size() == 2, "MakeSignal takes two arguments");
 
-        Supplier<Object> evaluation = new Supplier<Object>() {
-            @Override
-            public Object get() {
-                return input.get(0);
-            }
-        };
-        Node<Object> tree = (Node<Object>) input.get(1);
-        Collection<Dependency> dependencies = getDependencies(tree);
+    private final Supplier<NumberFactory> factorySupplier;
 
-        return factory.bind(dependencies, evaluation);
+    public MakeSignal(Supplier<NumberFactory> factorySupplier) {
+        this.factorySupplier = factorySupplier;
     }
 
-    protected Collection<Dependency> getDependencies(Node<Object> tree) {
-        // TODO: implement proper dependency lookup
-        return ImmutableSet.of();
+    @Override
+    public Signal<?> apply(ReactiveFactory factory, final List<Object> input, final Map<String, ?> context) {
+        Preconditions.checkArgument(input.size() == 2, "MakeSignal takes two arguments");
+
+        final Node<Object> tree = (Node<Object>) input.get(1);
+
+        final SignalCapture signalCapture = new SignalCapture();
+        final SignalExpand signalExpand = new SignalExpand();
+        final NumberLifter numberLifter = new NumberLifter(factorySupplier);
+
+        tree.accept(new ContextualVisitor(context, of(signalCapture, numberLifter)));
+
+        return factory.bind(signalCapture.dependencies, new Supplier<Object>() {
+            @Override
+            public Object get() {
+                return tree.accept(new ContextualVisitor(context, of(signalExpand, numberLifter)));
+            }
+        });
     }
 
     @Override
     public String toString() {
         return "signal";
+    }
+
+    private static final class SignalCapture implements Function<Object, Object> {
+        private final Collection<Dependency> dependencies = Sets.newHashSet();
+
+        @Override
+        public Object apply(@Nullable Object input) {
+            if (input instanceof Signal<?>) {
+                Signal<?> signal = (Signal<?>) input;
+                dependencies.add(signal);
+                return signal.getNow();
+            }
+            return input;
+        }
+    }
+
+    private static final class SignalExpand implements Function<Object, Object> {
+        @Override
+        public Object apply(@Nullable Object input) {
+            if (input instanceof Signal<?>) {
+                Signal<?> signal = (Signal<?>) input;
+                return signal.getNow();
+            }
+            return input;
+        }
     }
 }
