@@ -57,6 +57,14 @@ public class ReactiveFactory {
     }
 
     /**
+     * Create a dependency node, from specified dependencies.
+     * @return constructed trigger
+     */
+    public Trigger chain(Collection<? extends Dependency> dependencies) {
+        return new EndpointTrigger(eventBus, dependencies);
+    }
+
+    /**
      * Bind expression evaluation to specified dependencies.
      * Evaluation will be triggered on dependency change.
      * Then, if result is different, this signal will be invalidated.

@@ -21,9 +21,15 @@ import com.google.common.eventbus.EventBus;
 import see.reactive.Dependency;
 import see.reactive.Trigger;
 
+import java.util.Collection;
+
 class EndpointTrigger extends AbstractDependency implements Trigger {
-    protected EndpointTrigger(EventBus eventBus) {
-        super(eventBus, ImmutableSet.<Dependency>of());
+    public EndpointTrigger(EventBus eventBus, Collection<? extends Dependency> dependencies) {
+        super(eventBus, dependencies);
+    }
+
+    public EndpointTrigger(EventBus eventBus) {
+        this(eventBus, ImmutableSet.<Dependency>of());
     }
 
     @Override
@@ -33,6 +39,6 @@ class EndpointTrigger extends AbstractDependency implements Trigger {
 
     @Override
     protected void updateInternalState() {
-        // No dependencies
+        invalidate();
     }
 }
