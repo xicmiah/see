@@ -1,6 +1,5 @@
 package see.evaluator;
 
-import com.google.common.base.Function;
 import com.google.common.base.Suppliers;
 import see.exceptions.EvaluationException;
 import see.parser.numbers.NumberFactory;
@@ -31,7 +30,7 @@ public class SimpleEvaluator implements Evaluator {
     @Override
     public <T> T evaluate(Node<T> tree, Map<String, ?> context) throws EvaluationException {
         try {
-            Function<Object, Object> numberLifter = new NumberLifter(Suppliers.ofInstance(numberFactory));
+            ValueProcessor numberLifter = new NumberLifter(Suppliers.ofInstance(numberFactory));
             return tree.accept(new ContextualVisitor(context, of(numberLifter)));
         } catch (EvaluationException e) {
             throw e;

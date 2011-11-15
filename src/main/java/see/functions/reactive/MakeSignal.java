@@ -16,12 +16,12 @@
 
 package see.functions.reactive;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Sets;
 import see.evaluator.ContextualVisitor;
 import see.evaluator.NumberLifter;
+import see.evaluator.ValueProcessor;
 import see.parser.numbers.NumberFactory;
 import see.reactive.Dependency;
 import see.reactive.Signal;
@@ -72,7 +72,7 @@ public class MakeSignal extends ReactiveFunction<Object, Signal<?>> {
         return "signal";
     }
 
-    private static final class SignalCapture implements Function<Object, Object> {
+    private static final class SignalCapture implements ValueProcessor {
         private final Collection<Dependency> dependencies = Sets.newHashSet();
 
         @Override
@@ -86,7 +86,7 @@ public class MakeSignal extends ReactiveFunction<Object, Signal<?>> {
         }
     }
 
-    private static final class SignalExpand implements Function<Object, Object> {
+    private static final class SignalExpand implements ValueProcessor {
         @Override
         public Object apply(@Nullable Object input) {
             if (input instanceof Signal<?>) {

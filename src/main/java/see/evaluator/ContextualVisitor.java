@@ -14,10 +14,10 @@ import static see.util.Reduce.fold;
 public class ContextualVisitor implements Visitor {
 	private final Map<String, ?> context;
 
-    private List<Function<Object, Object>> valueProcessors;
+    private List<ValueProcessor> valueProcessors;
 
 	public ContextualVisitor(Map<String, ?> context) {
-        this(context, ImmutableList.<Function<Object, Object>>of());
+        this(context, ImmutableList.<ValueProcessor>of());
 	}
 
     /**
@@ -27,7 +27,7 @@ public class ContextualVisitor implements Visitor {
      * @param valueProcessors value processors
      */
     public ContextualVisitor(Map<String, ?> context,
-                             List<Function<Object, Object>> valueProcessors) {
+                             List<ValueProcessor> valueProcessors) {
         this.context = context;
         this.valueProcessors = valueProcessors;
     }

@@ -16,7 +16,6 @@
 
 package see.evaluator;
 
-import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import see.parser.numbers.NumberFactory;
 
@@ -26,7 +25,7 @@ import javax.annotation.Nullable;
  * Value processor for use with {@link ContextualVisitor}.
  * If value is a number, pass it through NumberFactory.
  */
-public class NumberLifter implements Function<Object, Object> {
+public class NumberLifter implements ValueProcessor {
 
     private final Supplier<NumberFactory> factorySupplier;
 
