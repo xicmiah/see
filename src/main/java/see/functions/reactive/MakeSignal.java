@@ -18,6 +18,7 @@ package see.functions.reactive;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import see.evaluator.ContextualVisitor;
 import see.evaluator.NumberLifter;
@@ -56,13 +57,14 @@ public class MakeSignal extends ReactiveFunction<Object, Signal<?>> {
         final SignalCapture signalCapture = new SignalCapture();
         final SignalExpand signalExpand = new SignalExpand();
         final NumberLifter numberLifter = new NumberLifter(factorySupplier);
+        final List<ValueProcessor> custom = getCustomProcessors();
 
-        tree.accept(new ContextualVisitor(context, of(signalCapture, numberLifter)));
+        tree.accept(new ContextualVisitor(context, concat(custom, of(signalCapture, numberLifter))));
 
         return factory.bind(signalCapture.dependencies, new Supplier<Object>() {
             @Override
             public Object get() {
-                return tree.accept(new ContextualVisitor(context, of(signalExpand, numberLifter)));
+                return tree.accept(new ContextualVisitor(context, concat(custom, of(signalExpand, numberLifter))));
             }
         });
     }
@@ -70,6 +72,19 @@ public class MakeSignal extends ReactiveFunction<Object, Signal<?>> {
     @Override
     public String toString() {
         return "signal";
+    }
+
+    /**
+     * List of custom implicit conversions for signal expressions.
+     * Can be overridden in subclass.
+     * @return list of custom conversions
+     */
+    protected List<ValueProcessor> getCustomProcessors() {
+        return of();
+    }
+
+    private static <T> ImmutableList<T> concat(List<T> first, List<T> last) {
+        return ImmutableList.<T>builder().addAll(first).addAll(last).build();
     }
 
     private static final class SignalCapture implements ValueProcessor {
