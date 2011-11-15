@@ -16,7 +16,6 @@
 
 package see.integration;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.junit.Test;
 import see.ReactiveSee;
@@ -26,6 +25,7 @@ import see.tree.Node;
 
 import java.util.Map;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static org.junit.Assert.assertEquals;
 
 public class BindingTest {
@@ -37,7 +37,7 @@ public class BindingTest {
         VariableSignal<String> var = reactiveFactory.var("crno");
         PropertyTraversalTest.TestBean bean = new PropertyTraversalTest.TestBean("omg", null);
 
-        Map<String, Object> context = ImmutableMap.of("a", bean, "v", var);
+        Map<String, Object> context = of("a", bean, "v", var);
         
         see.eval("a.name <- v", context);
         assertEquals("crno", bean.getName());
@@ -52,7 +52,7 @@ public class BindingTest {
         VariableSignal<Integer> b = reactiveFactory.var(2);
         TestBean bean = new TestBean();
 
-        Map<String, Object> context = ImmutableMap.of("a", a, "b", b, "bean", bean);
+        Map<String, Object> context = of("a", a, "b", b, "bean", bean);
 
         see.eval("bean.value <- signal(a + b)", context);
         assertEquals("3.0", bean.getValue().toString());
@@ -69,7 +69,7 @@ public class BindingTest {
         VariableSignal<Integer> a = reactiveFactory.var(7);
         TestBean bean = new TestBean();
 
-        Map<String, Object> context = Maps.newHashMap(ImmutableMap.of("a", a, "b", 2, "bean", bean));
+        Map<String, Object> context = Maps.newHashMap(of("a", a, "b", 2, "bean", bean));
 
         see.eval("bean.value <- signal(a + b)", context);
         assertEquals("9.0", bean.getValue().toString());
@@ -86,7 +86,7 @@ public class BindingTest {
         VariableSignal<Integer> a = reactiveFactory.var(7);
         TestBean bean = new TestBean();
 
-        Map<String, Object> context = ImmutableMap.of("a", a, "bean", bean);
+        Map<String, Object> context = of("a", a, "bean", bean);
         Node<Object> tree = see.parseExpressionList("b = a.now; bean.value <- signal(b + 2);");
         see.evaluate(tree, context);
 
@@ -94,6 +94,20 @@ public class BindingTest {
 
         a.update(42);
         assertEquals("9.0", bean.getValue().toString());
+    }
+
+    @Test
+    public void testImplicitSignalCreation() throws Exception {
+        VariableSignal<Integer> a = reactiveFactory.var(4);
+        TestBean bean = new TestBean();
+
+        Map<String, Object> context = of("a", a, "bean", bean);
+        see.eval("bean.value <- a + 5", context); // No signal() function
+
+        assertEquals("9.0", bean.getValue().toString());
+        
+        a.update(37);
+        assertEquals("42.0", bean.getValue().toString());
     }
 
     public static class TestBean {

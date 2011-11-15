@@ -123,7 +123,7 @@ class Expressions extends AbstractGrammar {
     }
 
     Rule Binding() {
-        return Sequence(Settable(), T("<-"), Expression(), pushBinOp("<-"));
+        return Sequence(Settable(), T("<-"), Expression(), push(makeSignalNode(pop())), pushBinOp("<-"));
     }
 
     Rule Assignment() {
@@ -344,7 +344,16 @@ class Expressions extends AbstractGrammar {
      */
     Rule MakeSignal() {
         return Sequence(T("signal"), T("("), Expression(), T(")"),
-                push(makeFNode("signal", of(peek(), new ImmutableConstNode<Node<Object>>(pop())))));
+                push(makeSignalNode(pop())));
+    }
+
+    /**
+     * Create a function node with signal creation.
+     * @param signalExpression expression node to wrap in signal
+     * @return created wrapped node
+     */
+    FunctionNode<Object, Object> makeSignalNode(Node<Object> signalExpression) {
+        return makeFNode("signal", of(signalExpression, new ImmutableConstNode<Node<Object>>(signalExpression)));
     }
 
     /**
