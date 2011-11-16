@@ -31,7 +31,7 @@ public class SimpleEvaluator implements Evaluator {
     public <T> T evaluate(Node<T> tree, Map<String, ?> context) throws EvaluationException {
         try {
             ValueProcessor numberLifter = new NumberLifter(Suppliers.ofInstance(numberFactory));
-            return tree.accept(new ContextualVisitor(context, of(numberLifter)));
+            return tree.accept(new LazyVisitor(context, of(numberLifter)));
         } catch (EvaluationException e) {
             throw e;
         } catch (Exception e) {

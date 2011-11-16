@@ -22,7 +22,7 @@ import see.parser.numbers.NumberFactory;
 import javax.annotation.Nullable;
 
 /**
- * Value processor for use with {@link ContextualVisitor}.
+ * Value processor for use with {@link LazyVisitor}.
  * If value is a number, pass it through NumberFactory.
  */
 public class NumberLifter implements ValueProcessor {

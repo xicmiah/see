@@ -8,7 +8,6 @@ import see.functions.ContextCurriedFunction;
 import see.functions.Function;
 import see.functions.PureFunction;
 import see.parser.numbers.IntegerFactory;
-import see.tree.ConstNode;
 import see.tree.Node;
 import see.tree.immutable.ImmutableConstNode;
 import see.tree.immutable.ImmutableFunctionNode;
@@ -20,7 +19,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class ContextualVisitorTest {
+public class LazyVisitorTest {
 
     ContextCurriedFunction<Function<List<Integer>, Integer>> plus;
     ContextCurriedFunction<Function<List<Integer>, Integer>> fail;

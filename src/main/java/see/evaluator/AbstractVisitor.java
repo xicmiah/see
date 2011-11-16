@@ -1,8 +1,22 @@
+/*
+ * Copyright 2011 Vasily Shiyan
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package see.evaluator;
 
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import see.tree.*;
 import see.util.Reduce;
 
@@ -11,35 +25,18 @@ import java.util.Map;
 
 import static see.util.Reduce.fold;
 
-public class ContextualVisitor implements Visitor {
-	private final Map<String, ?> context;
-
+public abstract class AbstractVisitor implements Visitor {
+    private final Map<String, ?> context;
     private List<ValueProcessor> valueProcessors;
 
-	public ContextualVisitor(Map<String, ?> context) {
-        this(context, ImmutableList.<ValueProcessor>of());
-	}
-
-    /**
-     * Create a visitor from initial context and list of post-processors.
-     *
-     * @param context initial context
-     * @param valueProcessors value processors
-     */
-    public ContextualVisitor(Map<String, ?> context,
-                             List<ValueProcessor> valueProcessors) {
+    public AbstractVisitor(Map<String, ?> context, List<ValueProcessor> valueProcessors) {
         this.context = context;
         this.valueProcessors = valueProcessors;
     }
 
     @Override
     public <Arg, Result> Result visit(FunctionNode<Arg, Result> node) {
-		List<Arg> evaluatedArgs = Lists.transform(node.getArguments(), new Function<Node<Arg>, Arg>() {
-			@Override
-            public Arg apply(Node<Arg> input) {
-				return input.accept(ContextualVisitor.this);
-			}
-		});
+        List<Arg> evaluatedArgs = evaluateArgs(node.getArguments());
 
 		// Note: evaluatedArgs are lazy
         see.functions.Function<List<Arg>, Result> partial = node.getFunction().apply(context);
@@ -47,6 +44,8 @@ public class ContextualVisitor implements Visitor {
 
         return processValue(result);
 	}
+
+    protected abstract <Arg> List<Arg> evaluateArgs(List<Node<Arg>> arguments);
 
     /**
      * Get variable value from context.
@@ -65,7 +64,7 @@ public class ContextualVisitor implements Visitor {
         return (T) processValue(value);
 	}
 
-	@Override
+    @Override
     public <T> T visit(ConstNode<T> node) {
 		return node.getValue();
 	}

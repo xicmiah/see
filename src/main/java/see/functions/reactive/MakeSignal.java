@@ -20,7 +20,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
-import see.evaluator.ContextualVisitor;
+import see.evaluator.EagerVisitor;
+import see.evaluator.LazyVisitor;
 import see.evaluator.NumberLifter;
 import see.evaluator.ValueProcessor;
 import see.parser.numbers.NumberFactory;
@@ -59,12 +60,12 @@ public class MakeSignal extends ReactiveFunction<Object, Signal<?>> {
         final NumberLifter numberLifter = new NumberLifter(factorySupplier);
         final List<ValueProcessor> custom = getCustomProcessors();
 
-        tree.accept(new ContextualVisitor(context, concat(custom, of(signalCapture, numberLifter))));
+        tree.accept(new EagerVisitor(context, concat(custom, of(signalCapture, numberLifter))));
 
         return factory.bind(signalCapture.dependencies, new Supplier<Object>() {
             @Override
             public Object get() {
-                return tree.accept(new ContextualVisitor(context, concat(custom, of(signalExpand, numberLifter))));
+                return tree.accept(new LazyVisitor(context, concat(custom, of(signalExpand, numberLifter))));
             }
         });
     }

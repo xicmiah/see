@@ -16,9 +16,13 @@
 
 package see.integration;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.junit.Test;
 import see.ReactiveSee;
+import see.reactive.Dependency;
+import see.reactive.Signal;
 import see.reactive.VariableSignal;
 import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
@@ -108,6 +112,17 @@ public class BindingTest {
         
         a.update(37);
         assertEquals("42.0", bean.getValue().toString());
+    }
+
+    @Test
+    public void testEagerness() throws Exception {
+        Dependency a = reactiveFactory.var(false);
+        Dependency b = reactiveFactory.var(true);
+
+        Map<String, Object> context = ImmutableMap.<String, Object>of("a", a, "b", b);
+        Signal<?> result = (Signal<?>) see.eval("signal(a && b)", context); // b is not evaluated normally
+
+        assertEquals(ImmutableSet.of(a, b), result.getDependencies()); // Dependencies should contain b
     }
 
     public static class TestBean {
