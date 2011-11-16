@@ -313,7 +313,7 @@ class Expressions extends AbstractGrammar {
      */
     @SuppressSubnodes
     Rule Constant() {
-        return FirstOf(String(), Float(), Int(), Boolean());
+        return FirstOf(String(), Float(), Int(), Boolean(), Null());
     }
 
     /**
@@ -405,9 +405,20 @@ class Expressions extends AbstractGrammar {
         return T(literals.IntLiteral(), push(new ImmutableConstNode<Object>(matchNumber())));
     }
 
-    @WhitespaceSafe
-    Rule Boolean(){
+    /**
+     * Boolean literal. Pushes one node.
+     * @return constructed rule
+     */
+    Rule Boolean() {
         return T(literals.BooleanLiteral(), push(new ImmutableConstNode<Object>(Boolean.valueOf(match()))));
+    }
+
+    /**
+     * Null literal. Pushes one node.
+     * @return constructed rule
+     */
+    Rule Null() {
+        return T(literals.NullLiteral(), push(new ImmutableConstNode<Object>(null)));
     }
 
     @SuppressSubnodes

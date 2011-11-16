@@ -54,7 +54,12 @@ class Literals extends AbstractGrammar {
 
     @WhitespaceSafe
     Rule BooleanLiteral() {
-        return FirstOf(String("true"),String("false"));
+        return FirstOf(String("true"), String("false"));
+    }
+
+    @WhitespaceSafe
+    Rule NullLiteral() {
+        return String("null");
     }
 
     @WhitespaceSafe
