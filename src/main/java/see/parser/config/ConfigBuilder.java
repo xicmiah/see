@@ -30,7 +30,7 @@ public class ConfigBuilder {
     private Map<String, String> aliases;
     private Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions;
     
-    private List<ValueProcessor> valueProcessors;
+    private List<ValueProcessor> valueProcessors = ImmutableList.of();
 
     private NumberFactory numberFactory = new BigDecimalFactory();
     private ChainResolver propertyResolver = new SingularChainResolver(new PropertyUtilsResolver());

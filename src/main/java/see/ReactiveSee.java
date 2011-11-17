@@ -16,7 +16,6 @@
 
 package see;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import see.evaluator.ReactiveEvaluator;
 import see.evaluator.ValueProcessor;
@@ -111,7 +110,7 @@ public class ReactiveSee {
      * @return evaluated value
      */
     public <T> T evaluate(Node<T> tree, final Map<String, Object> context) {
-        List<ValueProcessor> customProcessors = ImmutableList.of();
+        List<ValueProcessor> customProcessors = config.getValueProcessors();
         ReactiveEvaluator evaluator = new ReactiveEvaluator(config, reactiveFactory, customProcessors);
         return evaluator.evaluate(tree, context);
     }
