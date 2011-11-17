@@ -22,33 +22,17 @@ import see.functions.VarArgFunction;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class PropertyFunctions {
-    private final Get getInstance = new Get();
+public class GetProperty implements VarArgFunction<Property<Object>, Object> {
+    @Override
+    public Object apply(@Nonnull List<Property<Object>> input) {
+        Preconditions.checkArgument(input.size() == 1, "GetProperty takes one argument");
 
-    /**
-     * Return instance of getter function
-     * @return configured Get instance
-     */
-    public Get getGetFunction() {
-        return getInstance;
+        Property<Object> property = input.get(0);
+
+        return property.get();
     }
-
-    public class Get implements VarArgFunction<Property<Object>, Object> {
-        private Get() {}
-
-        @Override
-        public Object apply(@Nonnull List<Property<Object>> input) {
-            Preconditions.checkArgument(input.size() == 1, "GetProperty takes one argument");
-
-            Property<Object> property = input.get(0);
-
-            return property.get();
-        }
-        @Override
-        public String toString() {
-            return "get";
-        }
-
+    @Override
+    public String toString() {
+        return "get";
     }
-
 }

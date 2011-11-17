@@ -45,7 +45,7 @@ public class ConfigBuilder {
         addLogic(builder);
         addArithmetic(builder);
         addCompare(builder);
-        addProperty(builder, builder.propertyResolver);
+        addProperty(builder);
         addIteration(builder);
         addBindings(builder);
         addCommon(builder);
@@ -70,13 +70,12 @@ public class ConfigBuilder {
         builder.addPureFunction("while", new While());
     }
 
-    private static void addProperty(ConfigBuilder builder, PropertyResolver resolver) {
+    private static void addProperty(ConfigBuilder builder) {
         builder.addAlias(".", "get");
         builder.addAlias("[]", "props.indexed");
         builder.addAlias("p=", "pSet");
 
-        PropertyFunctions propertyFunctions = new PropertyFunctions();
-        builder.addPureFunction("get", propertyFunctions.getGetFunction());
+        builder.addPureFunction("get", new GetProperty());
 
         builder.addPureFunction("props.target", new MakeTarget());
         builder.addPureFunction("props.indexed", new MakeIndexed());
@@ -196,7 +195,7 @@ public class ConfigBuilder {
      */
     public ConfigBuilder setPropertyResolver(PropertyResolver propertyResolver) {
         this.propertyResolver = propertyResolver;
-        addProperty(this, propertyResolver); // Update set/get functions
+        addProperty(this); // Update set/get functions
         return this;
     }
 
