@@ -1,6 +1,8 @@
 package see.parser.config;
 
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
+import see.evaluator.ValueProcessor;
 import see.functions.ContextCurriedFunction;
 import see.functions.Function;
 import see.functions.PureFunction;
@@ -27,6 +29,8 @@ import java.util.Map;
 public class ConfigBuilder {
     private Map<String, String> aliases;
     private Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions;
+    
+    private List<ValueProcessor> valueProcessors;
 
     private NumberFactory numberFactory = new BigDecimalFactory();
     private ChainResolver propertyResolver = new SingularChainResolver(new PropertyUtilsResolver());
@@ -197,8 +201,23 @@ public class ConfigBuilder {
         return this;
     }
 
+    /**
+     * Set custom value processors
+     * @param valueProcessors custom value processors
+     * @return this instance
+     */
+    public ConfigBuilder setValueProcessors(List<ValueProcessor> valueProcessors) {
+        this.valueProcessors = valueProcessors;
+        return this;
+    }
+
     public GrammarConfiguration build() {
-        return new GrammarConfiguration(new FunctionResolver(functions, aliases), numberFactory, propertyResolver);
+        return new GrammarConfiguration(
+                new FunctionResolver(functions, aliases),
+                numberFactory,
+                propertyResolver,
+                ImmutableList.copyOf(valueProcessors)
+        );
     }
 
     /**
