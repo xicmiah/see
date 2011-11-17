@@ -17,7 +17,10 @@
 package see;
 
 import com.google.common.collect.Maps;
+import see.evaluator.SimpleEvaluator;
 import see.functions.reactive.ReactiveFunction;
+import see.parser.config.ConfigBuilder;
+import see.parser.config.GrammarConfiguration;
 import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
 
@@ -32,23 +35,25 @@ import java.util.Map;
 public class ReactiveSee {
     private final See see;
     private final ReactiveFactory reactiveFactory;
+    private final GrammarConfiguration config;
 
     /**
      * Create new instance, custom See instance and reactive factory.
-     * @param see see instance
+     * @param configuration see configuration
      * @param factory reactive factory
      */
-    public ReactiveSee(See see, ReactiveFactory factory) {
-        this.see = see;
+    public ReactiveSee(GrammarConfiguration configuration, ReactiveFactory factory) {
+        this.see = new See(configuration);
         this.reactiveFactory = factory;
+        this.config = configuration;
     }
 
     /**
      * Create new instance, See configured with supplied configuration.
-     * @param see see instance
+     * @param config see configuration
      */
-    public ReactiveSee(See see) {
-        this(see, new ReactiveFactory());
+    public ReactiveSee(GrammarConfiguration config) {
+        this(config, new ReactiveFactory());
     }
 
     /**
@@ -56,14 +61,14 @@ public class ReactiveSee {
      * @param reactiveFactory reactive factory
      */
     public ReactiveSee(ReactiveFactory reactiveFactory) {
-        this(new See(), reactiveFactory);
+        this(ConfigBuilder.defaultConfig().build(), reactiveFactory);
     }
 
     /**
      * Create new instance with default See configuration.
      */
     public ReactiveSee() {
-        this(new See(), new ReactiveFactory());
+        this(new ReactiveFactory());
     }
 
     /**
@@ -104,7 +109,7 @@ public class ReactiveSee {
      * @return evaluated value
      */
     public <T> T evaluate(Node<T> tree, final Map<String, Object> context) {
-        return see.evaluate(tree, getReactiveContext(context));
+        return new SimpleEvaluator(config.getNumberFactory()).evaluate(tree, getReactiveContext(context));
     }
 
     /**
