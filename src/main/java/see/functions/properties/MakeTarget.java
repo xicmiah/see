@@ -26,7 +26,7 @@ public class MakeTarget implements VarArgFunction<Object, PropertyAccess.Value> 
     @Override
     public PropertyAccess.Value apply(List<Object> input) {
         Preconditions.checkArgument(input.size() == 1, "MakeTarget takes one argument");
-        return new PropertyAccess.Value(input.get(0));
+        return PropertyAccess.value(input.get(0));
     }
 
     @Override

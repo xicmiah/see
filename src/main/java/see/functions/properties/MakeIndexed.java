@@ -26,7 +26,7 @@ public class MakeIndexed implements VarArgFunction<Object, PropertyAccess.Indexe
     @Override
     public PropertyAccess.Indexed apply(List<Object> input) {
         Preconditions.checkArgument(input.size() == 1, "MakeIndexed takes one argument");
-        return new PropertyAccess.Indexed(input.get(0));
+        return PropertyAccess.indexed(input.get(0));
     }
 
     @Override

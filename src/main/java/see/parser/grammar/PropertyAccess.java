@@ -21,10 +21,23 @@ public abstract class PropertyAccess {
 
     public abstract <T, D> T accept(Visitor<T, D> visitor, D intermediate);
 
+    public static Simple simple(String name) {
+        return new Simple(name);
+    }
+
+    public static Indexed indexed(Object index) {
+        return new Indexed(index);
+    }
+
+    public static Value value(Object target) {
+        return new Value(target);
+    }
+
+    @Deprecated
     public static class Value extends PropertyAccess {
         private final Object target;
 
-        public Value(Object target) {
+        private Value(Object target) {
             this.target = target;
         }
 
@@ -49,7 +62,7 @@ public abstract class PropertyAccess {
     public static class Simple extends PropertyAccess {
         private final String name;
 
-        public Simple(String name) {
+        private Simple(String name) {
             this.name = name;
         }
 
@@ -74,7 +87,7 @@ public abstract class PropertyAccess {
     public static class Indexed extends PropertyAccess {
         private final Object index;
 
-        public Indexed(Object index) {
+        private Indexed(Object index) {
             this.index = index;
         }
 
