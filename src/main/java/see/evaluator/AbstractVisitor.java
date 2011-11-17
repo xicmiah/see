@@ -17,17 +17,25 @@
 package see.evaluator;
 
 import com.google.common.base.Function;
+import see.functions.properties.ChainResolver;
+import see.functions.properties.Property;
+import see.functions.properties.PropertyUtilsResolver;
+import see.functions.properties.SingularChainResolver;
+import see.parser.grammar.PropertyAccess;
+import see.parser.grammar.PropertyDescriptor;
 import see.tree.*;
 import see.util.Reduce;
 
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.collect.Lists.transform;
 import static see.util.Reduce.fold;
 
 public abstract class AbstractVisitor implements Visitor {
     private final Map<String, ?> context;
-    private List<ValueProcessor> valueProcessors;
+    private final List<ValueProcessor> valueProcessors;
+    private final ChainResolver resolver = new SingularChainResolver(new PropertyUtilsResolver());
 
     public AbstractVisitor(Map<String, ?> context, List<ValueProcessor> valueProcessors) {
         this.context = context;
@@ -69,12 +77,54 @@ public abstract class AbstractVisitor implements Visitor {
 		return node.getValue();
 	}
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T visit(PropertyNode<T> propertyNode) {
+        final Object target = propertyNode.getTarget().accept(this);
+
+        final List<? extends PropertyAccess> evaluatedProps = evaluateProperties(propertyNode.getProperties());
+
+        return (T) new Property<Object>() {
+            @Override
+            public void set(Object value) {
+                resolver.set(target, evaluatedProps, value);
+            }
+
+            @Override
+            public Object get() {
+                return resolver.get(target, evaluatedProps);
+            }
+        };
+    }
+
+    private List<? extends PropertyAccess> evaluateProperties(List<? extends PropertyDescriptor> initialProps) {
+        return transform(initialProps, new Function<PropertyDescriptor, PropertyAccess>() {
+            @Override
+            public PropertyAccess apply(PropertyDescriptor input) {
+                return evaluateProperty(input);
+            }
+        });
+    }
+
+    @SuppressWarnings("LoopStatementThatDoesntLoop")
+    private PropertyAccess evaluateProperty(PropertyDescriptor input) {
+        for (String name : input.value().left()) {
+            return PropertyAccess.simple(name);
+        }
+        for (Node<?> index : input.value().right()) {
+            return PropertyAccess.indexed(index.accept(this));
+        }
+
+        throw new IllegalStateException("Either has no value, will never happen");
+    }
+
     /**
      * Pass value through post-processors.
-     * @param value
-     * @param <T>
-     * @return
+     * @param value initial value
+     * @param <T> value type
+     * @return processed value
      */
+    @SuppressWarnings("unchecked")
     private <T> T processValue(T value) {
         return (T) fold(value, valueProcessors, new Reduce.FoldFunction<Function<Object, Object>, Object>() {
             @Override

@@ -17,25 +17,13 @@
 package see.functions.properties;
 
 import com.google.common.base.Preconditions;
-import see.functions.Settable;
 import see.functions.VarArgFunction;
-import see.parser.grammar.PropertyAccess;
-import see.util.Reduce;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
-import static see.util.Reduce.fold;
-
 public class PropertyFunctions {
-    private final PropertyResolver resolver;
-
     private final Get getInstance = new Get();
-    private final PropertyAsSettable setInstance = new PropertyAsSettable();
-
-    public PropertyFunctions(PropertyResolver resolver) {
-        this.resolver = resolver;
-    }
 
     /**
      * Return instance of getter function
@@ -45,37 +33,16 @@ public class PropertyFunctions {
         return getInstance;
     }
 
-    /**
-     * Return instance of setter function
-     * @return configured Set instance
-     */
-    public PropertyAsSettable getSetFunction() {
-        return setInstance;
-    }
-
-    private Object getBean(PropertyAccess input) {
-        Preconditions.checkArgument(input instanceof PropertyAccess.Value, "Cannot get value from " + input);
-
-        PropertyAccess.Value value = (PropertyAccess.Value) input;
-        return value.getTarget();
-    }
-
-    public class Get implements VarArgFunction<PropertyAccess, Object> {
+    public class Get implements VarArgFunction<Property<Object>, Object> {
         private Get() {}
 
         @Override
-        public Object apply(@Nonnull List<PropertyAccess> input) {
-            Preconditions.checkArgument(input.size() >= 1, "GetProperty takes one or more arguments");
+        public Object apply(@Nonnull List<Property<Object>> input) {
+            Preconditions.checkArgument(input.size() == 1, "GetProperty takes one argument");
 
-            Object bean = getBean(input.get(0));
-            List<PropertyAccess> properties = input.subList(1, input.size());
+            Property<Object> property = input.get(0);
 
-            return fold(bean, properties, new Reduce.FoldFunction<PropertyAccess, Object>() {
-                @Override
-                public Object apply(Object prev, PropertyAccess arg) {
-                    return resolver.get(prev, arg);
-                }
-            });
+            return property.get();
         }
         @Override
         public String toString() {
@@ -84,30 +51,4 @@ public class PropertyFunctions {
 
     }
 
-    /**
-     * Expose property access as {@link Settable} instance
-     */
-    public class PropertyAsSettable implements VarArgFunction<PropertyAccess, Settable<Object>> {
-        private PropertyAsSettable() {}
-
-        @Override
-        public Settable<Object> apply(@Nonnull List<PropertyAccess> input) {
-            Preconditions.checkArgument(input.size() >= 2, "PropertyAsSettable takes two or more arguments");
-
-            final Object lastBean = getInstance.apply(input.subList(0, input.size() - 1));
-            final PropertyAccess lastProperty = input.get(input.size() - 1);
-
-            return new Settable<Object>() {
-                @Override
-                public void set(Object value) {
-                    resolver.set(lastBean, lastProperty, value);
-                }
-            };
-        }
-
-        @Override
-        public String toString() {
-            return "pSettable";
-        }
-    }
 }

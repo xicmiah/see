@@ -17,13 +17,13 @@ import see.tree.Node;
 import see.tree.VarNode;
 import see.tree.immutable.ImmutableConstNode;
 import see.tree.immutable.ImmutableFunctionNode;
+import see.tree.immutable.ImmutablePropertyNode;
 import see.tree.immutable.ImmutableVarNode;
 
 import java.util.List;
 import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.of;
-import static see.parser.grammar.PropertyAccess.Simple;
 
 @SuppressWarnings({"InfiniteRecursion"})
 class Expressions extends AbstractGrammar {
@@ -139,8 +139,7 @@ class Expressions extends AbstractGrammar {
      * @return constructed rule
      */
     Rule SettableProperty() {
-        ListVar<Node<?>> props = new ListVar<Node<?>>();
-        return Sequence(PropertyAccess(props), push(makeFNode("p=", props.get())));
+        return PropertyAccess(); // PropertyNode evaluates to Property, which is already Settable
     }
 
     /**
@@ -225,19 +224,24 @@ class Expressions extends AbstractGrammar {
     }
 
     Rule PropertyRead() {
-        ListVar<Node<?>> props = new ListVar<Node<?>>();
         return FirstOf(
-                Sequence(PropertyAccess(props), push(makeFNode(".", props.get()))),
+                Sequence(PropertyAccess(), push(makeUNode(".", pop()))),
                 Atom()
         );
     }
 
-    Rule PropertyAccess(ListVar<? super Node<?>> props) {
-        return Sequence(Atom(), props.append(makeUNode("props.target", pop())),
+    /**
+     * Sequence of one or more property invocations. Pushes one PropertyNode.
+     * @return constructed rule
+     */
+    Rule PropertyAccess() {
+        ListVar<PropertyDescriptor> props = new ListVar<PropertyDescriptor>();
+        return Sequence(Atom(),
                 OneOrMore(FirstOf(
-                        T(".", Identifier(), props.append(new ImmutableConstNode<Simple>(new Simple(match())))),
-                        Sequence(T("["), RightExpression(), props.append(makeUNode("[]", pop())), T("]"))
-                ))
+                        T(".", Identifier(), props.append(PropertyDescriptor.simple(match()))),
+                        Sequence(T("["), RightExpression(), T("]"), props.append(PropertyDescriptor.indexed(pop())))
+                )),
+                push(ImmutablePropertyNode.propertyNode(pop(), props.get()))
         );
     }
 

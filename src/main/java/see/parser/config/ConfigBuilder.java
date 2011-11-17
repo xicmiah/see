@@ -75,9 +75,8 @@ public class ConfigBuilder {
         builder.addAlias("[]", "props.indexed");
         builder.addAlias("p=", "pSet");
 
-        PropertyFunctions propertyFunctions = new PropertyFunctions(resolver);
+        PropertyFunctions propertyFunctions = new PropertyFunctions();
         builder.addPureFunction("get", propertyFunctions.getGetFunction());
-        builder.addPureFunction("pSet", propertyFunctions.getSetFunction());
 
         builder.addPureFunction("props.target", new MakeTarget());
         builder.addPureFunction("props.indexed", new MakeIndexed());
