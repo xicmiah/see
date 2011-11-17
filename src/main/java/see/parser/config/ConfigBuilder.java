@@ -8,11 +8,13 @@ import see.functions.arithmetic.*;
 import see.functions.bool.And;
 import see.functions.bool.Not;
 import see.functions.bool.Or;
+import see.functions.common.Addition;
 import see.functions.compare.*;
 import see.functions.properties.*;
 import see.functions.reactive.Bind;
 import see.functions.reactive.MakeSignal;
 import see.functions.service.*;
+import see.functions.string.Concat;
 import see.parser.numbers.BigDecimalFactory;
 import see.parser.numbers.NumberFactory;
 
@@ -46,7 +48,8 @@ public class ConfigBuilder {
         addProperty(builder, builder.propertyResolver);
         addIteration(builder);
         addBindings(builder);
-
+        addCommon(builder);
+        addString(builder);
         return builder;
     }
 
@@ -89,8 +92,16 @@ public class ConfigBuilder {
         builder.addPureFunction("<=", new Leq());
     }
 
+    private static void addCommon(ConfigBuilder builder) {
+        builder.addAlias("+", "addition");
+        builder.addPureFunction("addition", new Addition());
+    }
+
+    private static void addString(ConfigBuilder builder){
+        builder.addPureFunction("concat", new Concat());
+    }
+
     private static void addArithmetic(final ConfigBuilder builder) {
-        builder.addAlias("+", "sum");
         builder.addAlias("-", "minus");
         builder.addAlias("*", "product");
         builder.addAlias("/", "divide");
@@ -147,10 +158,11 @@ public class ConfigBuilder {
     /**
      * Add supplied function to registry.
      * Function should accept context via currying
-     * @param name function name
+     *
+     * @param name     function name
      * @param function function to add
-     * @param <T> function argument type
-     * @param <R> function result type
+     * @param <T>      function argument type
+     * @param <R>      function result type
      * @return this instance
      */
     public <T, R> ConfigBuilder addFunction(String name, ContextCurriedFunction<Function<List<T>, R>> function) {
@@ -160,10 +172,11 @@ public class ConfigBuilder {
 
     /**
      * Add supplied pure function to registry.
-     * @param name function name
+     *
+     * @param name     function name
      * @param function function to add
-     * @param <T> function argument type
-     * @param <R> function result type
+     * @param <T>      function argument type
+     * @param <R>      function result type
      * @return this instance
      */
     public <T, R> ConfigBuilder addPureFunction(String name, Function<List<T>, R> function) {
@@ -178,6 +191,7 @@ public class ConfigBuilder {
 
     /**
      * Set custom property resolver. Dependant functions are updated automatically.
+     *
      * @param propertyResolver new property resolver
      * @return this instance
      */
@@ -193,6 +207,7 @@ public class ConfigBuilder {
 
     /**
      * Cast supplied function to type
+     *
      * @param function function to wrap
      * @return wrapped function
      */

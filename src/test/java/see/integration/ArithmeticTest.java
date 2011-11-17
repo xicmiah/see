@@ -42,6 +42,19 @@ public class ArithmeticTest {
     }
 
     @Test
+    public void testArithmeticConcat() throws Exception {
+        try {
+            see.eval("4+\"5\"");
+        } catch (Exception e) {
+            if (!(e.getCause() instanceof ClassCastException)) {
+                throw e;
+            }
+            return;
+        }
+        throw new Exception("No exception is raised");
+    }
+
+    @Test
     public void testPower() throws Exception {
         assertEquals(nine, see.eval("3^2"));
         assertEquals(9, ((Number) see.eval("81^0.5")).intValue());
@@ -51,6 +64,7 @@ public class ArithmeticTest {
     public void testDivision() throws Exception {
         assertEquals(1.0D / 3, ((Number) see.eval("1/3")).doubleValue(), 1e-9);
     }
+
 
     @Test
     public void testUnaryPlusMinus() throws Exception {
