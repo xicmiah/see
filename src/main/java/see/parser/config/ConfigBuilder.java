@@ -56,12 +56,7 @@ public class ConfigBuilder {
     private static void addBindings(final ConfigBuilder builder) {
         builder.addAlias("<-", "bind");
         builder.addFunction("bind", new Bind());
-        builder.addFunction("signal", new MakeSignal(new Supplier<NumberFactory>() {
-            @Override
-            public NumberFactory get() {
-                return builder.numberFactory;
-            }
-        }));
+        builder.addFunction("signal", new MakeSignal());
     }
 
     private static void addIteration(ConfigBuilder builder) {

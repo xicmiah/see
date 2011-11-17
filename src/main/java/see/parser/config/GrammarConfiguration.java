@@ -22,7 +22,7 @@ public class GrammarConfiguration {
         return numberFactory;
     }
 
-    public ChainResolver getProperties() {
+    public ChainResolver getChainResolver() {
         return properties;
     }
 }

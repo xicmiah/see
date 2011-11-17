@@ -16,14 +16,16 @@
 
 package see;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import see.evaluator.SimpleEvaluator;
-import see.functions.reactive.ReactiveFunction;
+import see.evaluator.ReactiveEvaluator;
+import see.evaluator.ValueProcessor;
 import see.parser.config.ConfigBuilder;
 import see.parser.config.GrammarConfiguration;
 import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -109,7 +111,9 @@ public class ReactiveSee {
      * @return evaluated value
      */
     public <T> T evaluate(Node<T> tree, final Map<String, Object> context) {
-        return new SimpleEvaluator(config.getNumberFactory()).evaluate(tree, getReactiveContext(context));
+        List<ValueProcessor> customProcessors = ImmutableList.of();
+        ReactiveEvaluator evaluator = new ReactiveEvaluator(config, reactiveFactory, customProcessors);
+        return evaluator.evaluate(tree, context);
     }
 
     /**
@@ -142,16 +146,5 @@ public class ReactiveSee {
      */
     public Object eval(String expression) {
         return eval(expression, Maps.<String, Object>newHashMap());
-    }
-
-    /**
-     * Create new context, which contains ReactiveFactory.
-     * @param context initial context
-     * @return context with reactive factory
-     */
-    private Map<String, Object> getReactiveContext(Map<String, Object> context) {
-        Map<String, Object> reactiveContext = Maps.newHashMap(context);
-        reactiveContext.put(ReactiveFunction.REACTIVE_KEY, reactiveFactory);
-        return reactiveContext;
     }
 }

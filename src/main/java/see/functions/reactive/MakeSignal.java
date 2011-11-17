@@ -22,12 +22,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import see.evaluator.EagerVisitor;
 import see.evaluator.LazyVisitor;
-import see.evaluator.NumberLifter;
 import see.evaluator.ValueProcessor;
-import see.parser.numbers.NumberFactory;
+import see.functions.properties.ChainResolver;
+import see.parser.config.GrammarConfiguration;
 import see.reactive.Dependency;
 import see.reactive.Signal;
-import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
 
 import javax.annotation.Nullable;
@@ -35,39 +34,37 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.collect.ImmutableList.of;
-
 /**
  * Signal creation. Expects second argument to be a tree.
  * Creates a
  */
 public class MakeSignal extends ReactiveFunction<Object, Signal<?>> {
-
-    private final Supplier<NumberFactory> factorySupplier;
-
-    public MakeSignal(Supplier<NumberFactory> factorySupplier) {
-        this.factorySupplier = factorySupplier;
-    }
-
     @Override
-    public Signal<?> apply(ReactiveFactory factory, final List<Object> input, final Map<String, ?> context) {
+    public Signal<?> apply(ContextConfig config, final List<Object> input, final Map<String, ?> context) {
         Preconditions.checkArgument(input.size() == 2, "MakeSignal takes two arguments");
 
         final Node<Object> tree = (Node<Object>) input.get(1);
 
-        final SignalCapture signalCapture = new SignalCapture();
-        final SignalExpand signalExpand = new SignalExpand();
-        final NumberLifter numberLifter = new NumberLifter(factorySupplier);
-        final List<ValueProcessor> custom = getCustomProcessors();
+        GrammarConfiguration grammarConfig = config.getGrammarConfig();
+        List<ValueProcessor> visitorProcessors = config.getValueProcessors();
 
-        tree.accept(new EagerVisitor(context, concat(custom, of(signalCapture, numberLifter))));
+        ChainResolver chainResolver = grammarConfig.getChainResolver();
 
-        return factory.bind(signalCapture.dependencies, new Supplier<Object>() {
+        SignalCapture signalCapture = new SignalCapture();
+        EagerVisitor eagerVisitor = new EagerVisitor(context, prepend(signalCapture, visitorProcessors), chainResolver);
+        tree.accept(eagerVisitor);
+
+        final LazyVisitor lazyVisitor = new LazyVisitor(context, prepend(new SignalExpand(), visitorProcessors), chainResolver);
+        return config.getReactiveFactory().bind(signalCapture.dependencies, new Supplier<Object>() {
             @Override
             public Object get() {
-                return tree.accept(new LazyVisitor(context, concat(custom, of(signalExpand, numberLifter))));
+                return tree.accept(lazyVisitor);
             }
         });
+    }
+
+    private static <T> List<T> prepend(T item, List<T> list) {
+        return ImmutableList.<T>builder().add(item).addAll(list).build();
     }
 
     @Override
@@ -75,18 +72,6 @@ public class MakeSignal extends ReactiveFunction<Object, Signal<?>> {
         return "signal";
     }
 
-    /**
-     * List of custom implicit conversions for signal expressions.
-     * Can be overridden in subclass.
-     * @return list of custom conversions
-     */
-    protected List<ValueProcessor> getCustomProcessors() {
-        return of();
-    }
-
-    private static <T> ImmutableList<T> concat(List<T> first, List<T> last) {
-        return ImmutableList.<T>builder().addAll(first).addAll(last).build();
-    }
 
     private static final class SignalCapture implements ValueProcessor {
         private final Collection<Dependency> dependencies = Sets.newHashSet();

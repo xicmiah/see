@@ -16,9 +16,12 @@
 
 package see.functions.reactive;
 
+import see.evaluator.ReactiveEvaluator;
+import see.evaluator.ValueProcessor;
 import see.functions.ContextCurriedFunction;
 import see.functions.Function;
 import see.functions.VarArgFunction;
+import see.parser.config.GrammarConfiguration;
 import see.reactive.impl.ReactiveFactory;
 
 import javax.annotation.Nonnull;
@@ -26,19 +29,47 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class ReactiveFunction<Arg, Result> implements ContextCurriedFunction<Function<List<Arg>, Result>> {
-    public static final String REACTIVE_KEY = "⑨reactive";
+
 
     @Override
     public Function<List<Arg>, Result> apply(final Map<String, ?> context) {
-        final ReactiveFactory factory = (ReactiveFactory) context.get(REACTIVE_KEY);
+        ReactiveFactory factory = (ReactiveFactory) context.get(ReactiveEvaluator.REACTIVE_KEY);
+        GrammarConfiguration config = (GrammarConfiguration) context.get(ReactiveEvaluator.CONFIG_KEY);
+        List<ValueProcessor> processors = (List<ValueProcessor>) context.get(ReactiveEvaluator.PROCESSORS_KEY);
+
+        final ContextConfig contextConfig = new ContextConfig(factory, config, processors);
 
         return new VarArgFunction<Arg, Result>() {
             @Override
             public Result apply(@Nonnull List<Arg> input) {
-                return ReactiveFunction.this.apply(factory, input, context);
+                return ReactiveFunction.this.apply(contextConfig, input, context);
             }
         };
     }
 
-    protected abstract Result apply(ReactiveFactory factory, List<Arg> input, Map<String, ?> context);
+    protected abstract Result apply(ContextConfig config, List<Arg> input, Map<String, ?> context);
+
+    protected static class ContextConfig {
+        private final ReactiveFactory reactiveFactory;
+        private final GrammarConfiguration grammarConfig;
+        private final List<ValueProcessor> valueProcessors;
+
+        public ContextConfig(ReactiveFactory reactiveFactory, GrammarConfiguration grammarConfig, List<ValueProcessor> valueProcessors) {
+            this.reactiveFactory = reactiveFactory;
+            this.grammarConfig = grammarConfig;
+            this.valueProcessors = valueProcessors;
+        }
+
+        public ReactiveFactory getReactiveFactory() {
+            return reactiveFactory;
+        }
+
+        public GrammarConfiguration getGrammarConfig() {
+            return grammarConfig;
+        }
+
+        public List<ValueProcessor> getValueProcessors() {
+            return valueProcessors;
+        }
+    }
 }

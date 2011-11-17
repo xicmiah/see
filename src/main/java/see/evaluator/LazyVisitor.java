@@ -1,8 +1,8 @@
 package see.evaluator;
 
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import see.functions.properties.ChainResolver;
 import see.tree.Node;
 
 import java.util.List;
@@ -10,19 +10,16 @@ import java.util.Map;
 
 public class LazyVisitor extends AbstractVisitor {
 
-    public LazyVisitor(Map<String, ?> context) {
-        this(context, ImmutableList.<ValueProcessor>of());
-	}
-
     /**
      * Create a visitor from initial context and list of post-processors.
      *
      * @param context initial context
      * @param valueProcessors value processors
+     * @param resolver property chain resolver
      */
     public LazyVisitor(Map<String, ?> context,
-                       List<ValueProcessor> valueProcessors) {
-        super(context, valueProcessors);
+                       List<ValueProcessor> valueProcessors, ChainResolver resolver) {
+        super(context, valueProcessors, resolver);
     }
 
     @Override

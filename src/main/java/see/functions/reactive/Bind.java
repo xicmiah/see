@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import see.functions.Settable;
 import see.reactive.Signal;
-import see.reactive.impl.ReactiveFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -29,14 +28,14 @@ import static com.google.common.collect.ImmutableList.of;
 
 public class Bind extends ReactiveFunction<Object, Signal<?>> {
     @Override
-    protected Signal<?> apply(ReactiveFactory factory, final List<Object> input, Map<String, ?> context) {
+    protected Signal<?> apply(ContextConfig config, final List<Object> input, Map<String, ?> context) {
         Preconditions.checkArgument(input.size() == 2, "Bind takes two arguments");
 
         final Settable<Object> target = (Settable<Object>) input.get(0);
 
         final Signal<?> signal = (Signal<?>) input.get(1);
 
-        factory.bind(of(signal), new Supplier<Object>() {
+        config.getReactiveFactory().bind(of(signal), new Supplier<Object>() {
             @Override
             public Object get() {
                 Object now = signal.getNow();

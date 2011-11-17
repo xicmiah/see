@@ -19,8 +19,6 @@ package see.evaluator;
 import com.google.common.base.Function;
 import see.functions.Property;
 import see.functions.properties.ChainResolver;
-import see.functions.properties.PropertyUtilsResolver;
-import see.functions.properties.SingularChainResolver;
 import see.parser.grammar.PropertyAccess;
 import see.parser.grammar.PropertyDescriptor;
 import see.tree.*;
@@ -35,11 +33,13 @@ import static see.util.Reduce.fold;
 public abstract class AbstractVisitor implements Visitor {
     private final Map<String, ?> context;
     private final List<ValueProcessor> valueProcessors;
-    private final ChainResolver resolver = new SingularChainResolver(new PropertyUtilsResolver());
+    private final ChainResolver resolver;
 
-    public AbstractVisitor(Map<String, ?> context, List<ValueProcessor> valueProcessors) {
+
+    public AbstractVisitor(Map<String, ?> context, List<ValueProcessor> valueProcessors, ChainResolver resolver) {
         this.context = context;
         this.valueProcessors = valueProcessors;
+        this.resolver = resolver;
     }
 
     @Override
@@ -92,7 +92,7 @@ public abstract class AbstractVisitor implements Visitor {
 
             @Override
             public Object get() {
-                return resolver.get(target, evaluatedProps);
+                return processValue(resolver.get(target, evaluatedProps));
             }
         };
     }

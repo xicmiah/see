@@ -19,6 +19,7 @@ package see.evaluator;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import see.functions.properties.ChainResolver;
 import see.tree.Node;
 
 import java.util.List;
@@ -28,8 +29,8 @@ import java.util.Map;
  * Visitor, which evaluates function arguments eagerly.
  */
 public class EagerVisitor extends AbstractVisitor {
-    public EagerVisitor(Map<String, ?> context, List<ValueProcessor> valueProcessors) {
-        super(context, valueProcessors);
+    public EagerVisitor(Map<String, ?> context, List<ValueProcessor> valueProcessors, ChainResolver resolver) {
+        super(context, valueProcessors, resolver);
     }
 
     @Override

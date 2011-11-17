@@ -2,6 +2,8 @@ package see.evaluator;
 
 import com.google.common.base.Suppliers;
 import see.exceptions.EvaluationException;
+import see.functions.properties.PropertyUtilsResolver;
+import see.functions.properties.SingularChainResolver;
 import see.parser.numbers.NumberFactory;
 import see.tree.Node;
 
@@ -31,7 +33,7 @@ public class SimpleEvaluator implements Evaluator {
     public <T> T evaluate(Node<T> tree, Map<String, ?> context) throws EvaluationException {
         try {
             ValueProcessor numberLifter = new NumberLifter(Suppliers.ofInstance(numberFactory));
-            return tree.accept(new LazyVisitor(context, of(numberLifter)));
+            return tree.accept(new LazyVisitor(context, of(numberLifter), new SingularChainResolver(new PropertyUtilsResolver())));
         } catch (EvaluationException e) {
             throw e;
         } catch (Exception e) {
