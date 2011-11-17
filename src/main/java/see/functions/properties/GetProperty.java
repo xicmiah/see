@@ -17,6 +17,7 @@
 package see.functions.properties;
 
 import com.google.common.base.Preconditions;
+import see.functions.Property;
 import see.functions.VarArgFunction;
 
 import javax.annotation.Nonnull;

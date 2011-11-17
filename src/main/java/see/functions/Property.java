@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package see.functions.properties;
+package see.functions;
 
 import com.google.common.base.Supplier;
-import see.functions.Settable;
 
 /**
  * Container holding one value of specified type.

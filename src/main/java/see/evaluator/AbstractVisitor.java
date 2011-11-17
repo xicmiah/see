@@ -17,8 +17,8 @@
 package see.evaluator;
 
 import com.google.common.base.Function;
+import see.functions.Property;
 import see.functions.properties.ChainResolver;
-import see.functions.properties.Property;
 import see.functions.properties.PropertyUtilsResolver;
 import see.functions.properties.SingularChainResolver;
 import see.parser.grammar.PropertyAccess;
