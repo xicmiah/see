@@ -10,7 +10,9 @@ import see.functions.bool.Not;
 import see.functions.bool.Or;
 import see.functions.common.Addition;
 import see.functions.compare.*;
-import see.functions.properties.*;
+import see.functions.properties.GetProperty;
+import see.functions.properties.PropertyResolver;
+import see.functions.properties.PropertyUtilsResolver;
 import see.functions.reactive.Bind;
 import see.functions.reactive.MakeSignal;
 import see.functions.service.*;
@@ -72,13 +74,7 @@ public class ConfigBuilder {
 
     private static void addProperty(ConfigBuilder builder) {
         builder.addAlias(".", "get");
-        builder.addAlias("[]", "props.indexed");
-        builder.addAlias("p=", "pSet");
-
         builder.addPureFunction("get", new GetProperty());
-
-        builder.addPureFunction("props.target", new MakeTarget());
-        builder.addPureFunction("props.indexed", new MakeIndexed());
     }
 
     private static void addCompare(ConfigBuilder builder) {
