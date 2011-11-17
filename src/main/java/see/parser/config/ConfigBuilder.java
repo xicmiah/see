@@ -10,9 +10,7 @@ import see.functions.bool.Not;
 import see.functions.bool.Or;
 import see.functions.common.Addition;
 import see.functions.compare.*;
-import see.functions.properties.GetProperty;
-import see.functions.properties.PropertyResolver;
-import see.functions.properties.PropertyUtilsResolver;
+import see.functions.properties.*;
 import see.functions.reactive.Bind;
 import see.functions.reactive.MakeSignal;
 import see.functions.service.*;
@@ -31,7 +29,7 @@ public class ConfigBuilder {
     private Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions;
 
     private NumberFactory numberFactory = new BigDecimalFactory();
-    private PropertyResolver propertyResolver = new PropertyUtilsResolver();
+    private ChainResolver propertyResolver = new SingularChainResolver(new PropertyUtilsResolver());
 
     private ConfigBuilder(Map<String, String> aliases,
                           Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions) {
@@ -184,19 +182,28 @@ public class ConfigBuilder {
     }
 
     /**
-     * Set custom property resolver. Dependant functions are updated automatically.
-     *
+     * Set custom property resolver (for one property).
+     * 
      * @param propertyResolver new property resolver
      * @return this instance
      */
     public ConfigBuilder setPropertyResolver(PropertyResolver propertyResolver) {
-        this.propertyResolver = propertyResolver;
-        addProperty(this); // Update set/get functions
+        this.propertyResolver = new SingularChainResolver(propertyResolver);
+        return this;
+    }
+
+    /**
+     * Set custom resolver for property chains.
+     * @param chainResolver new property resolver
+     * @return this instance
+     */
+    public ConfigBuilder setChainResolver(ChainResolver chainResolver) {
+        this.propertyResolver = chainResolver;
         return this;
     }
 
     public GrammarConfiguration build() {
-        return new GrammarConfiguration(new FunctionResolver(functions, aliases), numberFactory);
+        return new GrammarConfiguration(new FunctionResolver(functions, aliases), numberFactory, propertyResolver);
     }
 
     /**
