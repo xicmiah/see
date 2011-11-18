@@ -37,41 +37,6 @@ public abstract class PropertyAccess {
         return new Indexed(index);
     }
 
-    public static Value value(Object target) {
-        return new Value(target);
-    }
-
-    @Deprecated
-    public static class Value extends PropertyAccess {
-        private final Object target;
-
-        private Value(Object target) {
-            this.target = target;
-        }
-
-        public Object getTarget() {
-            return target;
-        }
-
-        @Override
-        public <T, D> T accept(Visitor<T, D> visitor, D intermediate) {
-            return visitor.visit(this, intermediate);
-        }
-
-        @Override
-        public Either<String, Object> value() {
-            throw new UnsupportedOperationException("Utility class, shouldn't be instantiated");
-        }
-
-        @Override
-        public String toString() {
-            final StringBuilder sb = new StringBuilder();
-            sb.append("Value");
-            sb.append("(").append(target).append(")");
-            return sb.toString();
-        }
-    }
-
     public static class Simple extends PropertyAccess {
         private final String name;
 
@@ -141,8 +106,6 @@ public abstract class PropertyAccess {
      * @param <D> intermediate data type
      */
     public static interface Visitor<T, D> {
-        T visit(Value value, D intermediate);
-
         T visit(Simple simple, D intermediate);
 
         T visit(Indexed indexed, D intermediate);

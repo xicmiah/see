@@ -41,10 +41,6 @@ public class PropertyUtilsResolver implements PropertyResolver {
 
 
     private static class GetVisitor implements PropertyAccess.Visitor<Object, Object> {
-        @Override
-        public Object visit(PropertyAccess.Value value, Object prev) {
-            return value.getTarget();
-        }
 
         @Override
         public Object visit(PropertyAccess.Simple simple, Object target) {
@@ -79,11 +75,6 @@ public class PropertyUtilsResolver implements PropertyResolver {
 
         public SetVisitor(Object value) {
             this.value = value;
-        }
-
-        @Override
-        public Object visit(PropertyAccess.Value value, Object prev) {
-            throw new UnsupportedOperationException();
         }
 
         @Override
