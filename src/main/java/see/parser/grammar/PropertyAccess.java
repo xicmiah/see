@@ -16,10 +16,18 @@
 
 package see.parser.grammar;
 
+import see.util.Either;
+
 public abstract class PropertyAccess {
     private PropertyAccess() {}
 
     public abstract <T, D> T accept(Visitor<T, D> visitor, D intermediate);
+
+    /**
+     * Get value contained in corresponding subclass.
+     * @return property name for simple properties, evaluated index for indexed properties
+     */
+    public abstract Either<String, Object> value();
 
     public static Simple simple(String name) {
         return new Simple(name);
@@ -51,6 +59,11 @@ public abstract class PropertyAccess {
         }
 
         @Override
+        public Either<String, Object> value() {
+            throw new UnsupportedOperationException("Utility class, shouldn't be instantiated");
+        }
+
+        @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder();
             sb.append("Value");
@@ -76,6 +89,11 @@ public abstract class PropertyAccess {
         }
 
         @Override
+        public Either<String, Object> value() {
+            return Either.left(name);
+        }
+
+        @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder();
             sb.append("Simple");
@@ -98,6 +116,11 @@ public abstract class PropertyAccess {
         @Override
         public <T, D> T accept(Visitor<T, D> visitor, D intermediate) {
             return visitor.visit(this, intermediate);
+        }
+
+        @Override
+        public Either<String, Object> value() {
+            return Either.right(index);
         }
 
         @Override
