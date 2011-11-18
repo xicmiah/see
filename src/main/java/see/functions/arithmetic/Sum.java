@@ -5,15 +5,14 @@ import see.functions.Function;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class Sum implements Function<List<BigDecimal>, BigDecimal> {
+public class Sum implements Function<List<Comparable>, Comparable> {
     @Override
-    public BigDecimal apply(List<BigDecimal> input) {
+    public Comparable apply(List<Comparable> input) {
         BigDecimal result = BigDecimal.ZERO;
-
-        for (BigDecimal value : input) {
-            result = result.add(value);
+        for (Comparable value : input) {
+            BigDecimal decValue=(BigDecimal) value;
+            result = result.add(decValue);
         }
-        
         return result;
     }
 
