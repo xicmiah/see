@@ -36,7 +36,7 @@ import java.util.Map;
 
 /**
  * Signal creation. Expects second argument to be a tree.
- * Creates a
+ * Creates a signal bound to signals present in tree.
  */
 public class MakeSignal extends ReactiveFunction<Object, Signal<?>> {
     @Override
@@ -72,7 +72,23 @@ public class MakeSignal extends ReactiveFunction<Object, Signal<?>> {
         return "signal";
     }
 
+    /**
+     * Processor, which expands signals to their current value.
+     */
+    private static final class SignalExpand implements ValueProcessor {
+        @Override
+        public Object apply(@Nullable Object input) {
+            if (input instanceof Signal<?>) {
+                Signal<?> signal = (Signal<?>) input;
+                return signal.getNow();
+            }
+            return input;
+        }
+    }
 
+    /**
+     * Processor, which expands signals to their current value, capturing dependencies.
+     */
     private static final class SignalCapture implements ValueProcessor {
         private final Collection<Dependency> dependencies = Sets.newHashSet();
 
@@ -85,16 +101,6 @@ public class MakeSignal extends ReactiveFunction<Object, Signal<?>> {
             }
             return input;
         }
-    }
 
-    private static final class SignalExpand implements ValueProcessor {
-        @Override
-        public Object apply(@Nullable Object input) {
-            if (input instanceof Signal<?>) {
-                Signal<?> signal = (Signal<?>) input;
-                return signal.getNow();
-            }
-            return input;
-        }
     }
 }
