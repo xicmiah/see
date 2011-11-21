@@ -57,6 +57,13 @@ public abstract class PropertyDescriptor {
         public Either<String, Node<Object>> value() {
             return Either.left(name);
         }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder();
+            sb.append(".").append(name);
+            return sb.toString();
+        }
     }
 
     public static class Indexed extends PropertyDescriptor {
@@ -73,6 +80,11 @@ public abstract class PropertyDescriptor {
         @Override
         public Either<String, Node<Object>> value() {
             return Either.right(index);
+        }
+
+        @Override
+        public String toString() {
+            return new StringBuilder("[").append(index).append("]").toString();
         }
     }
 }

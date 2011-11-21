@@ -16,6 +16,7 @@
 
 package see.tree.immutable;
 
+import com.google.common.base.Joiner;
 import see.parser.grammar.PropertyDescriptor;
 import see.tree.Node;
 import see.tree.PropertyNode;
@@ -51,5 +52,13 @@ public class ImmutablePropertyNode<T> implements PropertyNode<T> {
     public T accept(Visitor visitor) {
         return visitor.visit(this);
     }
-    
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Prop(");
+        sb.append(target).append(Joiner.on("").join(properties));
+        sb.append(')');
+        return sb.toString();
+    }
 }
