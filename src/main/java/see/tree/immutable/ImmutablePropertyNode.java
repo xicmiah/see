@@ -54,6 +54,11 @@ public class ImmutablePropertyNode<T> implements PropertyNode<T> {
     }
 
     @Override
+    public <V> V accept(ValueVisitor<V> visitor) {
+        return visitor.visit(this);
+    }
+
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("Prop(");

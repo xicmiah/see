@@ -11,11 +11,17 @@ public final class ImmutableConstNode<T> implements ConstNode<T> {
 		this.value = value;
 	}
 
-	public T accept(Visitor visitor) {
+	@Override
+    public T accept(Visitor visitor) {
 		return visitor.visit(this);
 	}
 
-	@Override public T getValue() {
+    @Override
+    public <V> V accept(ValueVisitor<V> visitor) {
+        return visitor.visit(this);
+    }
+
+    @Override public T getValue() {
 		return value;
 	}
 

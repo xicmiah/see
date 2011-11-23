@@ -1,9 +1,9 @@
 package see.tree.immutable;
 
-import see.functions.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import see.functions.ContextCurriedFunction;
+import see.functions.Function;
 import see.tree.FunctionNode;
 import see.tree.Node;
 import see.tree.Visitor;
@@ -24,9 +24,15 @@ public final class ImmutableFunctionNode<Arg, Result> implements FunctionNode<Ar
         this.arguments = ImmutableList.of();
     }
 
+    @Override
     public Result accept(Visitor visitor) {
 		return visitor.visit(this);
 	}
+
+    @Override
+    public <V> V accept(ValueVisitor<V> visitor) {
+        return visitor.visit(this);
+    }
 
     @Override public ContextCurriedFunction<Function<List<Arg>, Result>> getFunction() {
         return function;

@@ -11,11 +11,17 @@ public final class ImmutableVarNode<T> implements VarNode<T> {
 		this.name = name;
 	}
 
-	public T accept(Visitor visitor) {
+	@Override
+    public T accept(Visitor visitor) {
 		return visitor.visit(this);
 	}
 
-	@Override public String getName() {
+    @Override
+    public <V> V accept(ValueVisitor<V> visitor) {
+        return visitor.visit(this);
+    }
+
+    @Override public String getName() {
 		return name;
 	}
 
