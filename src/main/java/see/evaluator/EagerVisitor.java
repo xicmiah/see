@@ -17,11 +17,11 @@
 package see.evaluator;
 
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import see.functions.properties.ChainResolver;
 import see.tree.Node;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +42,6 @@ public class EagerVisitor extends AbstractVisitor {
             }
         });
 
-        return ImmutableList.copyOf(lazyArgs); // Forces evaluation
+        return Collections.unmodifiableList(Lists.newArrayList(lazyArgs)); // Forces evaluation
     }
 }

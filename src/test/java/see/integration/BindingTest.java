@@ -125,6 +125,18 @@ public class BindingTest {
         assertEquals(ImmutableSet.of(a, b), result.getDependencies()); // Dependencies should contain b
     }
 
+    @Test
+    public void testNullDuringDependencyResolution() throws Exception {
+        VariableSignal<String> a = reactiveFactory.var(null);
+
+        Map<String, Object> context = ImmutableMap.<String, Object>of("a", a);
+        Signal<?> result = (Signal<?>) see.eval("signal(a == null)", context);
+        assertEquals(true, result.getNow());
+        
+        a.update("crn");
+        assertEquals(false, result.getNow());
+    }
+
     public static class TestBean {
         private Number value;
 
