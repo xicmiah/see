@@ -132,6 +132,7 @@ public class ConfigBuilder {
         builder.addFunction("vSet", new VarAsSettable());
         builder.addFunction("isDefined", new IsDefined());
         builder.addPureFunction("if", new If<Object>());
+        builder.addFunction("apply", new Apply());
     }
 
     public static ConfigBuilder emptyConfig() {

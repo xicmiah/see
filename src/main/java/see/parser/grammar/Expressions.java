@@ -17,13 +17,13 @@ import see.tree.Node;
 import see.tree.VarNode;
 import see.tree.immutable.ImmutableConstNode;
 import see.tree.immutable.ImmutableFunctionNode;
-import see.tree.immutable.ImmutablePropertyNode;
 import see.tree.immutable.ImmutableVarNode;
 
 import java.util.List;
 import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.of;
+import static see.tree.immutable.ImmutablePropertyNode.propertyNode;
 
 @SuppressWarnings({"InfiniteRecursion"})
 class Expressions extends AbstractGrammar {
@@ -139,7 +139,7 @@ class Expressions extends AbstractGrammar {
      * @return constructed rule
      */
     Rule SettableProperty() {
-        return PropertyAccess(); // PropertyNode evaluates to Property, which is already Settable
+        return SettablePropertyChain(); // PropertyNode evaluates to Property, which is already Settable
     }
 
     /**
@@ -219,40 +219,55 @@ class Expressions extends AbstractGrammar {
     }
 
     Rule PowerExpression() {
-        return Sequence(PropertyRead(),
+        return Sequence(PropertyExpression(),
                 Optional(T("^"), UnaryExpression(), pushBinOp("^")));
     }
-
-    Rule PropertyRead() {
-        return FirstOf(
-                Sequence(PropertyAccess(), push(makeUNode(".", pop()))),
-                Atom()
-        );
+    
+    Rule PropertyExpression() {
+        return Sequence(Atom(), ZeroOrMore(FirstOf(
+                FunctionApplication(),
+                Sequence(PropertyModifier(), push(makeUNode(".", pop())))
+        )));
+    }
+    
+    Rule SettablePropertyChain() {
+        return Sequence(Atom(), Optional(FunctionApplication()), rep1sep(PropertyModifier(), Optional(FunctionApplication())));
     }
 
     /**
-     * Sequence of one or more property invocations. Pushes one PropertyNode.
-     * @return constructed rule
+     * Function application. Pushes FunctionNode(f, args).
+     * @return rule
      */
-    Rule PropertyAccess() {
+    Rule FunctionApplication() {
+        ListVar<Node<Object>> args = new ListVar<Node<Object>>();
+        return Sequence(ArgumentList(args), push(makeApplyNode(pop(), args.get())));
+    }
+
+    Node<Object> makeApplyNode(Node<Object> function, List<Node<Object>> args) {
+        return makeFNode("apply", ImmutableList.<Node<Object>>builder().add(function).addAll(args).build());
+    }
+
+    Rule PropertyModifier() {
         ListVar<PropertyDescriptor> props = new ListVar<PropertyDescriptor>();
-        return Sequence(Atom(),
-                OneOrMore(FirstOf(
-                        T(".", Identifier(), props.append(PropertyDescriptor.simple(match()))),
-                        Sequence(T("["), RightExpression(), T("]"), props.append(PropertyDescriptor.indexed(pop())))
-                )),
-                push(ImmutablePropertyNode.propertyNode(pop(), props.get()))
-        );
+        return Sequence(OneOrMore(FirstOf(
+                T(".", Identifier(), props.append(PropertyDescriptor.simple(match()))),
+                Sequence(T("["), RightExpression(), T("]"), props.append(PropertyDescriptor.indexed(pop())))
+        )), push(propertyNode(pop(), props.get())));
     }
 
     Rule Atom() {
         return FirstOf(
                 Constant(),
                 SpecialForm(),
-                Function(),
+                FunctionLiteral(),
                 Variable(),
                 Sequence(T("("), Expression(), T(")"))
         );
+    }
+
+    Rule FunctionLiteral() {
+        Var<ContextCurriedFunction<?>> function = new Var<ContextCurriedFunction<?>>();
+        return Sequence(FirstOf(Identifier(), "if"), function.set(functions.get(match())) && function.get() != null && push(new ImmutableConstNode<Object>(function.get())));
     }
 
     /**
@@ -318,20 +333,6 @@ class Expressions extends AbstractGrammar {
     @SuppressSubnodes
     Rule Constant() {
         return FirstOf(String(), Float(), Int(), Boolean(), Null());
-    }
-
-    /**
-     * Function application. Pushes FunctionNode(f, args).
-     * @return rule
-     */
-    Rule Function() {
-        Var<String> function = new Var<String>("");
-        ListVar<Node<Object>> args = new ListVar<Node<Object>>();
-        return Sequence(
-                T(FirstOf(Identifier(), "if"), function.set(matchTrim())),
-                ArgumentList(args),
-                push(makeFNode(function.get(), args.get()))
-        );
     }
 
     /**
@@ -426,6 +427,7 @@ class Expressions extends AbstractGrammar {
     }
 
     @SuppressSubnodes
+    @WhitespaceSafe
     Rule Identifier() {
         return Sequence(Name(), !keywords.contains(match()));
     }
