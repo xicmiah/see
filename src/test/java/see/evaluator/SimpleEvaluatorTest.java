@@ -6,27 +6,28 @@ import see.exceptions.EvaluationException;
 import see.functions.Function;
 import see.functions.PureFunction;
 import see.functions.VarArgFunction;
+import see.parser.config.ConfigBuilder;
 import see.parser.numbers.BigDecimalFactory;
-import see.tree.FunctionNode;
 import see.tree.Node;
 import see.tree.immutable.ImmutableFunctionNode;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 public class SimpleEvaluatorTest {
 
-    Evaluator evaluator = new SimpleEvaluator(new BigDecimalFactory());
+    Evaluator evaluator = new SimpleEvaluator(new BigDecimalFactory(), ConfigBuilder.emptyConfig().build().getFunctions());
     
     final VarArgFunction<Object, Object> epicFail = new VarArgFunction<Object, Object>() {
         @Override
-        public Object apply(List<Object> input) {
+        public Object apply(@Nonnull List<Object> input) {
             throw new EpicFailException();
         }
     };
 
     final VarArgFunction<Object, Object> fail = new VarArgFunction<Object, Object>() {
         @Override
-        public Object apply(List<Object> input) {
+        public Object apply(@Nonnull List<Object> input) {
             throw new RuntimeException();
         }
     };

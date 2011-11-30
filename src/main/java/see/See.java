@@ -19,6 +19,7 @@ import java.util.Map;
  * Warning: evaluation can modify passed context. If that is undesirable, create new HashMap via copy constructor or
  * pass ImmutableMap instance.
  */
+@SuppressWarnings("UnusedDeclaration")
 public class See {
 
     private final GrammarConfiguration config;
@@ -70,7 +71,7 @@ public class See {
      * @return evaluated value
      */
     public <T> T evaluate(Node<T> tree, Map<String, ?> context) {
-        return new SimpleEvaluator(config.getNumberFactory()).evaluate(tree, context);
+        return SimpleEvaluator.fromConfig(config).evaluate(tree, context);
     }
 
     /**
@@ -81,7 +82,7 @@ public class See {
      * @return evaluated value
      */
     public <T> T evaluate(Node<T> tree) {
-        return new SimpleEvaluator(config.getNumberFactory()).evaluate(tree, new HashMap<String, Object>());
+        return SimpleEvaluator.fromConfig(config).evaluate(tree, new HashMap<String, Object>());
     }
 
     /**

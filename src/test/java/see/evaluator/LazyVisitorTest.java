@@ -7,12 +7,14 @@ import org.junit.Test;
 import see.functions.ContextCurriedFunction;
 import see.functions.Function;
 import see.functions.PureFunction;
+import see.parser.config.ConfigBuilder;
 import see.parser.numbers.IntegerFactory;
 import see.tree.Node;
 import see.tree.immutable.ImmutableConstNode;
 import see.tree.immutable.ImmutableFunctionNode;
 import see.tree.immutable.ImmutableVarNode;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +33,7 @@ public class LazyVisitorTest {
     public void setUp() throws Exception {
         plus = new PureFunction<Function<List<Integer>, Integer>>(new Function<List<Integer>, Integer>() {
             @Override
-            public Integer apply(List<Integer> input) {
+            public Integer apply(@Nonnull List<Integer> input) {
                 int result = 0;
                 for (Integer value : input) {
                     result += value;
@@ -41,13 +43,13 @@ public class LazyVisitorTest {
         });
         fail = new PureFunction<Function<List<Integer>, Integer>>(new Function<List<Integer>, Integer>() {
             @Override
-            public Integer apply(List<Integer> input) {
+            public Integer apply(@Nonnull List<Integer> input) {
                 throw new UnsupportedOperationException("Fail");
             }
         });
         cond = new PureFunction<Function<List<Integer>, Integer>>(new Function<List<Integer>, Integer>() {
             @Override
-            public Integer apply(List<Integer> input) {
+            public Integer apply(@Nonnull List<Integer> input) {
                 if (input.get(0) != 0) {
                     return input.get(1);
                 } else {
@@ -55,7 +57,7 @@ public class LazyVisitorTest {
                 }
             }
         });
-        evaluator = new SimpleEvaluator(new IntegerFactory());
+        evaluator = new SimpleEvaluator(new IntegerFactory(), ConfigBuilder.emptyConfig().build().getFunctions());
     }
 
     @Test

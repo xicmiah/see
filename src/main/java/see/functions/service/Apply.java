@@ -17,31 +17,26 @@
 package see.functions.service;
 
 import com.google.common.base.Preconditions;
-import see.functions.ContextCurriedFunction;
 import see.functions.Function;
+import see.functions.VarArgFunction;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Function application. Evaluates supplied function with supplied arguments.
  * First argument is {@link Function} instance, rest are it's arguments.
  * Returns evaluation result.
  */
-public class Apply implements ContextCurriedFunction<Function<List<Object>, Object>> {
+public class Apply implements VarArgFunction<Object, Object> {
     @Override
-    public Function<List<Object>, Object> apply(final Map<String, ?> context) {
-        return new Function<List<Object>, Object>() {
-            @Override
-            public Object apply(@Nonnull List<Object> input) {
-                Preconditions.checkArgument(input.size() >= 1, "Apply takes one or more arguments");
+    public Object apply(@Nonnull List<Object> input) {
+        Preconditions.checkArgument(input.size() >= 1, "Apply takes one or more arguments");
 
-                ContextCurriedFunction<Function<List<Object>, Object>> target = (ContextCurriedFunction<Function<List<Object>, Object>>) input.get(0);
+        @SuppressWarnings("unchecked")
+        Function<List<Object>, Object> target = (Function<List<Object>, Object>) input.get(0);
 
-                return target.apply(context).apply(input.subList(1, input.size()));
-            }
-        };
+        return target.apply(input.subList(1, input.size()));
     }
 
     @Override

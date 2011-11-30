@@ -50,12 +50,13 @@ public class ReactiveEvaluator implements Evaluator {
                 .add(new NumberLifter(ofInstance(config.getNumberFactory())))
                 .build();
 
-        Map<String, Object> reactiveContext = Maps.newHashMap(context);
+        final Map<String, Object> reactiveContext = Maps.newHashMap(context);
         reactiveContext.put(CONFIG_KEY, config);
         reactiveContext.put(REACTIVE_KEY, reactiveFactory);
         reactiveContext.put(PROCESSORS_KEY, processors);
 
+        reactiveContext.putAll(config.getFunctions().getBoundFunctions(reactiveContext));
+        
         return tree.accept(new LazyVisitor(reactiveContext, processors, config.getChainResolver()));
     }
-
 }

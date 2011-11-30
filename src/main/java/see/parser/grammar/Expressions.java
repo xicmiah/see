@@ -1,7 +1,6 @@
 package see.parser.grammar;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 import org.parboiled.annotations.SuppressSubnodes;
@@ -20,7 +19,6 @@ import see.tree.immutable.ImmutableFunctionNode;
 import see.tree.immutable.ImmutableVarNode;
 
 import java.util.List;
-import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.of;
 import static see.tree.immutable.ImmutablePropertyNode.propertyNode;
@@ -33,8 +31,6 @@ class Expressions extends AbstractGrammar {
     final FunctionResolver functions;
 
     final Character argumentSeparator;
-
-    final Set<String> keywords = ImmutableSet.of("if", "then", "else", "return");
 
     Expressions(GrammarConfiguration config) {
         numberFactory = config.getNumberFactory();
@@ -259,15 +255,9 @@ class Expressions extends AbstractGrammar {
         return FirstOf(
                 Constant(),
                 SpecialForm(),
-                FunctionLiteral(),
                 Variable(),
                 Sequence(T("("), Expression(), T(")"))
         );
-    }
-
-    Rule FunctionLiteral() {
-        Var<ContextCurriedFunction<?>> function = new Var<ContextCurriedFunction<?>>();
-        return Sequence(FirstOf(Identifier(), "if"), function.set(functions.get(match())) && function.get() != null && push(new ImmutableConstNode<Object>(function.get())));
     }
 
     /**
@@ -429,7 +419,7 @@ class Expressions extends AbstractGrammar {
     @SuppressSubnodes
     @WhitespaceSafe
     Rule Identifier() {
-        return Sequence(Name(), !keywords.contains(match()));
+        return Name();
     }
 
     @WhitespaceSafe

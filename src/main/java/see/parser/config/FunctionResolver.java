@@ -1,6 +1,7 @@
 package see.parser.config;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import see.functions.ContextCurriedFunction;
 import see.functions.Function;
 
@@ -28,6 +29,24 @@ public class FunctionResolver {
         } else {
             return functions.get(name);
         }
+    }
+
+    /**
+     * Get contained functions bound to supplied context
+     * @param context target context
+     * @return mapping name -> bound function
+     */
+    public Map<String, Function<List<Object>, Object>> getBoundFunctions(Map<String, Object> context) {
+        Map<String, Function<List<Object>, Object>> bound = Maps.newHashMap();
+        for (String function : functions.keySet()) {
+            bound.put(function, get(function).apply(context));
+        }
+
+        for (String alias : aliases.keySet()) {
+            bound.put(alias, get(alias).apply(context));
+        }
+
+        return bound;
     }
 
 }
