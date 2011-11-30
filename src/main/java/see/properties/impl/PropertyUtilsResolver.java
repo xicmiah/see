@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package see.functions.properties;
+package see.properties.impl;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import see.exceptions.EvaluationException;
 import see.parser.grammar.PropertyAccess;
+import see.properties.PropertyResolver;
 
 /**
  * Property resolver via apache PropertyUtils.

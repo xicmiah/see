@@ -4,11 +4,11 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.Maps;
 import see.exceptions.EvaluationException;
-import see.functions.properties.PropertyUtilsResolver;
-import see.functions.properties.SingularChainResolver;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
+import see.properties.impl.PropertyUtilsResolver;
+import see.properties.impl.SingularChainResolver;
 import see.tree.Node;
 
 import java.util.Map;

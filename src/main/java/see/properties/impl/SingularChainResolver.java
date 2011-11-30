@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package see.functions.properties;
+package see.properties.impl;
 
 import see.parser.grammar.PropertyAccess;
+import see.properties.ChainResolver;
+import see.properties.PropertyResolver;
 import see.util.Reduce;
 
 import java.util.List;

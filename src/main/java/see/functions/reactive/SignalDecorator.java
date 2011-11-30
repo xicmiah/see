@@ -17,13 +17,13 @@
 package see.functions.reactive;
 
 import com.google.common.base.Optional;
-import see.functions.properties.PropertyResolver;
 import see.parser.grammar.PropertyAccess;
+import see.properties.PropertyResolver;
 import see.reactive.Signal;
 import see.reactive.VariableSignal;
 
 /**
- * Decorator for {@link see.functions.properties.ChainResolver}, which mirrors all operations
+ * Decorator for {@link see.properties.ChainResolver}, which mirrors all operations
  * to corresponding {@link Signal} instance, supplied by {@link SignalResolver}.
  */
 public class SignalDecorator implements PropertyResolver {

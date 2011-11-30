@@ -24,9 +24,9 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 import see.ReactiveSee;
-import see.functions.properties.PropertyUtilsResolver;
 import see.parser.config.ConfigBuilder;
 import see.parser.grammar.PropertyAccess;
+import see.properties.impl.PropertyUtilsResolver;
 import see.reactive.VariableSignal;
 import see.reactive.impl.ReactiveFactory;
 

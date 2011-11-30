@@ -14,25 +14,29 @@
  * limitations under the License.
  */
 
-package see.functions.properties;
+package see.properties;
 
 import see.parser.grammar.PropertyAccess;
 
-public interface PropertyResolver {
+import java.util.List;
 
+/**
+ * Property resolver for a full chain of properties.
+ */
+public interface ChainResolver {
     /**
-     * Get property via specified path
-     * @param bean target bean
-     * @param property property descriptor
-     * @return resolved property
+     * Get a object from property chain
+     * @param target target object for property resolution
+     * @param chain chain of property descriptors
+     * @return resolved object
      */
-    Object get(Object bean, PropertyAccess property);
+    Object get(Object target, List<? extends PropertyAccess> chain);
 
     /**
-     * Set property to target bean
-     * @param bean target bean
-     * @param property property descriptor
+     * Set a property at end of chain
+     * @param target target object for property resolution
+     * @param chain chain of property descriptors
      * @param value new property value
      */
-    void set(Object bean, PropertyAccess property, Object value);
+    void set(Object target, List<? extends PropertyAccess> chain, Object value);
 }

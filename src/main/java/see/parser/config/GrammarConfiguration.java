@@ -1,8 +1,8 @@
 package see.parser.config;
 
 import see.evaluator.ValueProcessor;
-import see.functions.properties.ChainResolver;
 import see.parser.numbers.NumberFactory;
+import see.properties.ChainResolver;
 
 import java.util.List;
 

@@ -18,7 +18,7 @@ package see.evaluator;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import see.functions.properties.ChainResolver;
+import see.properties.ChainResolver;
 import see.tree.Node;
 
 import java.util.Collections;

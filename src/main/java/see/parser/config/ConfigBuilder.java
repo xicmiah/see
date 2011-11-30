@@ -12,13 +12,17 @@ import see.functions.bool.Not;
 import see.functions.bool.Or;
 import see.functions.common.Addition;
 import see.functions.compare.*;
-import see.functions.properties.*;
+import see.functions.properties.GetProperty;
 import see.functions.reactive.Bind;
 import see.functions.reactive.MakeSignal;
 import see.functions.service.*;
 import see.functions.string.Concat;
 import see.parser.numbers.BigDecimalFactory;
 import see.parser.numbers.NumberFactory;
+import see.properties.ChainResolver;
+import see.properties.PropertyResolver;
+import see.properties.impl.PropertyUtilsResolver;
+import see.properties.impl.SingularChainResolver;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
