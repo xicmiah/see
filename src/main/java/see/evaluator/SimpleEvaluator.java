@@ -7,8 +7,7 @@ import see.exceptions.EvaluationException;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
-import see.properties.impl.PropertyUtilsResolver;
-import see.properties.impl.SingularChainResolver;
+import see.properties.ChainResolver;
 import see.tree.Node;
 
 import java.util.Map;
@@ -19,14 +18,16 @@ public class SimpleEvaluator implements Evaluator {
 
     private final NumberFactory numberFactory;
     private final FunctionResolver functionResolver;
+    private final ChainResolver chainResolver;
 
-    public SimpleEvaluator(NumberFactory numberFactory, FunctionResolver functionResolver) {
+    public SimpleEvaluator(NumberFactory numberFactory, FunctionResolver functionResolver, ChainResolver chainResolver) {
         this.numberFactory = numberFactory;
         this.functionResolver = functionResolver;
+        this.chainResolver = chainResolver;
     }
 
     public static SimpleEvaluator fromConfig(GrammarConfiguration config) {
-        return new SimpleEvaluator(config.getNumberFactory(), config.getFunctions());
+        return new SimpleEvaluator(config.getNumberFactory(), config.getFunctions(), config.getChainResolver());
     }
 
     /**
@@ -46,7 +47,7 @@ public class SimpleEvaluator implements Evaluator {
 
             Map<String, Object> extendedContext = getExtendedContext(context);
             
-            return tree.accept(new LazyVisitor(extendedContext, of(numberLifter), new SingularChainResolver(new PropertyUtilsResolver())));
+            return tree.accept(new LazyVisitor(extendedContext, of(numberLifter), chainResolver));
         } catch (EvaluationException e) {
             throw e;
         } catch (Exception e) {

@@ -20,13 +20,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
-import see.ReactiveSee;
+import see.See;
 import see.functions.VarArgFunction;
 
 import static org.junit.Assert.*;
 
-public class ArbitraryMethodsTest {
-    ReactiveSee see = new ReactiveSee();
+public class MethodCallsTest {
+    See see = new See();
 
     @Test
     public void testNoArgs() throws Exception {

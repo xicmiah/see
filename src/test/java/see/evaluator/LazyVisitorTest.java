@@ -57,7 +57,7 @@ public class LazyVisitorTest {
                 }
             }
         });
-        evaluator = new SimpleEvaluator(new IntegerFactory(), ConfigBuilder.emptyConfig().build().getFunctions());
+        evaluator = SimpleEvaluator.fromConfig(ConfigBuilder.defaultConfig().setNumberFactory(new IntegerFactory()).build());
     }
 
     @Test

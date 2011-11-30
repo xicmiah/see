@@ -7,7 +7,6 @@ import see.functions.Function;
 import see.functions.PureFunction;
 import see.functions.VarArgFunction;
 import see.parser.config.ConfigBuilder;
-import see.parser.numbers.BigDecimalFactory;
 import see.tree.Node;
 import see.tree.immutable.ImmutableFunctionNode;
 
@@ -16,7 +15,7 @@ import java.util.List;
 
 public class SimpleEvaluatorTest {
 
-    Evaluator evaluator = new SimpleEvaluator(new BigDecimalFactory(), ConfigBuilder.emptyConfig().build().getFunctions());
+    Evaluator evaluator = SimpleEvaluator.fromConfig(ConfigBuilder.defaultConfig().build());
     
     final VarArgFunction<Object, Object> epicFail = new VarArgFunction<Object, Object>() {
         @Override
