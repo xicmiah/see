@@ -20,7 +20,10 @@ import see.functions.string.Concat;
 import see.parser.numbers.BigDecimalFactory;
 import see.parser.numbers.NumberFactory;
 import see.properties.ChainResolver;
+import see.properties.PartialResolver;
 import see.properties.PropertyResolver;
+import see.properties.impl.AggregatingResolver;
+import see.properties.impl.MethodResolver;
 import see.properties.impl.PropertyUtilsResolver;
 import see.properties.impl.SingularChainResolver;
 
@@ -37,7 +40,7 @@ public class ConfigBuilder {
     private List<ValueProcessor> valueProcessors = ImmutableList.of();
 
     private NumberFactory numberFactory = new BigDecimalFactory();
-    private ChainResolver propertyResolver = new SingularChainResolver(new PropertyUtilsResolver());
+    private ChainResolver propertyResolver = new SingularChainResolver(new AggregatingResolver(ImmutableList.<PartialResolver>of(new MethodResolver()), new PropertyUtilsResolver()));
 
     private ConfigBuilder(Map<String, String> aliases,
                           Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions) {
