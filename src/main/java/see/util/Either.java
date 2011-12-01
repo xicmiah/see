@@ -17,6 +17,9 @@
 package see.util;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+
+import java.util.NoSuchElementException;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -68,10 +71,44 @@ public class Either<L,R> {
     }
 
     /**
-     * Get left instance.
-     * @return iterable containing one element if container holds left instance, empty otherwise
+     * Get right instance.
+     * @return iterable containing one element if container holds right instance, empty otherwise
      */
     public Iterable<R> right() {
         return right;
+    }
+
+    /**
+     * Check, if container holds left instance.
+     * @return true if this container holds left instance
+     */
+    public boolean hasLeft() {
+        return left.iterator().hasNext();
+    }
+
+    /**
+     * Check, if container holds right instance.
+     * @return true if this container holds right instance
+     */
+    public boolean hasRight() {
+        return right.iterator().hasNext();
+    }
+
+    /**
+     * Get left value, throwing exception if value is not present.
+     * @return left value
+     * @throws NoSuchElementException if container doesn't hold left value
+     */
+    public L leftValue() {
+        return Iterables.getOnlyElement(left);
+    }
+
+    /**
+     * Get right value, throwing exception if value is not present.
+     * @return right value
+     * @throws NoSuchElementException if container doesn't hold right value
+     */
+    public R rightValue() {
+        return Iterables.getOnlyElement(right);
     }
 }
