@@ -19,9 +19,11 @@ package see.properties.impl;
 import see.parser.grammar.PropertyAccess;
 import see.properties.PartialResolver;
 
+import javax.annotation.Nonnull;
+
 public abstract class ReadOnlyResolver implements PartialResolver {
     @Override
-    public boolean canSet(Object target, PropertyAccess propertyAccess, Object value) {
+    public boolean canSet(Object target, @Nonnull PropertyAccess propertyAccess, Object value) {
         return false;
     }
 

@@ -18,6 +18,8 @@ package see.properties;
 
 import see.parser.grammar.PropertyAccess;
 
+import javax.annotation.Nonnull;
+
 
 public class PropertyResolvers {
     private PropertyResolvers() {}
@@ -39,12 +41,12 @@ public class PropertyResolvers {
         }
 
         @Override
-        public boolean canGet(Object target, PropertyAccess propertyAccess) {
+        public boolean canGet(Object target, @Nonnull PropertyAccess propertyAccess) {
             return true;
         }
 
         @Override
-        public boolean canSet(Object target, PropertyAccess propertyAccess, Object value) {
+        public boolean canSet(Object target, @Nonnull PropertyAccess propertyAccess, Object value) {
             return true;
         }
 

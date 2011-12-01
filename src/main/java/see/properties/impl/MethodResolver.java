@@ -33,7 +33,7 @@ import static java.util.Arrays.asList;
 
 public class MethodResolver extends ReadOnlyResolver {
     @Override
-    public boolean canGet(@Nullable Object target, PropertyAccess propertyAccess) {
+    public boolean canGet(@Nullable Object target, @Nonnull PropertyAccess propertyAccess) {
         if (target == null || !propertyAccess.value().hasLeft()) return false;
 
         final String methodName = propertyAccess.value().leftValue();

@@ -18,6 +18,9 @@ package see.properties;
 
 import see.parser.grammar.PropertyAccess;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * A property resolver, which supports only a part of operations
  */
@@ -28,7 +31,7 @@ public interface PartialResolver extends PropertyResolver {
      * @param propertyAccess target property
      * @return true, if this operation is supported
      */
-    boolean canGet(Object target, PropertyAccess propertyAccess);
+    boolean canGet(@Nullable Object target, @Nonnull PropertyAccess propertyAccess);
 
     /**
      * Return, if this resolver can set such property
@@ -37,5 +40,5 @@ public interface PartialResolver extends PropertyResolver {
      * @param value new value
      * @return true, if this operation is supported
      */
-    boolean canSet(Object target, PropertyAccess propertyAccess, Object value);
+    boolean canSet(@Nullable Object target, @Nonnull PropertyAccess propertyAccess, Object value);
 }
