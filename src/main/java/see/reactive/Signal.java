@@ -16,6 +16,10 @@
 
 package see.reactive;
 
+/**
+ * Dependency with a value, which can vary.
+ * @param <T> value type
+ */
 public interface Signal<T> extends Dependency {
     T getNow();
 }

@@ -16,6 +16,9 @@
 
 package see.reactive;
 
+/**
+ * Dependency, which can be manually invalidated.
+ */
 public interface Trigger extends Dependency {
     void trigger();
 }

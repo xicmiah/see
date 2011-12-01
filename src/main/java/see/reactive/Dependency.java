@@ -18,6 +18,9 @@ package see.reactive;
 
 import java.util.Collection;
 
+/**
+ * A dependency node. Can depend on other nodes.
+ */
 public interface Dependency {
     Collection<? extends Dependency> getDependencies();
 }
