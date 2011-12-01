@@ -49,7 +49,7 @@ public class SignalDecorator implements PropertyResolver {
 
         Optional<VariableSignal<Object>> signal = resolver.getSignal(bean, property);
         if (signal.isPresent()) {
-            signal.get().update(value);
+            signal.get().set(value);
         }
     }
 

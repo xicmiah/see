@@ -46,7 +46,7 @@ public class BindingTest {
         see.eval("a.name <- v", context);
         assertEquals("crno", bean.getName());
 
-        var.update("bka");
+        var.set("bka");
         assertEquals("bka", bean.getName());
     }
 
@@ -61,10 +61,10 @@ public class BindingTest {
         see.eval("bean.value <- signal(a + b)", context);
         assertEquals("3.0", bean.getValue().toString());
         
-        a.update(7);
+        a.set(7);
         assertEquals("9.0", bean.getValue().toString());
 
-        b.update(35);
+        b.set(35);
         assertEquals("42.0", bean.getValue().toString());
     }
 
@@ -81,7 +81,7 @@ public class BindingTest {
         context.put("b", 42);
         assertEquals("9.0", bean.getValue().toString());
 
-        a.update(40);
+        a.set(40);
         assertEquals("42.0", bean.getValue().toString()); // Signal is bound to old b == 42
     }
 
@@ -96,7 +96,7 @@ public class BindingTest {
 
         assertEquals("9.0", bean.getValue().toString());
 
-        a.update(42);
+        a.set(42);
         assertEquals("9.0", bean.getValue().toString());
     }
 
@@ -110,7 +110,7 @@ public class BindingTest {
 
         assertEquals("9.0", bean.getValue().toString());
         
-        a.update(37);
+        a.set(37);
         assertEquals("42.0", bean.getValue().toString());
     }
 
@@ -133,7 +133,7 @@ public class BindingTest {
         Signal<?> result = (Signal<?>) see.eval("signal(a == null)", context);
         assertEquals(true, result.getNow());
         
-        a.update("crn");
+        a.set("crn");
         assertEquals(false, result.getNow());
     }
 

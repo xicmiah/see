@@ -47,9 +47,9 @@ public class ReactiveTest {
         });
 
         assertEquals(valueOf(3), b.getNow());
-        a.update("omg");
+        a.set("omg");
         assertEquals(valueOf(3), b.getNow());
-        a.update("zxcv");
+        a.set("zxcv");
         assertEquals(valueOf(4), b.getNow());
     }
 
@@ -67,10 +67,10 @@ public class ReactiveTest {
 
         assertEquals(valueOf(3), sum.getNow());
 
-        a.update(7);
+        a.set(7);
         assertEquals(valueOf(9), sum.getNow());
         
-        b.update(35);
+        b.set(35);
         assertEquals(valueOf(42), sum.getNow());
     }
 
@@ -95,7 +95,7 @@ public class ReactiveTest {
         assertEquals(valueOf(4), b.getNow());
         assertEquals(2, counter.get());
         
-        a.update("bka");
+        a.set("bka");
         assertEquals(2, counter.get());
         assertEquals(valueOf(3), b.getNow());
         assertEquals(3, counter.get());
@@ -129,7 +129,7 @@ public class ReactiveTest {
         assertEquals(1, lengthCounter.get());
         assertEquals(1, plusCounter.get());
 
-        a.update("bka");
+        a.set("bka");
         assertEquals(2, lengthCounter.get());
         assertEquals(2, plusCounter.get());
 

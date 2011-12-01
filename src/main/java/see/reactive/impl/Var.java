@@ -31,7 +31,7 @@ class Var<T> extends AbstractDependency implements VariableSignal<T> {
     }
 
     @Override
-    public void update(T newValue) {
+    public void set(T newValue) {
         value = newValue;
         invalidate();
     }

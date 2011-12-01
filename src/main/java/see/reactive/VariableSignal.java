@@ -16,5 +16,11 @@
 
 package see.reactive;
 
-public interface VariableSignal<T> extends Updatable<T>, Signal<T> {
+import see.functions.Settable;
+
+/**
+ * Signal, which can be updated manually.
+ * @param <T> value type
+ */
+public interface VariableSignal<T> extends Settable<T>, Signal<T> {
 }
