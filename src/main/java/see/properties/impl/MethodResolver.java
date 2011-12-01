@@ -24,6 +24,7 @@ import see.functions.VarArgFunction;
 import see.parser.grammar.PropertyAccess;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -32,9 +33,10 @@ import static java.util.Arrays.asList;
 
 public class MethodResolver extends ReadOnlyResolver {
     @Override
-    public boolean canGet(Object target, PropertyAccess propertyAccess) {
-        final String methodName = Iterables.getOnlyElement(propertyAccess.value().left(), "");
+    public boolean canGet(@Nullable Object target, PropertyAccess propertyAccess) {
+        if (target == null || !propertyAccess.value().hasLeft()) return false;
 
+        final String methodName = propertyAccess.value().leftValue();
         return Iterables.any(asList(target.getClass().getMethods()), new Predicate<Method>() {
             @Override
             public boolean apply(Method input) {
@@ -45,7 +47,7 @@ public class MethodResolver extends ReadOnlyResolver {
 
     @Override
     public VarArgFunction<Object, ?> get(final Object bean, PropertyAccess property) {
-        final String methodName = Iterables.getOnlyElement(property.value().left(), "");
+        final String methodName = property.value().leftValue();
 
         return new VarArgFunction<Object, Object>() {
             @Override
@@ -64,14 +66,6 @@ public class MethodResolver extends ReadOnlyResolver {
     }
 
     public static class ResolutionException extends EvaluationException {
-        public ResolutionException(String message) {
-            super(message);
-        }
-
-        public ResolutionException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
         public ResolutionException(Throwable cause) {
             super(cause);
         }
