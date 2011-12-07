@@ -17,4 +17,9 @@ public class Addition implements Function<List<Comparable>, Comparable> {
         }
         return new Concat().apply(input);
     }
+
+    @Override
+    public String toString() {
+        return "addOrConcat";
+    }
 }
