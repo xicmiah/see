@@ -16,6 +16,7 @@
 
 package see.util;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 
@@ -24,6 +25,27 @@ import com.google.common.collect.Iterables;
  */
 public abstract class Reduce {
     private Reduce() {}
+
+    /**
+     * Apply a function to each element of a collection, and concatenate results.
+     * Operation is lazy - collections won't be queried in process.
+     *
+     * @param initial initial collection
+     * @param f function, which from element of initial collection to separate collection
+     * @param <A> initial collection type
+     * @param <B> resulting collection type
+     * @return lazy collection, formed from applying function and concatenating results.
+     */
+    public static <A, B> Iterable<B> flatMap(Iterable<A> initial, Function<? super A, ? extends Iterable<B>> f) {
+        return Iterables.concat(Iterables.transform(initial, f));
+    }
+
+    /**
+     * Function alias for usage with flatMap().
+     * @param <A> initial collection type
+     * @param <B> resulting collection type
+     */
+    public static interface FlatFunction<A, B> extends Function<A, Iterable<B>> {}
 
     /**
      * Fold a sequence with specified function and initial value.
