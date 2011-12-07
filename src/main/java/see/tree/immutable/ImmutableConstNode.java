@@ -11,6 +11,10 @@ public final class ImmutableConstNode<T> implements ConstNode<T> {
 		this.value = value;
 	}
 
+    public static <V> ConstNode<V> constNode(V value) {
+        return new ImmutableConstNode<V>(value);
+    }
+
 	@Override
     public T accept(Visitor visitor) {
 		return visitor.visit(this);
