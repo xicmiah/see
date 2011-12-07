@@ -1,6 +1,6 @@
 package see.parser.config;
 
-import see.evaluator.ValueProcessor;
+import see.evaluation.ValueProcessor;
 import see.parser.numbers.NumberFactory;
 import see.properties.ChainResolver;
 

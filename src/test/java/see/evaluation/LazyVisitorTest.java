@@ -1,9 +1,10 @@
-package see.evaluator;
+package see.evaluation;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
+import see.evaluation.evaluators.SimpleEvaluator;
 import see.functions.ContextCurriedFunction;
 import see.functions.Function;
 import see.functions.PureFunction;

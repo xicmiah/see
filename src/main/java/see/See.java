@@ -2,7 +2,7 @@ package see;
 
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
-import see.evaluator.SimpleEvaluator;
+import see.evaluation.evaluators.SimpleEvaluator;
 import see.parser.BasicParser;
 import see.parser.Parser;
 import see.parser.config.ConfigBuilder;

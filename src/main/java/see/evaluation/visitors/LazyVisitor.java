@@ -1,7 +1,8 @@
-package see.evaluator;
+package see.evaluation.visitors;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import see.evaluation.ValueProcessor;
 import see.properties.ChainResolver;
 import see.tree.Node;
 

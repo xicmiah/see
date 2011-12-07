@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package see.evaluator;
+package see.evaluation.visitors;
 
 import com.google.common.base.Function;
+import see.evaluation.ValueProcessor;
 import see.functions.Property;
 import see.parser.grammar.PropertyAccess;
 import see.parser.grammar.PropertyDescriptor;

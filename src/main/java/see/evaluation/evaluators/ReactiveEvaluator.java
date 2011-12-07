@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package see.evaluator;
+package see.evaluation.evaluators;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import see.evaluation.Evaluator;
+import see.evaluation.ValueProcessor;
+import see.evaluation.processors.NumberLifter;
+import see.evaluation.visitors.LazyVisitor;
 import see.exceptions.EvaluationException;
 import see.parser.config.GrammarConfiguration;
 import see.reactive.impl.ReactiveFactory;

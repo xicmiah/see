@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package see.evaluator;
+package see.evaluation.processors;
 
 import com.google.common.base.Supplier;
+import see.evaluation.ValueProcessor;
 import see.parser.numbers.NumberFactory;
 
 import javax.annotation.Nullable;
 
 /**
- * Value processor for use with {@link LazyVisitor}.
+ * Value processor for use with {@link see.evaluation.visitors.LazyVisitor}.
  * If value is a number, pass it through NumberFactory.
  */
 public class NumberLifter implements ValueProcessor {

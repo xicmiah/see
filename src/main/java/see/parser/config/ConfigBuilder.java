@@ -2,7 +2,7 @@ package see.parser.config;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
-import see.evaluator.ValueProcessor;
+import see.evaluation.ValueProcessor;
 import see.functions.ContextCurriedFunction;
 import see.functions.Function;
 import see.functions.PureFunction;

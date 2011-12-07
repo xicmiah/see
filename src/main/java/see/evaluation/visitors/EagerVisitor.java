@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package see.evaluator;
+package see.evaluation.visitors;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import see.evaluation.ValueProcessor;
 import see.properties.ChainResolver;
 import see.tree.Node;
 

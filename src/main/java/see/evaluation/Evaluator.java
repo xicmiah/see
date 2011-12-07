@@ -1,4 +1,4 @@
-package see.evaluator;
+package see.evaluation;
 
 import see.exceptions.EvaluationException;
 import see.tree.Node;

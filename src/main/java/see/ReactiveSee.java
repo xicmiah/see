@@ -17,8 +17,8 @@
 package see;
 
 import com.google.common.collect.Maps;
-import see.evaluator.ReactiveEvaluator;
-import see.evaluator.ValueProcessor;
+import see.evaluation.ValueProcessor;
+import see.evaluation.evaluators.ReactiveEvaluator;
 import see.parser.config.ConfigBuilder;
 import see.parser.config.GrammarConfiguration;
 import see.reactive.impl.ReactiveFactory;

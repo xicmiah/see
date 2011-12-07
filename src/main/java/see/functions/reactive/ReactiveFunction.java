@@ -16,8 +16,8 @@
 
 package see.functions.reactive;
 
-import see.evaluator.ReactiveEvaluator;
-import see.evaluator.ValueProcessor;
+import see.evaluation.ValueProcessor;
+import see.evaluation.evaluators.ReactiveEvaluator;
 import see.functions.ContextCurriedFunction;
 import see.functions.Function;
 import see.functions.VarArgFunction;

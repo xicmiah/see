@@ -1,4 +1,4 @@
-package see.evaluator;
+package see.evaluation;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
