@@ -17,6 +17,7 @@
 package see.properties.impl;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import see.parser.grammar.PropertyAccess;
 import see.properties.PartialResolver;
@@ -30,8 +31,8 @@ public class AggregatingResolver implements PropertyResolver {
 
     private final PartialResolver defaultResolver;
 
-    public AggregatingResolver(Iterable<PartialResolver> resolvers, PropertyResolver defaultResolver) {
-        this.resolvers = resolvers;
+    public AggregatingResolver(Iterable<? extends PartialResolver> resolvers, PropertyResolver defaultResolver) {
+        this.resolvers = ImmutableList.copyOf(resolvers);
         this.defaultResolver = universalResolver(defaultResolver);
     }
 
