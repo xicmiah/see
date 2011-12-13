@@ -20,7 +20,6 @@ import com.google.common.base.Supplier;
 import com.google.common.eventbus.EventBus;
 import see.reactive.Dependency;
 import see.reactive.Signal;
-import see.reactive.Trigger;
 import see.reactive.VariableSignal;
 
 import java.util.Collection;
@@ -46,23 +45,6 @@ public class ReactiveFactory {
      */
     public <T> VariableSignal<T> var(T initialValue) {
         return new Var<T>(eventBus, initialValue);
-    }
-
-    /**
-     * Create a trigger endpoint - dependency, can be invalidated manually.
-     * @return constructed trigger
-     */
-    public Trigger trigger() {
-        return new EndpointTrigger(eventBus);
-    }
-
-    /**
-     * Create a dependency node, from specified dependencies.
-     * @param dependencies node dependencies
-     * @return constructed trigger
-     */
-    public Trigger chain(Collection<? extends Dependency> dependencies) {
-        return new EndpointTrigger(eventBus, dependencies);
     }
 
     /**
