@@ -27,16 +27,6 @@ public class ReactiveFactory {
     private final EventBus eventBus = new EventBus();
 
     /**
-     * Create a constant signal.
-     * @param value signal value
-     * @param <T> value type
-     * @return constant signal
-     */
-    public <T> Signal<T> val(T value) {
-        return new Val<T>(value);
-    }
-
-    /**
      * Create a variable endpoint - signal without dependencies, can be updated.
      * @param initialValue initial signal value
      * @param <T> value type
