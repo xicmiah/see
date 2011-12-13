@@ -28,9 +28,9 @@ import javax.annotation.Nullable;
  */
 public class NumberLifter implements ValueProcessor {
 
-    private final Supplier<NumberFactory> factorySupplier;
+    private final Supplier<? extends NumberFactory> factorySupplier;
 
-    public NumberLifter(Supplier<NumberFactory> factorySupplier) {
+    public NumberLifter(Supplier<? extends NumberFactory> factorySupplier) {
         this.factorySupplier = factorySupplier;
     }
 
