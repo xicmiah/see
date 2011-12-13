@@ -23,7 +23,7 @@ import java.util.Collection;
  * @param <T> value type
  */
 public interface Signal<T> {
-    T getNow();
+    T now();
 
     Collection<? extends Signal<?>> getDependencies();
 }

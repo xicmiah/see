@@ -90,7 +90,7 @@ public class BindingTest {
         TestBean bean = new TestBean();
 
         Map<String, Object> context = of("a", a, "bean", bean);
-        Node<Object> tree = see.parseExpressionList("b = a.now; bean.value <- signal(b + 2);");
+        Node<Object> tree = see.parseExpressionList("b = a.now(); bean.value <- signal(b + 2);");
         see.evaluate(tree, context);
 
         assertEquals("9.0", bean.getValue().toString());
@@ -130,10 +130,10 @@ public class BindingTest {
 
         Map<String, Object> context = ImmutableMap.<String, Object>of("a", a);
         Signal<?> result = (Signal<?>) see.eval("signal(a == null)", context);
-        assertEquals(true, result.getNow());
+        assertEquals(true, result.now());
         
         a.set("crn");
-        assertEquals(false, result.getNow());
+        assertEquals(false, result.now());
     }
 
     @Test
@@ -143,10 +143,10 @@ public class BindingTest {
         Map<String, Object> context = ImmutableMap.<String, Object>of("s", s);
         Signal<?> result = (Signal<?>) see.eval("signal(if(s != null, s.class, 'empty'))", context);
 
-        assertEquals("empty", result.getNow());
+        assertEquals("empty", result.now());
 
         s.set("crn");
-        assertEquals(String.class, result.getNow());
+        assertEquals(String.class, result.now());
     }
 
     public static class TestBean {

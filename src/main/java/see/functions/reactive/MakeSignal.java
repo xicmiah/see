@@ -83,7 +83,7 @@ public class MakeSignal implements ContextCurriedFunction<VarArgFunction<Object,
         public Object apply(@Nullable Object input) {
             if (input instanceof Signal<?>) {
                 Signal<?> signal = (Signal<?>) input;
-                return signal.getNow();
+                return signal.now();
             }
             return input;
         }
@@ -100,7 +100,7 @@ public class MakeSignal implements ContextCurriedFunction<VarArgFunction<Object,
             if (input instanceof Signal<?>) {
                 Signal<?> signal = (Signal<?>) input;
                 dependencies.add(signal);
-                return signal.getNow();
+                return signal.now();
             }
             return input;
         }

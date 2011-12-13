@@ -42,15 +42,15 @@ public class ReactiveTest {
         Signal<Integer> b = reactiveFactory.bind(of(a), new Supplier<Integer>() {
             @Override
             public Integer get() {
-                return a.getNow().length();
+                return a.now().length();
             }
         });
 
-        assertEquals(valueOf(3), b.getNow());
+        assertEquals(valueOf(3), b.now());
         a.set("omg");
-        assertEquals(valueOf(3), b.getNow());
+        assertEquals(valueOf(3), b.now());
         a.set("zxcv");
-        assertEquals(valueOf(4), b.getNow());
+        assertEquals(valueOf(4), b.now());
     }
 
     @Test
@@ -61,17 +61,17 @@ public class ReactiveTest {
         Signal<Integer> sum = reactiveFactory.bind(of(a, b), new Supplier<Integer>() {
             @Override
             public Integer get() {
-                return a.getNow() + b.getNow();
+                return a.now() + b.now();
             }
         });
 
-        assertEquals(valueOf(3), sum.getNow());
+        assertEquals(valueOf(3), sum.now());
 
         a.set(7);
-        assertEquals(valueOf(9), sum.getNow());
+        assertEquals(valueOf(9), sum.now());
         
         b.set(35);
-        assertEquals(valueOf(42), sum.getNow());
+        assertEquals(valueOf(42), sum.now());
     }
 
     @Test
@@ -83,7 +83,7 @@ public class ReactiveTest {
             @Override
             public Integer get() {
                 lengthCounter.incrementAndGet();
-                return a.getNow().length();
+                return a.now().length();
             }
         });
 
@@ -94,7 +94,7 @@ public class ReactiveTest {
             @Override
             public Integer get() {
                 plusCounter.incrementAndGet();
-                return length.getNow() + 1;
+                return length.now() + 1;
             }
         });
 
@@ -105,7 +105,7 @@ public class ReactiveTest {
         assertEquals(2, lengthCounter.get());
         assertEquals(2, plusCounter.get());
 
-        assertEquals(valueOf(4), plusOne.getNow());
+        assertEquals(valueOf(4), plusOne.now());
         assertEquals(2, lengthCounter.get());
         assertEquals(2, plusCounter.get());
     }

@@ -83,7 +83,7 @@ public class SignalDecoratorTest {
      * @param bean bean to check
      */
     private void assertBeanContract(SimpleBean bean) {
-        assertEquals(bean.getName(), signals.getUnchecked(bean).getNow());
+        assertEquals(bean.getName(), signals.getUnchecked(bean).now());
     }
 
     private void evalOn(String expression, SimpleBean bean) {

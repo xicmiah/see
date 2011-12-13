@@ -45,7 +45,7 @@ public class Bind implements ContextCurriedFunction<VarArgFunction<Object, Signa
                 context.getService(ReactiveFactory.class).bind(of(signal), new Supplier<Object>() {
                     @Override
                     public Object get() {
-                        Object now = signal.getNow();
+                        Object now = signal.now();
                         target.set(now);
                         return now;
                     }

@@ -36,7 +36,7 @@ class StatefulSignal<T> extends AbstractSignal<T> implements Signal<T> {
     }
 
     @Override
-    public T getNow() {
+    public T now() {
         return currentValue;
     }
 

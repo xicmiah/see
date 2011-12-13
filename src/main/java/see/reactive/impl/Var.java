@@ -42,7 +42,7 @@ class Var<T> extends AbstractSignal<T> implements VariableSignal<T> {
     }
 
     @Override
-    public T getNow() {
+    public T now() {
         return value;
     }
 }
