@@ -27,7 +27,7 @@ import static see.util.Reduce.fold;
 public class AggregatingProcessor implements ValueProcessor {
     private final Iterable<? extends ValueProcessor> processors;
 
-    public AggregatingProcessor(Iterable<? extends ValueProcessor> processors) {
+    private AggregatingProcessor(Iterable<? extends ValueProcessor> processors) {
         this.processors = processors;
     }
 
