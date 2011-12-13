@@ -49,16 +49,4 @@ public class ReactiveFactory {
         return new StatefulSignal<T>(eventBus, dependencies, evaluation);
     }
 
-    /**
-     * Bind expression evaluation to specified dependencies.
-     * Evaluation will be triggered on {@code Signal.getNow()} call.
-     * Invalidation will be triggered on dependency change.
-     * @param dependencies expression dependencies
-     * @param evaluation expression
-     * @param <T> expression return type
-     * @return constructed signal
-     */
-    public <T> Signal<T> bindLazy(Collection<? extends Signal<?>> dependencies, Supplier<T> evaluation) {
-        return new StatelessSignal<T>(eventBus, dependencies, evaluation);
-    }
 }

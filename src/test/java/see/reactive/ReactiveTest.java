@@ -75,34 +75,6 @@ public class ReactiveTest {
     }
 
     @Test
-    public void testStatelessSignal() throws Exception {
-        final VariableSignal<String> a = reactiveFactory.var("crno");
-        final AtomicInteger counter = new AtomicInteger(0);
-
-        Signal<Integer> b = reactiveFactory.bindLazy(of(a), new Supplier<Integer>() {
-            @Override
-            public Integer get() {
-                counter.incrementAndGet();
-                return a.getNow().length();
-            }
-        });
-
-        assertEquals(0, counter.get());
-
-        assertEquals(valueOf(4), b.getNow());
-        assertEquals(1, counter.get());
-
-        assertEquals(valueOf(4), b.getNow());
-        assertEquals(2, counter.get());
-        
-        a.set("bka");
-        assertEquals(2, counter.get());
-        assertEquals(valueOf(3), b.getNow());
-        assertEquals(3, counter.get());
-
-    }
-
-    @Test
     public void testStatefulSignal() throws Exception {
         final VariableSignal<String> a = reactiveFactory.var("crno");
         final AtomicInteger lengthCounter = new AtomicInteger(0);
