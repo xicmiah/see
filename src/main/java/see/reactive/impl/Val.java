@@ -17,7 +17,6 @@
 package see.reactive.impl;
 
 import com.google.common.collect.ImmutableSet;
-import see.reactive.Dependency;
 import see.reactive.Signal;
 
 import java.util.Collection;
@@ -36,7 +35,7 @@ class Val<T> implements Signal<T> {
     }
 
     @Override
-    public Collection<? extends Dependency> getDependencies() {
+    public Collection<? extends Signal<?>> getDependencies() {
         return ImmutableSet.of();
     }
 }

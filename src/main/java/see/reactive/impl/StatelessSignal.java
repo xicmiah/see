@@ -18,16 +18,15 @@ package see.reactive.impl;
 
 import com.google.common.base.Supplier;
 import com.google.common.eventbus.EventBus;
-import see.reactive.Dependency;
 import see.reactive.Signal;
 
 import java.util.Collection;
 
-class StatelessSignal<T> extends AbstractDependency implements Signal<T> {
+class StatelessSignal<T> extends AbstractSignal<T> implements Signal<T> {
 
     private Supplier<T> evaluation;
 
-    public StatelessSignal(EventBus eventBus, Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
+    public StatelessSignal(EventBus eventBus, Collection<? extends Signal<?>> dependencies, Supplier<T> evaluation) {
         super(eventBus, dependencies);
         this.evaluation = evaluation;
     }

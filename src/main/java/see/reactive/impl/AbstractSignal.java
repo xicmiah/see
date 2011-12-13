@@ -19,17 +19,17 @@ package see.reactive.impl;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import see.reactive.Dependency;
+import see.reactive.Signal;
 
 import java.util.Collection;
 import java.util.Set;
 
-abstract class AbstractDependency implements Dependency {
+abstract class AbstractSignal<T> implements Signal<T> {
     private final EventBus eventBus;
 
-    private final Set<? extends Dependency> dependencies;
+    private final Set<? extends Signal<?>> dependencies;
 
-    protected AbstractDependency(EventBus eventBus, Collection<? extends Dependency> dependencies) {
+    protected AbstractSignal(EventBus eventBus, Collection<? extends Signal<?>> dependencies) {
         this.eventBus = eventBus;
         this.dependencies = ImmutableSet.copyOf(dependencies);
         eventBus.register(this);
@@ -47,20 +47,20 @@ abstract class AbstractDependency implements Dependency {
     }
 
     @Override
-    public Collection<? extends Dependency> getDependencies() {
+    public Collection<? extends Signal<?>> getDependencies() {
         return dependencies;
     }
 
     protected abstract void updateInternalState();
 
     private static class ChangeEvent {
-        private final Dependency target;
+        private final Signal<?> target;
 
-        public ChangeEvent(Dependency target) {
+        public ChangeEvent(Signal<?> target) {
             this.target = target;
         }
 
-        public Dependency getTarget() {
+        public Signal<?> getTarget() {
             return target;
         }
     }

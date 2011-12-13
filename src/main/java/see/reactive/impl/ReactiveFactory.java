@@ -18,7 +18,6 @@ package see.reactive.impl;
 
 import com.google.common.base.Supplier;
 import com.google.common.eventbus.EventBus;
-import see.reactive.Dependency;
 import see.reactive.Signal;
 import see.reactive.VariableSignal;
 
@@ -56,7 +55,7 @@ public class ReactiveFactory {
      * @param <T> expression return type
      * @return constructed signal
      */
-    public <T> Signal<T> bind(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
+    public <T> Signal<T> bind(Collection<? extends Signal<?>> dependencies, Supplier<T> evaluation) {
         return new StatefulSignal<T>(eventBus, dependencies, evaluation);
     }
 
@@ -69,7 +68,7 @@ public class ReactiveFactory {
      * @param <T> expression return type
      * @return constructed signal
      */
-    public <T> Signal<T> bindLazy(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
+    public <T> Signal<T> bindLazy(Collection<? extends Signal<?>> dependencies, Supplier<T> evaluation) {
         return new StatelessSignal<T>(eventBus, dependencies, evaluation);
     }
 }

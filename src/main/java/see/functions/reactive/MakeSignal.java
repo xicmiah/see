@@ -26,7 +26,6 @@ import see.evaluation.visitors.LazyVisitor;
 import see.functions.ContextCurriedFunction;
 import see.functions.VarArgFunction;
 import see.properties.ChainResolver;
-import see.reactive.Dependency;
 import see.reactive.Signal;
 import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
@@ -94,7 +93,7 @@ public class MakeSignal implements ContextCurriedFunction<VarArgFunction<Object,
      * Processor, which expands signals to their current value, capturing dependencies.
      */
     private static final class SignalCapture implements ValueProcessor {
-        private final Collection<Dependency> dependencies = Sets.newHashSet();
+        private final Collection<Signal<?>> dependencies = Sets.newHashSet();
 
         @Override
         public Object apply(@Nullable Object input) {

@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.junit.Test;
 import see.ReactiveSee;
-import see.reactive.Dependency;
 import see.reactive.Signal;
 import see.reactive.VariableSignal;
 import see.reactive.impl.ReactiveFactory;
@@ -116,8 +115,8 @@ public class BindingTest {
 
     @Test
     public void testEagerness() throws Exception {
-        Dependency a = reactiveFactory.var(false);
-        Dependency b = reactiveFactory.var(true);
+        Signal<?> a = reactiveFactory.var(false);
+        Signal<?> b = reactiveFactory.var(true);
 
         Map<String, Object> context = ImmutableMap.<String, Object>of("a", a, "b", b);
         Signal<?> result = (Signal<?>) see.eval("signal(a && b)", context); // b is not evaluated normally

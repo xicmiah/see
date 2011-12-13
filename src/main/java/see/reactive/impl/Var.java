@@ -18,15 +18,15 @@ package see.reactive.impl;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
-import see.reactive.Dependency;
+import see.reactive.Signal;
 import see.reactive.VariableSignal;
 
-class Var<T> extends AbstractDependency implements VariableSignal<T> {
+class Var<T> extends AbstractSignal<T> implements VariableSignal<T> {
 
     private T value;
 
     public Var(EventBus eventBus, T initial) {
-        super(eventBus, ImmutableSet.<Dependency>of());
+        super(eventBus, ImmutableSet.<Signal<?>>of());
         value = initial;
     }
 
