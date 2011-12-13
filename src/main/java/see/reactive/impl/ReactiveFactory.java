@@ -72,15 +72,4 @@ public class ReactiveFactory {
     public <T> Signal<T> bindLazy(Collection<? extends Dependency> dependencies, Supplier<T> evaluation) {
         return new StatelessSignal<T>(eventBus, dependencies, evaluation);
     }
-
-    /**
-     * Bind a {@link Runnable} to specified dependencies.
-     * {@link Runnable} will be executed on dependency invalidation
-     * @param dependencies execution triggers
-     * @param actions actions to execute
-     * @return constructed dependency
-     */
-    public Dependency sink(Collection<? extends Dependency> dependencies, Runnable actions) {
-        return new Sink(eventBus, dependencies, actions);
-    }
 }
