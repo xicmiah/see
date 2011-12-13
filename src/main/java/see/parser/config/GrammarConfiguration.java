@@ -4,19 +4,17 @@ import see.evaluation.ValueProcessor;
 import see.parser.numbers.NumberFactory;
 import see.properties.ChainResolver;
 
-import java.util.List;
-
 public class GrammarConfiguration {
     private final FunctionResolver functions;
     private final NumberFactory numberFactory;
     private final ChainResolver properties;
-    private final List<ValueProcessor> valueProcessors;
+    private final ValueProcessor valueProcessor;
 
-    public GrammarConfiguration(FunctionResolver functions, NumberFactory numberFactory, ChainResolver properties, List<ValueProcessor> valueProcessors) {
+    public GrammarConfiguration(FunctionResolver functions, NumberFactory numberFactory, ChainResolver properties, ValueProcessor processor) {
         this.functions = functions;
         this.numberFactory = numberFactory;
         this.properties = properties;
-        this.valueProcessors = valueProcessors;
+        this.valueProcessor = processor;
     }
 
     public FunctionResolver getFunctions() {
@@ -31,7 +29,7 @@ public class GrammarConfiguration {
         return properties;
     }
 
-    public List<ValueProcessor> getValueProcessors() {
-        return valueProcessors;
+    public ValueProcessor getValueProcessor() {
+        return valueProcessor;
     }
 }

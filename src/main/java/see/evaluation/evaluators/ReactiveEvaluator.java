@@ -17,14 +17,15 @@
 package see.evaluation.evaluators;
 
 import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.common.collect.MutableClassToInstanceMap;
 import see.evaluation.Evaluator;
 import see.evaluation.ValueProcessor;
 import see.evaluation.visitors.LazyVisitor;
 import see.exceptions.EvaluationException;
 import see.functions.Function;
+import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
 import see.properties.ChainResolver;
@@ -36,14 +37,22 @@ import java.util.Map;
 
 public class ReactiveEvaluator implements Evaluator {
 
-    private final GrammarConfiguration config;
-    private final ReactiveFactory reactiveFactory;
-    private final ValueProcessor processor;
+    private final FunctionResolver functionResolver;
+    
+    private final NumberFactory numberFactory;
+    private final ChainResolver resolver;
+    private final ValueProcessor valueProcessor;
 
-    public ReactiveEvaluator(GrammarConfiguration config, ReactiveFactory reactiveFactory, ValueProcessor processor) {
-        this.config = config;
+    private final ReactiveFactory reactiveFactory;
+
+    public ReactiveEvaluator(GrammarConfiguration config, ReactiveFactory reactiveFactory) {
+        this.functionResolver = config.getFunctions();
+
+        this.numberFactory = config.getNumberFactory();
+        this.resolver = config.getChainResolver();
+        this.valueProcessor = config.getValueProcessor();
+
         this.reactiveFactory = reactiveFactory;
-        this.processor = processor;
     }
 
     @Override
@@ -51,19 +60,20 @@ public class ReactiveEvaluator implements Evaluator {
         Map<String, Object> mutable = Maps.newHashMap(initial);
         Map<String, ?> constants = ImmutableMap.of();
 
-        ClassToInstanceMap<Object> services = MutableClassToInstanceMap.create();
-        services.putInstance(NumberFactory.class, config.getNumberFactory());
-        services.putInstance(ChainResolver.class, config.getChainResolver());
-        services.putInstance(ReactiveFactory.class, reactiveFactory);
-        services.putInstance(ValueProcessor.class, processor);
+        ClassToInstanceMap<Object> services = ImmutableClassToInstanceMap.builder()
+                .put(NumberFactory.class, numberFactory)
+                .put(ChainResolver.class, resolver)
+                .put(ValueProcessor.class, valueProcessor)
+                .put(ReactiveFactory.class, reactiveFactory)
+                .build();
 
         SimpleContext context = new SimpleContext(mutable, constants, services);
 
-        Map<String, Function<List<Object>, Object>> boundFunctions = config.getFunctions().getBoundFunctions(context);
+        Map<String, Function<List<Object>, Object>> boundFunctions = functionResolver.getBoundFunctions(context);
         for (Map.Entry<String, Function<List<Object>, Object>> entry : boundFunctions.entrySet()) {
             context.addConstant(entry.getKey(), entry.getValue());
         }
 
-        return tree.accept(new LazyVisitor(context, processor, config.getChainResolver()));
+        return tree.accept(new LazyVisitor(context, valueProcessor, resolver));
     }
 }

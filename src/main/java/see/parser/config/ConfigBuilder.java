@@ -3,6 +3,7 @@ package see.parser.config;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import see.evaluation.ValueProcessor;
+import see.evaluation.processors.NumberLifter;
 import see.functions.ContextCurriedFunction;
 import see.functions.Function;
 import see.functions.PureFunction;
@@ -32,14 +33,22 @@ import java.math.MathContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static see.evaluation.processors.AggregatingProcessor.concat;
 
 public class ConfigBuilder {
     private Map<String, String> aliases;
     private Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions;
     
-    private List<ValueProcessor> valueProcessors = ImmutableList.of();
+    private List<? extends ValueProcessor> valueProcessors = ImmutableList.of(new NumberLifter(new Supplier<NumberFactory>() {
+        @Override
+        public NumberFactory get() {
+            return numberFactory.get();
+        }
+    }));
 
-    private NumberFactory numberFactory = new BigDecimalFactory();
+    private AtomicReference<NumberFactory> numberFactory = new AtomicReference<NumberFactory>(new BigDecimalFactory());
     private ChainResolver propertyResolver = new SingularChainResolver(new AggregatingResolver(ImmutableList.<PartialResolver>of(new MethodResolver()), new PropertyUtilsResolver()));
 
     private ConfigBuilder(Map<String, String> aliases,
@@ -113,7 +122,7 @@ public class ConfigBuilder {
         builder.addPureFunction("divide", new Divide(new Supplier<MathContext>() {
             @Override
             public MathContext get() {
-                return ((BigDecimalFactory) builder.numberFactory).getMathContext();
+                return ((BigDecimalFactory) builder.numberFactory.get()).getMathContext();
             }
         })); // Math context is passed by-name, will adapt to setNumberFactory() calls on builder
         builder.addPureFunction("pow", new Power());
@@ -184,7 +193,7 @@ public class ConfigBuilder {
     }
 
     public ConfigBuilder setNumberFactory(NumberFactory numberFactory) {
-        this.numberFactory = numberFactory;
+        this.numberFactory.set(numberFactory);
         return this;
     }
 
@@ -222,9 +231,9 @@ public class ConfigBuilder {
     public GrammarConfiguration build() {
         return new GrammarConfiguration(
                 new FunctionResolver(functions, aliases),
-                numberFactory,
+                numberFactory.get(),
                 propertyResolver,
-                ImmutableList.copyOf(valueProcessors)
+                concat(valueProcessors)
         );
     }
 
