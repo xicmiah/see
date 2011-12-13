@@ -46,11 +46,6 @@ abstract class AbstractSignal<T> implements Signal<T> {
         }
     }
 
-    @Override
-    public Collection<? extends Signal<?>> getDependencies() {
-        return dependencies;
-    }
-
     protected abstract void updateInternalState();
 
     private static class ChangeEvent {

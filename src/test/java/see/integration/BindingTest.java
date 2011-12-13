@@ -17,7 +17,6 @@
 package see.integration;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.junit.Test;
 import see.ReactiveSee;
@@ -29,7 +28,7 @@ import see.tree.Node;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class BindingTest {
     ReactiveFactory reactiveFactory = new ReactiveFactory();
@@ -115,13 +114,19 @@ public class BindingTest {
 
     @Test
     public void testEagerness() throws Exception {
-        Signal<?> a = reactiveFactory.var(false);
-        Signal<?> b = reactiveFactory.var(true);
+        VariableSignal<Boolean> a = reactiveFactory.var(false);
+        VariableSignal<Boolean> b = reactiveFactory.var(false);
 
         Map<String, Object> context = ImmutableMap.<String, Object>of("a", a, "b", b);
-        Signal<?> result = (Signal<?>) see.eval("signal(a && b)", context); // b is not evaluated normally
+        Signal<Boolean> result = (Signal<Boolean>) see.eval("signal(a && b)", context); // b is not evaluated normally
 
-        assertEquals(ImmutableSet.of(a, b), result.getDependencies()); // Dependencies should contain b
+        assertFalse(result.now());
+        
+        a.set(true);
+        assertFalse(result.now());
+        
+        b.set(true);
+        assertTrue(result.now()); // compound signal should react to changes of b
     }
 
     @Test

@@ -16,14 +16,10 @@
 
 package see.reactive;
 
-import java.util.Collection;
-
 /**
  * Dependency with a value, which can vary.
  * @param <T> value type
  */
 public interface Signal<T> {
     T now();
-
-    Collection<? extends Signal<?>> getDependencies();
 }
