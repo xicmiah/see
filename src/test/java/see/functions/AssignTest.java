@@ -1,6 +1,7 @@
 package see.functions;
 
 import org.junit.Test;
+import see.evaluation.evaluators.SimpleContext;
 import see.functions.service.Assign;
 import see.functions.service.VarAsSettable;
 
@@ -34,6 +35,6 @@ public class AssignTest {
     }
 
     private Settable<Object> settableFor(Map<String, Object> context, String var) {
-        return varAsSettable.apply(context).apply(of(var));
+        return varAsSettable.apply(SimpleContext.fromMutable(context)).apply(of(var));
     }
 }

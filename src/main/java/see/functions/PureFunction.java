@@ -1,6 +1,8 @@
 package see.functions;
 
-import java.util.Map;
+import see.evaluation.Context;
+
+import javax.annotation.Nonnull;
 
 /**
  * Wrapper for pure functions, which throws away context
@@ -14,7 +16,7 @@ public class PureFunction<F extends Function<?, ?>> implements ContextCurriedFun
     }
 
     @Override
-    public F apply(Map<String, ?> context) {
+    public F apply(@Nonnull Context context) {
         return delegate;
     }
 

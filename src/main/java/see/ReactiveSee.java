@@ -16,16 +16,19 @@
 
 package see;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Maps;
 import see.evaluation.ValueProcessor;
 import see.evaluation.evaluators.ReactiveEvaluator;
+import see.evaluation.processors.NumberLifter;
 import see.parser.config.ConfigBuilder;
 import see.parser.config.GrammarConfiguration;
 import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
 
-import java.util.List;
 import java.util.Map;
+
+import static see.evaluation.processors.AggregatingProcessor.concat;
 
 /**
  * Public API for working with reactive extensions(signals, bindings, etc.).
@@ -110,8 +113,9 @@ public class ReactiveSee {
      * @return evaluated value
      */
     public <T> T evaluate(Node<T> tree, final Map<String, Object> context) {
-        List<ValueProcessor> customProcessors = config.getValueProcessors();
-        ReactiveEvaluator evaluator = new ReactiveEvaluator(config, reactiveFactory, customProcessors);
+        ValueProcessor customProcessor = concat(config.getValueProcessors());
+        NumberLifter numberLifter = new NumberLifter(Suppliers.ofInstance(config.getNumberFactory()));
+        ReactiveEvaluator evaluator = new ReactiveEvaluator(config, reactiveFactory, concat(customProcessor, numberLifter));
         return evaluator.evaluate(tree, context);
     }
 

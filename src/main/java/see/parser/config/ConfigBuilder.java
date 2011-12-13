@@ -164,7 +164,7 @@ public class ConfigBuilder {
      * @param <R>      function result type
      * @return this instance
      */
-    public <T, R> ConfigBuilder addFunction(String name, ContextCurriedFunction<Function<List<T>, R>> function) {
+    public <T, R> ConfigBuilder addFunction(String name, ContextCurriedFunction<? extends Function<List<T>, R>> function) {
         functions.put(name, wrap(function));
         return this;
     }
@@ -235,7 +235,7 @@ public class ConfigBuilder {
      * @return wrapped function
      */
     @SuppressWarnings("unchecked")
-    private static <Arg, Result> ContextCurriedFunction<Function<List<Object>, Object>> wrap(final ContextCurriedFunction<Function<List<Arg>, Result>> function) {
+    private static <Arg, Result> ContextCurriedFunction<Function<List<Object>, Object>> wrap(final ContextCurriedFunction<? extends Function<List<Arg>, Result>> function) {
         // Intentional raw type usage
         return (ContextCurriedFunction) function;
     }

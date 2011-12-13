@@ -17,29 +17,27 @@
 package see.evaluation.visitors;
 
 import com.google.common.base.Function;
+import see.evaluation.Context;
 import see.evaluation.ValueProcessor;
 import see.functions.Property;
 import see.parser.grammar.PropertyAccess;
 import see.parser.grammar.PropertyDescriptor;
 import see.properties.ChainResolver;
 import see.tree.*;
-import see.util.Reduce;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.google.common.collect.Lists.transform;
-import static see.util.Reduce.fold;
 
 public abstract class AbstractVisitor implements Visitor {
-    private final Map<String, ?> context;
-    private final List<ValueProcessor> valueProcessors;
+    private final Context context;
+    private final ValueProcessor valueProcessor;
     private final ChainResolver resolver;
 
 
-    public AbstractVisitor(Map<String, ?> context, List<ValueProcessor> valueProcessors, ChainResolver resolver) {
+    public AbstractVisitor(Context context, ValueProcessor valueProcessor, ChainResolver resolver) {
         this.context = context;
-        this.valueProcessors = valueProcessors;
+        this.valueProcessor = valueProcessor;
         this.resolver = resolver;
     }
 
@@ -127,11 +125,6 @@ public abstract class AbstractVisitor implements Visitor {
      */
     @SuppressWarnings("unchecked")
     private <T> T processValue(T value) {
-        return (T) fold(value, valueProcessors, new Reduce.FoldFunction<Function<Object, Object>, Object>() {
-            @Override
-            public Object apply(Object prev, Function<Object, Object> arg) {
-                return arg.apply(prev);
-            }
-        });
+        return (T) valueProcessor.apply(value);
     }
 }

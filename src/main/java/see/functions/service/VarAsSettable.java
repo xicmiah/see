@@ -17,23 +17,20 @@
 package see.functions.service;
 
 import com.google.common.base.Preconditions;
+import see.evaluation.Context;
 import see.functions.ContextCurriedFunction;
-import see.functions.Function;
 import see.functions.Settable;
 import see.functions.VarArgFunction;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Exposes variable assignment as {@link Settable} interface.
  */
-public class VarAsSettable implements ContextCurriedFunction<Function<List<String>, Settable<Object>>> {
+public class VarAsSettable implements ContextCurriedFunction<VarArgFunction<String, Settable<Object>>> {
     @Override
-    public Function<List<String>, Settable<Object>> apply(Map<String, ?> context) {
-        final Map<String, Object> writableContext = (Map<String, Object>) context;
-
+    public VarArgFunction<String, Settable<Object>> apply(@Nonnull final Context context) {
         return new VarArgFunction<String, Settable<Object>>() {
             @Override
             public Settable<Object> apply(@Nonnull List<String> input) {
@@ -43,7 +40,7 @@ public class VarAsSettable implements ContextCurriedFunction<Function<List<Strin
                 return new Settable<Object>() {
                     @Override
                     public void set(Object value) {
-                        writableContext.put(varName, value);
+                        context.put(varName, value);
                     }
                 };
             }

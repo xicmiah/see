@@ -18,34 +18,45 @@ package see.functions.reactive;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
+import see.evaluation.Context;
+import see.functions.ContextCurriedFunction;
 import see.functions.Settable;
+import see.functions.VarArgFunction;
 import see.reactive.Signal;
+import see.reactive.impl.ReactiveFactory;
 
+import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.of;
 
-public class Bind extends ReactiveFunction<Object, Signal<?>> {
+public class Bind implements ContextCurriedFunction<VarArgFunction<Object, Signal<?>>> {
     @Override
-    protected Signal<?> apply(ContextConfig config, final List<Object> input, Map<String, ?> context) {
-        Preconditions.checkArgument(input.size() == 2, "Bind takes two arguments");
-
-        final Settable<Object> target = (Settable<Object>) input.get(0);
-
-        final Signal<?> signal = (Signal<?>) input.get(1);
-
-        config.getReactiveFactory().bind(of(signal), new Supplier<Object>() {
+    public VarArgFunction<Object, Signal<?>> apply(@Nonnull final Context context) {
+        return new VarArgFunction<Object, Signal<?>>() {
             @Override
-            public Object get() {
-                Object now = signal.getNow();
-                target.set(now);
-                return now;
-            }
-        });
+            public Signal<?> apply(@Nonnull List<Object> input) {
+                Preconditions.checkArgument(input.size() == 2, "Bind takes two arguments");
 
-        return signal;
-}
+                final Settable<Object> target = (Settable<Object>) input.get(0);
+
+                final Signal<?> signal = (Signal<?>) input.get(1);
+
+                context.getService(ReactiveFactory.class).bind(of(signal), new Supplier<Object>() {
+                    @Override
+                    public Object get() {
+                        Object now = signal.getNow();
+                        target.set(now);
+                        return now;
+                    }
+                });
+
+                return signal;
+
+            }
+        };
+    }
+
     @Override
     public String toString() {
         return "bind";

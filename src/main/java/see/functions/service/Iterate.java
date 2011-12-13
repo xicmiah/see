@@ -17,12 +17,12 @@
 package see.functions.service;
 
 import com.google.common.base.Preconditions;
+import see.evaluation.Context;
 import see.functions.ContextCurriedFunction;
-import see.functions.Function;
 import see.functions.VarArgFunction;
 
+import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -35,14 +35,12 @@ import java.util.Map;
  * This implementation assumes that evaluator doesn't cache evaluation results,
  * i.e. each time get(int) is called on arguments, corresponding sub-tree is evaluated.
  */
-public class Iterate implements ContextCurriedFunction<Function<List<Object>, Object>> {
+public class Iterate implements ContextCurriedFunction<VarArgFunction<Object, Object>> {
     @Override
-    public Function<List<Object>, Object> apply(Map<String, ?> context) {
-        final Map<String, ? super Object> writableContext = (Map<String, ? super Object>) context;
-
+    public VarArgFunction<Object, Object> apply(@Nonnull final Context context) {
         return new VarArgFunction<Object, Object>() {
             @Override
-            public Object apply(List<Object> input) {
+            public Object apply(@Nonnull List<Object> input) {
                 Preconditions.checkArgument(input.size() == 3, "Iterate takes 3 arguments");
 
                 String varName = (String) input.get(0);
@@ -50,7 +48,7 @@ public class Iterate implements ContextCurriedFunction<Function<List<Object>, Ob
 
                 Object lastValue = null;
                 for (Object item : list) {
-                    writableContext.put(varName, item);
+                    context.put(varName, item);
                     lastValue = input.get(2); // **WILL** re-evaluate argument
                 }
                 

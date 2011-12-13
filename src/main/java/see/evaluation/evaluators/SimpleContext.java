@@ -29,7 +29,7 @@ import static com.google.common.base.Optional.fromNullable;
 public class SimpleContext implements Context {
 
     private final Map<String, Object> mutable;
-    private final Map<String, ?> constants;
+    private Map<String, ?> constants;
     private final ClassToInstanceMap<Object> service;
 
     public SimpleContext(Map<String, Object> mutable, Map<String, ?> constants, ClassToInstanceMap<Object> service) {
@@ -58,5 +58,16 @@ public class SimpleContext implements Context {
     @Override
     public <T> T getService(Class<T> serviceClass) {
         return service.getInstance(serviceClass);
+    }
+
+    public void addConstant(String name, Object constant) {
+        constants = ImmutableMap.<String, Object>builder().putAll(constants).put(name, constant).build();
+    }
+
+    public static SimpleContext fromMutable(Map<String, Object> mutablePart) {
+        Map<String, Object> constants = ImmutableMap.of();
+        ImmutableClassToInstanceMap<Object> services = ImmutableClassToInstanceMap.builder().build();
+        return new SimpleContext(mutablePart, constants, services);
+
     }
 }

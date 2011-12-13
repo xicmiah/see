@@ -2,18 +2,19 @@ package see.functions.service;
 
 
 import com.google.common.base.Preconditions;
+import see.evaluation.Context;
 import see.functions.ContextCurriedFunction;
-import see.functions.Function;
+import see.functions.VarArgFunction;
 
+import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Map;
 
-public class IsDefined implements ContextCurriedFunction<Function<List<String>, Boolean>> {
+public class IsDefined implements ContextCurriedFunction<VarArgFunction<String, Boolean>> {
     @Override
-    public Function<List<String>, Boolean> apply(final Map<String, ?> context) {
-        return new Function<List<String>, Boolean>() {
+    public VarArgFunction<String, Boolean> apply(@Nonnull final Context context) {
+        return new VarArgFunction<String, Boolean>() {
             @Override
-            public Boolean apply(List<String> strings) {
+            public Boolean apply(@Nonnull List<String> strings) {
                 Preconditions.checkArgument(strings.size() == 1, "isDefined takes variable name");
 
                 String variable = strings.get(0);

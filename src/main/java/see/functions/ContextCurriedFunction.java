@@ -1,6 +1,8 @@
 package see.functions;
 
-import java.util.Map;
+import see.evaluation.Context;
+
+import javax.annotation.Nonnull;
 
 /**
  * Interface for supporting context-aware functions.
@@ -13,7 +15,7 @@ import java.util.Map;
  * @param <F> curried remainder
  * @see PureFunction
  */
-public interface ContextCurriedFunction<F extends Function<?, ?>> extends Function<Map<String, ?>, F> {
+public interface ContextCurriedFunction<F extends Function<?, ?>> extends Function<Context, F> {
     @Override
-    F apply(final Map<String, ?> context);
+    F apply(@Nonnull final Context context);
 }

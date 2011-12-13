@@ -18,53 +18,57 @@ package see.functions.reactive;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
+import see.evaluation.Context;
 import see.evaluation.ValueProcessor;
 import see.evaluation.visitors.EagerVisitor;
 import see.evaluation.visitors.LazyVisitor;
-import see.parser.config.GrammarConfiguration;
+import see.functions.ContextCurriedFunction;
+import see.functions.VarArgFunction;
 import see.properties.ChainResolver;
 import see.reactive.Dependency;
 import see.reactive.Signal;
+import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+
+import static see.evaluation.processors.AggregatingProcessor.concat;
 
 /**
  * Signal creation. Expects second argument to be a tree.
  * Creates a signal bound to signals present in tree.
  */
-public class MakeSignal extends ReactiveFunction<Object, Signal<?>> {
+public class MakeSignal implements ContextCurriedFunction<VarArgFunction<Object, Signal<?>>> {
     @Override
-    public Signal<?> apply(ContextConfig config, final List<Object> input, final Map<String, ?> context) {
-        Preconditions.checkArgument(input.size() == 2, "MakeSignal takes two arguments");
-
-        final Node<Object> tree = (Node<Object>) input.get(1);
-
-        GrammarConfiguration grammarConfig = config.getGrammarConfig();
-        List<ValueProcessor> visitorProcessors = config.getValueProcessors();
-
-        ChainResolver chainResolver = grammarConfig.getChainResolver();
-
-        SignalCapture signalCapture = new SignalCapture();
-        EagerVisitor eagerVisitor = new EagerVisitor(context, prepend(signalCapture, visitorProcessors), chainResolver);
-        tree.accept(eagerVisitor);
-
-        final LazyVisitor lazyVisitor = new LazyVisitor(context, prepend(new SignalExpand(), visitorProcessors), chainResolver);
-        return config.getReactiveFactory().bind(signalCapture.dependencies, new Supplier<Object>() {
+    public VarArgFunction<Object, Signal<?>> apply(@Nonnull final Context context) {
+        return new VarArgFunction<Object, Signal<?>>() {
             @Override
-            public Object get() {
-                return tree.accept(lazyVisitor);
-            }
-        });
-    }
+            public Signal<?> apply(@Nonnull List<Object> input) {
+                Preconditions.checkArgument(input.size() == 2, "MakeSignal takes two arguments");
 
-    private static <T> List<T> prepend(T item, List<T> list) {
-        return ImmutableList.<T>builder().add(item).addAll(list).build();
+                final Node<Object> tree = (Node<Object>) input.get(1);
+
+                ChainResolver resolver = context.getService(ChainResolver.class);
+                ValueProcessor processor = context.getService(ValueProcessor.class);
+
+                SignalCapture signalCapture = new SignalCapture();
+                EagerVisitor eagerVisitor = new EagerVisitor(context, concat(signalCapture, processor), resolver);
+                tree.accept(eagerVisitor);
+
+                final LazyVisitor lazyVisitor = new LazyVisitor(context, concat(new SignalExpand(), processor), resolver);
+                return context.getService(ReactiveFactory.class).bind(signalCapture.dependencies, new Supplier<Object>() {
+                    @Override
+                    public Object get() {
+                        return tree.accept(lazyVisitor);
+                    }
+                });
+
+            }
+        };
     }
 
     @Override

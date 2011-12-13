@@ -16,51 +16,54 @@
 
 package see.evaluation.evaluators;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.MutableClassToInstanceMap;
 import see.evaluation.Evaluator;
 import see.evaluation.ValueProcessor;
-import see.evaluation.processors.NumberLifter;
 import see.evaluation.visitors.LazyVisitor;
 import see.exceptions.EvaluationException;
+import see.functions.Function;
 import see.parser.config.GrammarConfiguration;
+import see.parser.numbers.NumberFactory;
+import see.properties.ChainResolver;
 import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Suppliers.ofInstance;
-
 public class ReactiveEvaluator implements Evaluator {
-    public static final String CONFIG_KEY = "⑨config";
-    public static final String PROCESSORS_KEY = "⑨processors";
-    public static final String REACTIVE_KEY = "⑨reactive";
 
     private final GrammarConfiguration config;
     private final ReactiveFactory reactiveFactory;
-    private final List<ValueProcessor> customProcessors;
+    private final ValueProcessor processor;
 
-    public ReactiveEvaluator(GrammarConfiguration config, ReactiveFactory reactiveFactory, List<ValueProcessor> processors) {
+    public ReactiveEvaluator(GrammarConfiguration config, ReactiveFactory reactiveFactory, ValueProcessor processor) {
         this.config = config;
         this.reactiveFactory = reactiveFactory;
-        this.customProcessors = processors;
+        this.processor = processor;
     }
 
     @Override
-    public <T> T evaluate(Node<T> tree, Map<String, ?> context) throws EvaluationException {
-        List<ValueProcessor> processors = ImmutableList.<ValueProcessor>builder()
-                .addAll(customProcessors)
-                .add(new NumberLifter(ofInstance(config.getNumberFactory())))
-                .build();
+    public <T> T evaluate(Node<T> tree, Map<String, ?> initial) throws EvaluationException {
+        Map<String, Object> mutable = Maps.newHashMap(initial);
+        Map<String, ?> constants = ImmutableMap.of();
 
-        final Map<String, Object> reactiveContext = Maps.newHashMap(context);
-        reactiveContext.put(CONFIG_KEY, config);
-        reactiveContext.put(REACTIVE_KEY, reactiveFactory);
-        reactiveContext.put(PROCESSORS_KEY, processors);
+        ClassToInstanceMap<Object> services = MutableClassToInstanceMap.create();
+        services.putInstance(NumberFactory.class, config.getNumberFactory());
+        services.putInstance(ChainResolver.class, config.getChainResolver());
+        services.putInstance(ReactiveFactory.class, reactiveFactory);
+        services.putInstance(ValueProcessor.class, processor);
 
-        reactiveContext.putAll(config.getFunctions().getBoundFunctions(reactiveContext));
-        
-        return tree.accept(new LazyVisitor(reactiveContext, processors, config.getChainResolver()));
+        SimpleContext context = new SimpleContext(mutable, constants, services);
+
+        Map<String, Function<List<Object>, Object>> boundFunctions = config.getFunctions().getBoundFunctions(context);
+        for (Map.Entry<String, Function<List<Object>, Object>> entry : boundFunctions.entrySet()) {
+            context.addConstant(entry.getKey(), entry.getValue());
+        }
+
+        return tree.accept(new LazyVisitor(context, processor, config.getChainResolver()));
     }
 }

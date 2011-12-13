@@ -1,22 +1,24 @@
 package see.evaluation.evaluators;
 
 import com.google.common.base.Suppliers;
-import com.google.common.collect.ForwardingMap;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.MutableClassToInstanceMap;
+import see.evaluation.Context;
 import see.evaluation.Evaluator;
 import see.evaluation.ValueProcessor;
 import see.evaluation.processors.NumberLifter;
 import see.evaluation.visitors.LazyVisitor;
 import see.exceptions.EvaluationException;
+import see.functions.Function;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
 import see.properties.ChainResolver;
 import see.tree.Node;
 
+import java.util.List;
 import java.util.Map;
-
-import static com.google.common.collect.ImmutableList.of;
 
 public class SimpleEvaluator implements Evaluator {
 
@@ -49,9 +51,9 @@ public class SimpleEvaluator implements Evaluator {
         try {
             ValueProcessor numberLifter = new NumberLifter(Suppliers.ofInstance(numberFactory));
 
-            Map<String, Object> extendedContext = getExtendedContext(context);
+            Context extendedContext = getExtendedContext(context);
             
-            return tree.accept(new LazyVisitor(extendedContext, of(numberLifter), chainResolver));
+            return tree.accept(new LazyVisitor(extendedContext, numberLifter, chainResolver));
         } catch (EvaluationException e) {
             throw e;
         } catch (Exception e) {
@@ -59,27 +61,19 @@ public class SimpleEvaluator implements Evaluator {
         }
     }
 
-    private Map<String, Object> getExtendedContext(Map<String, ?> context) {
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> writableContext = (Map<String, Object>) context;
-        return new ForwardingMap<String, Object>() {
-            @Override
-            protected Map<String, Object> delegate() {
-                Map<String, Object> initialContext = Maps.newHashMap(writableContext);
-                initialContext.putAll(functionResolver.getBoundFunctions(initialContext));
-                return initialContext;
-            }
+    private Context getExtendedContext(Map<String, ?> initial) {
+        ClassToInstanceMap<Object> services = MutableClassToInstanceMap.create();
+        services.putInstance(NumberFactory.class, numberFactory);
+        services.putInstance(ChainResolver.class, chainResolver);
 
-            @Override
-            public Object put(String key, Object value) {
-                writableContext.put(key, value);
-                return super.put(key, value);
-            }
+        ImmutableMap<String, Object> empty = ImmutableMap.of();
+        SimpleContext context = new SimpleContext((Map<String, Object>) initial, empty, services);
 
-            @Override
-            public void putAll(Map<? extends String, ?> map) {
-                standardPutAll(map);
-            }
-        };
+        Map<String, Function<List<Object>, Object>> boundFunctions = functionResolver.getBoundFunctions(context);
+        for (Map.Entry<String, Function<List<Object>, Object>> entry : boundFunctions.entrySet()) {
+            context.addConstant(entry.getKey(), entry.getValue());
+        }
+
+        return context;
     }
 }
