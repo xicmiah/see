@@ -17,13 +17,16 @@
 package see.evaluator;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import see.properties.ChainResolver;
 import see.tree.Node;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.collect.ImmutableList.copyOf;
+import static com.google.common.collect.Lists.transform;
 
 /**
  * Visitor, which evaluates function arguments eagerly.
@@ -33,15 +36,40 @@ public class EagerVisitor extends AbstractVisitor {
         super(context, valueProcessors, resolver);
     }
 
+    /**
+     * Returns evaluated arguments.
+     * Calling {@link List#get(int)} on returned list will either return pre-evaluated result,
+     * or throw an exception.
+     * @param arguments argument nodes to evaluate
+     * @param <Arg> common argument supertype
+     * @return pre-evaluated arguments
+     */
     @Override
     protected <Arg> List<Arg> evaluateArgs(List<Node<Arg>> arguments) {
-        List<Arg> lazyArgs = Lists.transform(arguments, new Function<Node<Arg>, Arg>() {
+        List<Supplier<Arg>> evaluated = copyOf(transform(arguments, new Function<Node<Arg>, Supplier<Arg>>() {
             @Override
-            public Arg apply(Node<Arg> input) {
-                return input.accept(EagerVisitor.this);
+            public Supplier<Arg> apply(Node<Arg> input) {
+                try {
+                    return Suppliers.ofInstance(input.accept(EagerVisitor.this));
+                } catch (RuntimeException e) {
+                    return new ThrowingSupplier<Arg>(e);
+                }
             }
-        });
+        }));
 
-        return Collections.unmodifiableList(Lists.newArrayList(lazyArgs)); // Forces evaluation
+        return transform(evaluated, Suppliers.<Arg>supplierFunction());
+    }
+
+    private class ThrowingSupplier<Arg> implements Supplier<Arg> {
+        private final RuntimeException e;
+
+        public ThrowingSupplier(RuntimeException e) {
+            this.e = e;
+        }
+
+        @Override
+        public Arg get() {
+            throw e;
+        }
     }
 }

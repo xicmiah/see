@@ -137,6 +137,19 @@ public class BindingTest {
         assertEquals(false, result.getNow());
     }
 
+    @Test
+    public void testErrorsDuringDependencyResolution() throws Exception {
+        VariableSignal<String> s = reactiveFactory.var(null);
+
+        Map<String, Object> context = ImmutableMap.<String, Object>of("s", s);
+        Signal<?> result = (Signal<?>) see.eval("signal(if(s != null, s.class, 'empty'))", context);
+
+        assertEquals("empty", result.getNow());
+
+        s.set("crn");
+        assertEquals(String.class, result.getNow());
+    }
+
     public static class TestBean {
         private Number value;
 
