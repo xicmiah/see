@@ -25,6 +25,10 @@ import see.properties.PropertyResolver;
 
 import static see.properties.PropertyResolvers.universalResolver;
 
+/**
+ * Resolver, which aggregates several partial resolvers.
+ * @deprecated Use {@link see.properties.PropertyResolvers#aggregate(Iterable)}
+ */
 public class AggregatingResolver implements PropertyResolver {
 
     private final Iterable<PartialResolver> resolvers;

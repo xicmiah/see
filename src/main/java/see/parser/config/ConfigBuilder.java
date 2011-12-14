@@ -1,7 +1,6 @@
 package see.parser.config;
 
 import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableList;
 import see.evaluation.ValueProcessor;
 import see.evaluation.processors.NumberLifter;
 import see.functions.ContextCurriedFunction;
@@ -21,9 +20,7 @@ import see.functions.string.Concat;
 import see.parser.numbers.BigDecimalFactory;
 import see.parser.numbers.NumberFactory;
 import see.properties.ChainResolver;
-import see.properties.PartialResolver;
 import see.properties.PropertyResolver;
-import see.properties.impl.AggregatingResolver;
 import see.properties.impl.MethodResolver;
 import see.properties.impl.PropertyUtilsResolver;
 import see.properties.impl.SingularChainResolver;
@@ -35,13 +32,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.google.common.collect.ImmutableList.of;
 import static see.evaluation.processors.AggregatingProcessor.concat;
+import static see.properties.PropertyResolvers.aggregate;
+import static see.properties.PropertyResolvers.universalResolver;
 
 public class ConfigBuilder {
     private Map<String, String> aliases;
     private Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions;
     
-    private List<? extends ValueProcessor> valueProcessors = ImmutableList.of(new NumberLifter(new Supplier<NumberFactory>() {
+    private List<? extends ValueProcessor> valueProcessors = of(new NumberLifter(new Supplier<NumberFactory>() {
         @Override
         public NumberFactory get() {
             return numberFactory.get();
@@ -49,7 +49,7 @@ public class ConfigBuilder {
     }));
 
     private AtomicReference<NumberFactory> numberFactory = new AtomicReference<NumberFactory>(new BigDecimalFactory());
-    private ChainResolver propertyResolver = new SingularChainResolver(new AggregatingResolver(ImmutableList.<PartialResolver>of(new MethodResolver()), new PropertyUtilsResolver()));
+    private ChainResolver propertyResolver = new SingularChainResolver(aggregate(of(new MethodResolver(), universalResolver(new PropertyUtilsResolver()))));
 
     private ConfigBuilder(Map<String, String> aliases,
                           Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions) {
