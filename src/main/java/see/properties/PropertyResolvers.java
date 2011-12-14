@@ -16,9 +16,12 @@
 
 package see.properties;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import see.parser.grammar.PropertyAccess;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 public class PropertyResolvers {
@@ -31,6 +34,17 @@ public class PropertyResolvers {
      */
     public static PartialResolver universalResolver(final PropertyResolver resolver) {
         return new UniversalResolver(resolver);
+    }
+
+    /**
+     * Construct a partial resolver from a collection of other partial resolvers.
+     * Constructed resolver delegates to first resolver, which can complete target operation.
+     *
+     * @param resolvers partial resolvers to aggregate
+     * @return constructed aggregating resolver
+     */
+    public static PartialResolver aggregate(final Iterable<? extends PartialResolver> resolvers) {
+        return new PartialAggregator(resolvers);
     }
 
     private static class UniversalResolver implements PartialResolver {
@@ -58,6 +72,66 @@ public class PropertyResolvers {
         @Override
         public void set(Object bean, PropertyAccess property, Object value) {
             resolver.set(bean, property, value);
+        }
+    }
+
+    private static class PartialAggregator implements PartialResolver {
+        private final Iterable<? extends PartialResolver> resolvers;
+
+        public PartialAggregator(Iterable<? extends PartialResolver> resolvers) {
+            this.resolvers = resolvers;
+        }
+
+        @Override
+        public boolean canGet(@Nullable final Object target, @Nonnull final PropertyAccess propertyAccess) {
+            return Iterables.any(resolvers, new CanGetPredicate(target, propertyAccess));
+        }
+
+        @Override
+        public boolean canSet(@Nullable final Object target, @Nonnull final PropertyAccess propertyAccess, final Object value) {
+            return Iterables.any(resolvers, new CanSetPredicate(target, propertyAccess, value));
+        }
+
+        @Override
+        public Object get(Object bean, PropertyAccess property) {
+            return Iterables.find(resolvers, new CanGetPredicate(bean, property)).get(bean, property);
+        }
+
+        @Override
+        public void set(Object bean, PropertyAccess property, Object value) {
+            Iterables.find(resolvers, new CanSetPredicate(bean, property, value)).set(bean, property, value);
+        }
+    }
+
+    private static class CanGetPredicate implements Predicate<PartialResolver> {
+        private final Object target;
+        private final PropertyAccess propertyAccess;
+
+        public CanGetPredicate(Object target, PropertyAccess propertyAccess) {
+            this.target = target;
+            this.propertyAccess = propertyAccess;
+        }
+
+        @Override
+        public boolean apply(PartialResolver input) {
+            return input.canGet(target, propertyAccess);
+        }
+    }
+
+    private static class CanSetPredicate implements Predicate<PartialResolver> {
+        private final Object target;
+        private final PropertyAccess propertyAccess;
+        private final Object value;
+
+        public CanSetPredicate(Object target, PropertyAccess propertyAccess, Object value) {
+            this.target = target;
+            this.propertyAccess = propertyAccess;
+            this.value = value;
+        }
+
+        @Override
+        public boolean apply(PartialResolver input) {
+            return input.canSet(target, propertyAccess, value);
         }
     }
 }
