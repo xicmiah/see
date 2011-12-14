@@ -51,6 +51,23 @@ public class MakeSignal implements ContextCurriedFunction<VarArgFunction<Object,
 
                 final Node<Object> tree = (Node<Object>) input.get(1);
 
+                Collection<Signal<?>> dependencies = extractDependencies(tree);
+
+                final LazyVisitor lazyVisitor = createVisitor();
+                return context.getService(ReactiveFactory.class).bind(dependencies, new Supplier<Object>() {
+                    @Override
+                    public Object get() {
+                        return tree.accept(lazyVisitor);
+                    }
+                });
+            }
+
+            @Override
+            public String toString() {
+                return "signal";
+            }
+
+            private Collection<Signal<?>> extractDependencies(Node<Object> tree) {
                 ChainResolver resolver = context.getService(ChainResolver.class);
                 ValueProcessor processor = context.getService(ValueProcessor.class);
 
@@ -58,14 +75,13 @@ public class MakeSignal implements ContextCurriedFunction<VarArgFunction<Object,
                 EagerVisitor eagerVisitor = new EagerVisitor(context, concat(signalCapture, processor), resolver);
                 tree.accept(eagerVisitor);
 
-                final LazyVisitor lazyVisitor = new LazyVisitor(context, concat(new SignalExpand(), processor), resolver);
-                return context.getService(ReactiveFactory.class).bind(signalCapture.dependencies, new Supplier<Object>() {
-                    @Override
-                    public Object get() {
-                        return tree.accept(lazyVisitor);
-                    }
-                });
+                return signalCapture.dependencies;
+            }
 
+            private LazyVisitor createVisitor() {
+                ChainResolver resolver = context.getService(ChainResolver.class);
+                ValueProcessor processor = context.getService(ValueProcessor.class);
+                return new LazyVisitor(context, concat(new SignalExpand(), processor), resolver);
             }
         };
     }
