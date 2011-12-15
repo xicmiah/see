@@ -16,10 +16,30 @@
 
 package see.reactive;
 
+import see.functions.VarArgFunction;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+
 /**
  * Dependency with a value, which can vary.
  * @param <T> value type
  */
-public interface Signal<T> {
+public interface Signal<T> extends VarArgFunction<Void, T> {
+
+    /**
+     * Bind to signal value.
+     * Used only in signal expressions.
+     * @param input empty arg list
+     * @return current value
+     * @throws IllegalStateException if called outside signal expression
+     */
+    @Override
+    T apply(@Nonnull List<Void> input) throws IllegalStateException;
+
+    /**
+     * Get current signal value
+     * @return current value
+     */
     T now();
 }

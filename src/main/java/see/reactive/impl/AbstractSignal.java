@@ -21,7 +21,9 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import see.reactive.Signal;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 abstract class AbstractSignal<T> implements Signal<T> {
@@ -47,6 +49,18 @@ abstract class AbstractSignal<T> implements Signal<T> {
     }
 
     protected abstract void updateInternalState();
+
+    /**
+     * Stub implementation which always throws exception.
+     * Intended to be intercepted in signal expressions.
+     * @param input empty arg list
+     * @return never returns
+     * @throws IllegalStateException always
+     */
+    @Override
+    public T apply(@Nonnull List<Void> input) {
+        throw new IllegalStateException("Can be called only from signal expressions");
+    }
 
     private static class ChangeEvent {
         private final Signal<?> target;
