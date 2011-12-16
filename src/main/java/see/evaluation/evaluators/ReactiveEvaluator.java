@@ -16,12 +16,13 @@
 
 package see.evaluation.evaluators;
 
-import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import see.evaluation.Evaluator;
+import see.evaluation.ToFunction;
 import see.evaluation.ValueProcessor;
+import see.evaluation.conversions.VarArgIdentity;
 import see.evaluation.visitors.LazyVisitor;
 import see.exceptions.EvaluationException;
 import see.functions.Function;
@@ -60,14 +61,7 @@ public class ReactiveEvaluator implements Evaluator {
         Map<String, Object> mutable = Maps.newHashMap(initial);
         Map<String, ?> constants = ImmutableMap.of();
 
-        ClassToInstanceMap<Object> services = ImmutableClassToInstanceMap.builder()
-                .put(NumberFactory.class, numberFactory)
-                .put(ChainResolver.class, resolver)
-                .put(ValueProcessor.class, valueProcessor)
-                .put(ReactiveFactory.class, reactiveFactory)
-                .build();
-
-        SimpleContext context = new SimpleContext(mutable, constants, services);
+        SimpleContext context = new SimpleContext(mutable, constants, createServices());
 
         Map<String, Function<List<Object>, Object>> boundFunctions = functionResolver.getBoundFunctions(context);
         for (Map.Entry<String, Function<List<Object>, Object>> entry : boundFunctions.entrySet()) {
@@ -75,5 +69,15 @@ public class ReactiveEvaluator implements Evaluator {
         }
 
         return tree.accept(new LazyVisitor(context, valueProcessor, resolver));
+    }
+
+    private ImmutableClassToInstanceMap<Object> createServices() {
+        return ImmutableClassToInstanceMap.builder()
+                .put(NumberFactory.class, numberFactory)
+                .put(ChainResolver.class, resolver)
+                .put(ValueProcessor.class, valueProcessor)
+                .put(ReactiveFactory.class, reactiveFactory)
+                .put(ToFunction.class, new VarArgIdentity())
+                .build();
     }
 }

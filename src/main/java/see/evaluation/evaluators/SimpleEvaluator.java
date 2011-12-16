@@ -3,10 +3,11 @@ package see.evaluation.evaluators;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.MutableClassToInstanceMap;
 import see.evaluation.Context;
 import see.evaluation.Evaluator;
+import see.evaluation.ToFunction;
 import see.evaluation.ValueProcessor;
+import see.evaluation.conversions.VarArgIdentity;
 import see.evaluation.processors.NumberLifter;
 import see.evaluation.visitors.LazyVisitor;
 import see.exceptions.EvaluationException;
@@ -19,6 +20,8 @@ import see.tree.Node;
 
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.collect.ImmutableClassToInstanceMap.builder;
 
 public class SimpleEvaluator implements Evaluator {
 
@@ -51,7 +54,7 @@ public class SimpleEvaluator implements Evaluator {
         try {
             ValueProcessor numberLifter = new NumberLifter(Suppliers.ofInstance(numberFactory));
 
-            Context extendedContext = getExtendedContext(context);
+            Context extendedContext = getExtendedContext((Map<String, Object>) context);
             
             return tree.accept(new LazyVisitor(extendedContext, numberLifter, chainResolver));
         } catch (EvaluationException e) {
@@ -61,13 +64,11 @@ public class SimpleEvaluator implements Evaluator {
         }
     }
 
-    private Context getExtendedContext(Map<String, ?> initial) {
-        ClassToInstanceMap<Object> services = MutableClassToInstanceMap.create();
-        services.putInstance(NumberFactory.class, numberFactory);
-        services.putInstance(ChainResolver.class, chainResolver);
+    private Context getExtendedContext(Map<String, Object> initial) {
+        ClassToInstanceMap<Object> services = createServices();
 
         ImmutableMap<String, Object> empty = ImmutableMap.of();
-        SimpleContext context = new SimpleContext((Map<String, Object>) initial, empty, services);
+        SimpleContext context = new SimpleContext(initial, empty, services);
 
         Map<String, Function<List<Object>, Object>> boundFunctions = functionResolver.getBoundFunctions(context);
         for (Map.Entry<String, Function<List<Object>, Object>> entry : boundFunctions.entrySet()) {
@@ -75,5 +76,13 @@ public class SimpleEvaluator implements Evaluator {
         }
 
         return context;
+    }
+
+    private ClassToInstanceMap<Object> createServices() {
+        return builder()
+                .put(NumberFactory.class, numberFactory)
+                .put(ChainResolver.class, chainResolver)
+                .put(ToFunction.class, new VarArgIdentity())
+                .build();
     }
 }
