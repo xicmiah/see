@@ -22,11 +22,16 @@ import see.functions.PartialFunction;
 
 import javax.annotation.Nonnull;
 
+import static java.util.Arrays.asList;
+
 public abstract class FunctionUtils {
     private FunctionUtils() {}
 
-    public <A, R> PartialFunction<A, R> aggregate(final Iterable<? extends PartialFunction<? super A, ? extends R>> functions) {
+    public static <A, R> PartialFunction<A, R> aggregate(final Iterable<? extends PartialFunction<? super A, ? extends R>> functions) {
         return new AggregatingFunction<A, R>(functions);
+    }
+    public static <A, R> PartialFunction<A, R> aggregate(PartialFunction<? super A, ? extends R>... functions) {
+        return new AggregatingFunction<A, R>(asList(functions));
     }
 
     private static class IsDefinedPredicate<A, R> implements Predicate<PartialFunction<? super A, ? extends R>> {
@@ -42,7 +47,7 @@ public abstract class FunctionUtils {
         }
     }
 
-    private class AggregatingFunction<A, R> implements PartialFunction<A, R> {
+    private static class AggregatingFunction<A, R> implements PartialFunction<A, R> {
         private final Iterable<? extends PartialFunction<? super A, ? extends R>> functions;
 
         public AggregatingFunction(Iterable<? extends PartialFunction<? super A, ? extends R>> functions) {
