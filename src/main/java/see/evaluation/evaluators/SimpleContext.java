@@ -17,9 +17,7 @@
 package see.evaluation.evaluators;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ClassToInstanceMap;
-import com.google.common.collect.ImmutableClassToInstanceMap;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.*;
 import see.evaluation.Context;
 
 import java.util.Map;
@@ -64,10 +62,28 @@ public class SimpleContext implements Context {
         constants = ImmutableMap.<String, Object>builder().putAll(constants).put(name, constant).build();
     }
 
+    /**
+     * Create new context from mutable part
+     * @param mutablePart mutable map of variables
+     * @return created context
+     */
     public static SimpleContext fromMutable(Map<String, Object> mutablePart) {
         Map<String, Object> constants = ImmutableMap.of();
         ImmutableClassToInstanceMap<Object> services = ImmutableClassToInstanceMap.builder().build();
-        return new SimpleContext(mutablePart, constants, services);
 
+        return new SimpleContext(mutablePart, constants, services);
+    }
+
+    /**
+     * Returns copy of this context with updated services.
+     * @param newServices new services
+     * @return updated copy of this context
+     */
+    public SimpleContext withServices(ClassToInstanceMap<?> newServices) {
+        ClassToInstanceMap<Object> services = MutableClassToInstanceMap.create(Maps.newHashMap(service));
+
+        services.putAll(newServices);
+
+        return new SimpleContext(mutable, constants, services);
     }
 }
