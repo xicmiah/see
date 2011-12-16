@@ -1,15 +1,16 @@
 package see.functions.service;
 
-import see.functions.Function;
+import see.functions.VarArgFunction;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static see.functions.bool.BooleanCastHelper.toBoolean;
 
-public class If<T> implements Function<List<T>, T> {
+public class If<T> implements VarArgFunction<T, T> {
     @Override
-    public T apply(List<T> args) {
+    public T apply(@Nonnull List<T> args) {
         checkArgument(args.size() >= 1 || args.size() <= 3, "If takes one, two or three arguments");
 
         T condition = args.get(0);
