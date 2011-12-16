@@ -41,7 +41,7 @@ public class BindingTest {
 
         Map<String, Object> context = of("a", bean, "v", var);
         
-        see.eval("a.name <- v", context);
+        see.eval("a.name <- v()", context);
         assertEquals("crno", bean.getName());
 
         var.set("bka");
@@ -56,7 +56,7 @@ public class BindingTest {
 
         Map<String, Object> context = of("a", a, "b", b, "bean", bean);
 
-        see.eval("bean.value <- signal(a + b)", context);
+        see.eval("bean.value <- a() + b()", context);
         assertEquals("3.0", bean.getValue().toString());
         
         a.set(7);
@@ -73,7 +73,7 @@ public class BindingTest {
 
         Map<String, Object> context = Maps.newHashMap(of("a", a, "b", 2, "bean", bean));
 
-        see.eval("bean.value <- signal(a + b)", context);
+        see.eval("bean.value <- a() + b", context);
         assertEquals("9.0", bean.getValue().toString());
 
         context.put("b", 42);
@@ -89,7 +89,7 @@ public class BindingTest {
         TestBean bean = new TestBean();
 
         Map<String, Object> context = of("a", a, "bean", bean);
-        Node<Object> tree = see.parseExpressionList("b = a.now(); bean.value <- signal(b + 2);");
+        Node<Object> tree = see.parseExpressionList("b = a.now(); bean.value <- b + 2;");
         see.evaluate(tree, context);
 
         assertEquals("9.0", bean.getValue().toString());
@@ -104,7 +104,7 @@ public class BindingTest {
         TestBean bean = new TestBean();
 
         Map<String, Object> context = of("a", a, "bean", bean);
-        see.eval("bean.value <- a + 5", context); // No signal() function
+        see.eval("bean.value <- a() + 5", context); // No signal() function
 
         assertEquals("9.0", bean.getValue().toString());
         
@@ -118,7 +118,7 @@ public class BindingTest {
         VariableSignal<Boolean> b = reactiveFactory.var(false);
 
         Map<String, Object> context = ImmutableMap.<String, Object>of("a", a, "b", b);
-        Signal<Boolean> result = (Signal<Boolean>) see.eval("signal(a && b)", context); // b is not evaluated normally
+        Signal<Boolean> result = (Signal<Boolean>) see.eval("signal(a() && b())", context); // b is not evaluated normally
 
         assertFalse(result.now());
         
@@ -134,7 +134,7 @@ public class BindingTest {
         VariableSignal<String> a = reactiveFactory.var(null);
 
         Map<String, Object> context = ImmutableMap.<String, Object>of("a", a);
-        Signal<?> result = (Signal<?>) see.eval("signal(a == null)", context);
+        Signal<?> result = (Signal<?>) see.eval("signal(a() == null)", context);
         assertEquals(true, result.now());
         
         a.set("crn");
@@ -146,7 +146,7 @@ public class BindingTest {
         VariableSignal<String> s = reactiveFactory.var(null);
 
         Map<String, Object> context = ImmutableMap.<String, Object>of("s", s);
-        Signal<?> result = (Signal<?>) see.eval("signal(if(s != null, s.class, 'empty'))", context);
+        Signal<?> result = (Signal<?>) see.eval("signal(if(s() != null, s().class, 'empty'))", context);
 
         assertEquals("empty", result.now());
 

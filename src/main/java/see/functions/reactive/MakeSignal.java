@@ -21,10 +21,13 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.Sets;
 import see.evaluation.Context;
+import see.evaluation.ToFunction;
 import see.evaluation.ValueProcessor;
+import see.evaluation.evaluators.SimpleContext;
 import see.evaluation.visitors.EagerVisitor;
 import see.evaluation.visitors.LazyVisitor;
 import see.functions.ContextCurriedFunction;
+import see.functions.Function;
 import see.functions.VarArgFunction;
 import see.properties.ChainResolver;
 import see.reactive.Signal;
@@ -32,11 +35,11 @@ import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 
-import static see.evaluation.processors.AggregatingProcessor.concat;
+import static com.google.common.collect.ImmutableClassToInstanceMap.builder;
+import static see.evaluation.conversions.FunctionConversions.concat;
 
 /**
  * Signal creation. Expects second argument to be a tree.
@@ -69,22 +72,35 @@ public class MakeSignal implements ContextCurriedFunction<VarArgFunction<Object,
             }
 
             private Collection<Signal<?>> extractDependencies(Node<Object> tree) {
-                ClassToInstanceMap<Object> services = context.getServices();
-                ChainResolver resolver = services.getInstance(ChainResolver.class);
-                ValueProcessor processor = services.getInstance(ValueProcessor.class);
+                Collection<Signal<?>> dependencies = Sets.newHashSet();
 
-                SignalCapture signalCapture = new SignalCapture();
-                EagerVisitor eagerVisitor = new EagerVisitor(context, concat(signalCapture, processor), resolver);
-                tree.accept(eagerVisitor);
+                Context extractionContext = getPatchedContext(new SignalExtractor(dependencies));
+                tree.accept(new EagerVisitor(extractionContext, getProcessor(), getResolver()));
 
-                return signalCapture.dependencies;
+                return dependencies;
             }
 
             private LazyVisitor createVisitor() {
-                ClassToInstanceMap<Object> services = context.getServices();
-                ChainResolver resolver = services.getInstance(ChainResolver.class);
-                ValueProcessor processor = services.getInstance(ValueProcessor.class);
-                return new LazyVisitor(context, concat(new SignalExpand(), processor), resolver);
+                return new LazyVisitor(getPatchedContext(new SignalToFunction()), getProcessor(), getResolver());
+            }
+
+            private Context getPatchedContext(ToFunction signalFunction) {
+                SimpleContext simpleContext = (SimpleContext) context; // TODO: do proper copy here
+                ToFunction old = simpleContext.getServices().getInstance(ToFunction.class);
+
+                ClassToInstanceMap<Object> altServices = builder()
+                        .put(ToFunction.class, concat(signalFunction, old))
+                        .build();
+
+                return simpleContext.withServices(altServices);
+            }
+
+            private ValueProcessor getProcessor() {
+                return context.getServices().getInstance(ValueProcessor.class);
+            }
+
+            private ChainResolver getResolver() {
+                return context.getServices().getInstance(ChainResolver.class);
             }
         };
     }
@@ -94,35 +110,39 @@ public class MakeSignal implements ContextCurriedFunction<VarArgFunction<Object,
         return "signal";
     }
 
-    /**
-     * Processor, which expands signals to their current value.
-     */
-    private static final class SignalExpand implements ValueProcessor {
+    private static class SignalExtractor extends SignalToFunction {
+        private final Collection<? super Signal<?>> dependencies;
+
+        private SignalExtractor(Collection<? super Signal<?>> dependencies) {
+            this.dependencies = dependencies;
+        }
+
         @Override
-        public Object apply(@Nullable Object input) {
+        public boolean isDefinedAt(Object input) {
             if (input instanceof Signal<?>) {
-                Signal<?> signal = (Signal<?>) input;
-                return signal.now();
+                dependencies.add((Signal<?>) input);
             }
-            return input;
+
+            return super.isDefinedAt(input);
         }
     }
 
-    /**
-     * Processor, which expands signals to their current value, capturing dependencies.
-     */
-    private static final class SignalCapture implements ValueProcessor {
-        private final Collection<Signal<?>> dependencies = Sets.newHashSet();
-
+    private static class SignalToFunction implements ToFunction {
+        @Nonnull
         @Override
-        public Object apply(@Nullable Object input) {
-            if (input instanceof Signal<?>) {
-                Signal<?> signal = (Signal<?>) input;
-                dependencies.add(signal);
-                return signal.now();
-            }
-            return input;
+        public Function<List<Object>, ?> apply(@Nonnull Object input) {
+            final Signal<?> signal = (Signal<?>) input;
+            return new VarArgFunction<Object, Object>() {
+                @Override
+                public Object apply(@Nonnull List<Object> input) {
+                    return signal.now();
+                }
+            };
         }
 
+        @Override
+        public boolean isDefinedAt(Object input) {
+            return input instanceof Signal;
+        }
     }
 }
