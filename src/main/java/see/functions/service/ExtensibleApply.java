@@ -43,7 +43,7 @@ public class ExtensibleApply implements ContextCurriedFunction<VarArgFunction<Ob
             }
 
             private Function<List<Object>, ?> convertToFunction(Object f) {
-                final ToFunction toFunction = context.getService(ToFunction.class);
+                final ToFunction toFunction = context.getServices().getInstance(ToFunction.class);
 
                 if (!toFunction.isDefinedAt(f)) {
                     throw new IllegalArgumentException("Input is not convertible to function");

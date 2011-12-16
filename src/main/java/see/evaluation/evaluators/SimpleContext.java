@@ -56,8 +56,8 @@ public class SimpleContext implements Context {
     }
 
     @Override
-    public <T> T getService(Class<T> serviceClass) {
-        return service.getInstance(serviceClass);
+    public ClassToInstanceMap<Object> getServices() {
+        return service;
     }
 
     public void addConstant(String name, Object constant) {

@@ -18,6 +18,7 @@ package see.functions.reactive;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
+import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.Sets;
 import see.evaluation.Context;
 import see.evaluation.ValueProcessor;
@@ -54,7 +55,7 @@ public class MakeSignal implements ContextCurriedFunction<VarArgFunction<Object,
                 Collection<Signal<?>> dependencies = extractDependencies(tree);
 
                 final LazyVisitor lazyVisitor = createVisitor();
-                return context.getService(ReactiveFactory.class).bind(dependencies, new Supplier<Object>() {
+                return context.getServices().getInstance(ReactiveFactory.class).bind(dependencies, new Supplier<Object>() {
                     @Override
                     public Object get() {
                         return tree.accept(lazyVisitor);
@@ -68,8 +69,9 @@ public class MakeSignal implements ContextCurriedFunction<VarArgFunction<Object,
             }
 
             private Collection<Signal<?>> extractDependencies(Node<Object> tree) {
-                ChainResolver resolver = context.getService(ChainResolver.class);
-                ValueProcessor processor = context.getService(ValueProcessor.class);
+                ClassToInstanceMap<Object> services = context.getServices();
+                ChainResolver resolver = services.getInstance(ChainResolver.class);
+                ValueProcessor processor = services.getInstance(ValueProcessor.class);
 
                 SignalCapture signalCapture = new SignalCapture();
                 EagerVisitor eagerVisitor = new EagerVisitor(context, concat(signalCapture, processor), resolver);
@@ -79,8 +81,9 @@ public class MakeSignal implements ContextCurriedFunction<VarArgFunction<Object,
             }
 
             private LazyVisitor createVisitor() {
-                ChainResolver resolver = context.getService(ChainResolver.class);
-                ValueProcessor processor = context.getService(ValueProcessor.class);
+                ClassToInstanceMap<Object> services = context.getServices();
+                ChainResolver resolver = services.getInstance(ChainResolver.class);
+                ValueProcessor processor = services.getInstance(ValueProcessor.class);
                 return new LazyVisitor(context, concat(new SignalExpand(), processor), resolver);
             }
         };

@@ -16,6 +16,8 @@
 
 package see.evaluation;
 
+import com.google.common.collect.ClassToInstanceMap;
+
 import java.util.Map;
 
 public interface Context {
@@ -41,10 +43,8 @@ public interface Context {
     Map<String, ?> asMap();
 
     /**
-     * Get service a object (property resolver, etc.) by it's class
-     *
-     * @param serviceClass service class
-     * @return service instance, null if not present
+     * Get services present in this context
+     * @return context services
      */
-    <T> T getService(Class<T> serviceClass);
+    ClassToInstanceMap<Object> getServices();
 }

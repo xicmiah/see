@@ -42,7 +42,7 @@ public class Bind implements ContextCurriedFunction<VarArgFunction<Object, Signa
 
                 final Signal<?> signal = (Signal<?>) input.get(1);
 
-                context.getService(ReactiveFactory.class).bind(of(signal), new Supplier<Object>() {
+                context.getServices().getInstance(ReactiveFactory.class).bind(of(signal), new Supplier<Object>() {
                     @Override
                     public Object get() {
                         Object now = signal.now();
