@@ -2,6 +2,7 @@ package see.parser.grammar;
 
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
+import org.parboiled.annotations.DontLabel;
 import org.parboiled.annotations.SuppressNode;
 import see.tree.Node;
 
@@ -27,14 +28,6 @@ abstract class AbstractGrammar extends BaseParser<Node<Object>> {
     }
 
     /**
-     * Returns match() with removed trailing whitespace.
-     * @return matched input text
-     */
-    protected String matchTrim() {
-        return match().trim();
-    }
-
-    /**
      * Repeat expression with separator. Expression must match at least once.
      * Corresponds to (rule (separator rule)*)
      *
@@ -42,6 +35,7 @@ abstract class AbstractGrammar extends BaseParser<Node<Object>> {
      * @param separator separator between repeats of rule
      * @return resulting rule
      */
+    @DontLabel
     Rule rep1sep(Object rule, Object separator) {
         return Sequence(rule, ZeroOrMore(separator, rule));
     }
@@ -54,6 +48,7 @@ abstract class AbstractGrammar extends BaseParser<Node<Object>> {
      * @param separator separator between repeats of rule
      * @return resulting rule
      */
+    @DontLabel
     Rule repsep(Object rule, Object separator) {
         return Optional(rep1sep(rule, separator));
     }
@@ -63,6 +58,7 @@ abstract class AbstractGrammar extends BaseParser<Node<Object>> {
      * @param children child rules to match
      * @return constructed rule
      */
+    @DontLabel
     Rule T(Object... children) {
         return Sequence(Sequence(children), Whitespace());
     }
