@@ -19,6 +19,7 @@ package see.evaluation.visitors;
 import com.google.common.base.Function;
 import see.evaluation.Context;
 import see.evaluation.ValueProcessor;
+import see.exceptions.PropagatedException;
 import see.functions.Property;
 import see.parser.grammar.PropertyAccess;
 import see.parser.grammar.PropertyDescriptor;
@@ -43,14 +44,20 @@ public abstract class AbstractVisitor implements Visitor {
 
     @Override
     public <Arg, Result> Result visit(FunctionNode<Arg, Result> node) {
-        List<Arg> evaluatedArgs = evaluateArgs(node.getArguments());
+        try {
+            List<Arg> evaluatedArgs = evaluateArgs(node.getArguments());
 
-		// Note: evaluatedArgs are lazy
-        see.functions.Function<List<Arg>, Result> partial = node.getFunction().apply(context);
-        Result result = partial.apply(evaluatedArgs);
+            // Note: evaluatedArgs are lazy
+            see.functions.Function<List<Arg>, Result> partial = node.getFunction().apply(context);
+            Result result = partial.apply(evaluatedArgs);
 
-        return processValue(result);
-	}
+            return processValue(result);
+        } catch (PropagatedException e) {
+            throw new PropagatedException(node, e);
+        }  catch (Exception e) {
+            throw new PropagatedException(node, e);
+        }
+    }
 
     protected abstract <Arg> List<Arg> evaluateArgs(List<Node<Arg>> arguments);
 
@@ -79,21 +86,27 @@ public abstract class AbstractVisitor implements Visitor {
     @SuppressWarnings("unchecked")
     @Override
     public <T> T visit(PropertyNode<T> propertyNode) {
-        final Object target = propertyNode.getTarget().accept(this);
+        try {
+            final Object target = propertyNode.getTarget().accept(this);
 
-        final List<? extends PropertyAccess> evaluatedProps = evaluateProperties(propertyNode.getProperties());
+            final List<? extends PropertyAccess> evaluatedProps = evaluateProperties(propertyNode.getProperties());
 
-        return (T) new Property<Object>() {
-            @Override
-            public void set(Object value) {
-                resolver.set(target, evaluatedProps, value);
-            }
+            return (T) new Property<Object>() {
+                @Override
+                public void set(Object value) {
+                    resolver.set(target, evaluatedProps, value);
+                }
 
-            @Override
-            public Object get() {
-                return processValue(resolver.get(target, evaluatedProps));
-            }
-        };
+                @Override
+                public Object get() {
+                    return processValue(resolver.get(target, evaluatedProps));
+                }
+            };
+        } catch (PropagatedException e) {
+            throw new PropagatedException(propertyNode, e);
+        } catch (Exception e) {
+            throw new PropagatedException(propertyNode, e);
+        }
     }
 
     private List<? extends PropertyAccess> evaluateProperties(List<? extends PropertyDescriptor> initialProps) {

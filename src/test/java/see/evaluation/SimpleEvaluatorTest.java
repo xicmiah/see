@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import see.evaluation.evaluators.SimpleEvaluator;
 import see.exceptions.EvaluationException;
+import see.exceptions.PropagatedException;
 import see.functions.Function;
 import see.functions.PureFunction;
 import see.functions.VarArgFunction;
@@ -13,6 +14,10 @@ import see.tree.immutable.ImmutableFunctionNode;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class SimpleEvaluatorTest {
 
@@ -47,12 +52,17 @@ public class SimpleEvaluatorTest {
      * Test that subclasses of EvaluationException are not wrapped
      * @throws Exception
      */
-    @Test(expected = EpicFailException.class)
+    @Test
     public void testExceptionTranslation() throws Exception {
         PureFunction<Function<List<Object>, Object>> pureFail = new PureFunction<Function<List<Object>, Object>>(epicFail);
         Node<Object> tree = new ImmutableFunctionNode<Object, Object>(pureFail);
 
-        evaluator.evaluate(tree, ImmutableMap.<String, Object>of());
+        try {
+            evaluator.evaluate(tree, ImmutableMap.<String, Object>of());
+            fail("Exception expected");
+        } catch (PropagatedException e) {
+            assertThat(e.getLastCause(), instanceOf(EpicFailException.class));
+        }
     }
 
     private static class EpicFailException extends EvaluationException {

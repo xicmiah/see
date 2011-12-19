@@ -1,31 +1,16 @@
 package see.integration;
 
-import com.google.common.collect.ImmutableMap;
-import org.junit.Before;
 import org.junit.Test;
 import see.See;
-import see.functions.Function;
-import see.parser.config.ConfigBuilder;
+import see.exceptions.PropagatedException;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import static java.math.BigDecimal.valueOf;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class StringTest {
 
-    See see;
-
-    @Before
-    public void setUp() throws Exception {
-        see = new See(ConfigBuilder.defaultConfig().addPureFunction("fail", new Function<List<Object>, Boolean>() {
-            @Override
-            public Boolean apply(List<Object> input) {
-                throw new IllegalStateException("Fail evaluated");
-            }
-        }).build());
-    }
+    See see = new See();
 
     @Test
     public void testAppend() throws Exception {
@@ -36,12 +21,11 @@ public class StringTest {
     public void testArithmeticConcat() throws Exception {
         try {
             see.eval("\"4\"+5");
-        } catch (Exception e) {
-            if (!(e.getCause() instanceof ClassCastException)) {
-                throw e;
-            }
-            return;
+            throw new AssertionError("No exception is raised");
+        } catch (PropagatedException e) {
+            assertThat(e.getLastCause(), instanceOf(ClassCastException.class));
         }
-        throw new Exception("No exception is raised");
     }
+
+
 }
