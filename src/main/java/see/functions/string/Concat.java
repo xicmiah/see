@@ -1,14 +1,13 @@
 package see.functions.string;
 
-import see.functions.Function;
+import see.functions.VarArgFunction;
 
 import javax.annotation.Nonnull;
-import java.math.BigDecimal;
 import java.util.List;
 
-public class Concat implements Function<List<Comparable>, Comparable> {
+public class Concat implements VarArgFunction<Comparable, String> {
     @Override
-    public Comparable apply(@Nonnull List<Comparable> input) {
+    public String apply(@Nonnull List<Comparable> input) {
         StringBuilder sb = new StringBuilder();
         for (Comparable str : input) {
             String v = (String) str;
