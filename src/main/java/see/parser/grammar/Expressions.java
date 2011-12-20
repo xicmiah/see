@@ -258,7 +258,35 @@ class Expressions extends AbstractGrammar {
                 SpecialForm(),
                 FunctionDefinition(),
                 Variable(),
+                CollectionLiteral(),
                 Sequence(T("("), Expression(), T(")"))
+        );
+    }
+
+    Rule CollectionLiteral() {
+        return FirstOf(ListLiteral(), MapLiteral());
+    }
+
+    Rule ListLiteral() {
+        ListVar<Node<?>> items = new ListVar<Node<?>>();
+        return Sequence(
+                T("["), repsep(Sequence(Expression(), items.append(pop())), T(",")), T("]"),
+                push(makeFNode("[]", items.get()))
+                );
+    }
+
+    Rule MapLiteral() {
+        ListVar<Node<?>> entries = new ListVar<Node<?>>();
+        return Sequence(
+                T("{"), 
+                repsep(Sequence(
+                        T(Identifier(), push(constNode((Object) match()))), T(":"), RightExpression(),
+                        swap() && entries.append(pop()) && entries.append(pop())
+                ),
+                        T(",")
+                ),
+                T("}"),
+                push(makeFNode("{}", entries.get()))
         );
     }
 
