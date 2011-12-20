@@ -83,6 +83,7 @@ public class SimpleEvaluator implements Evaluator {
                 .put(NumberFactory.class, numberFactory)
                 .put(ChainResolver.class, chainResolver)
                 .put(ToFunction.class, new VarArgIdentity())
+                .put(Evaluator.class, this)
                 .build();
     }
 }

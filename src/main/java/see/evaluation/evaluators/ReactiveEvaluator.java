@@ -78,6 +78,7 @@ public class ReactiveEvaluator implements Evaluator {
                 .put(ValueProcessor.class, valueProcessor)
                 .put(ReactiveFactory.class, reactiveFactory)
                 .put(ToFunction.class, new VarArgIdentity())
+                .put(Evaluator.class, this)
                 .build();
     }
 }
