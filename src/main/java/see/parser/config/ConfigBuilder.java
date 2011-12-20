@@ -142,6 +142,7 @@ public class ConfigBuilder {
         builder.addAlias(";", "seq");
         builder.addAlias("=", "assign");
         builder.addAlias("v=", "vSet");
+        builder.addAlias("function", "def");
 
         builder.addFunction("seq", wrap(new Sequence<Object>()));
         builder.addPureFunction("assign", new Assign<Object>());
@@ -149,6 +150,7 @@ public class ConfigBuilder {
         builder.addFunction("isDefined", new IsDefined());
         builder.addPureFunction("if", new If<Object>());
         builder.addFunction("apply", new ExtensibleApply());
+        builder.addFunction("def", new MakeFunction());
     }
 
     public static ConfigBuilder emptyConfig() {

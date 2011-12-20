@@ -21,6 +21,7 @@ import see.tree.immutable.ImmutableVarNode;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.of;
+import static see.tree.immutable.ImmutableConstNode.constNode;
 import static see.tree.immutable.ImmutablePropertyNode.propertyNode;
 
 @SuppressWarnings({"InfiniteRecursion"})
@@ -255,8 +256,18 @@ class Expressions extends AbstractGrammar {
         return FirstOf(
                 Constant(),
                 SpecialForm(),
+                FunctionDefinition(),
                 Variable(),
                 Sequence(T("("), Expression(), T(")"))
+        );
+    }
+
+    Rule FunctionDefinition() {
+        ListVar<String> argNames = new ListVar<String>();
+        return Sequence(T("function"),
+                T("("), repsep(Sequence(Identifier(), argNames.append(match())), ArgumentSeparator()), T(")"),
+                T("{"), ExpressionList(), T("}"),
+                push(makeFNode("function", of(constNode(argNames.get()), constNode(pop()))))
         );
     }
 

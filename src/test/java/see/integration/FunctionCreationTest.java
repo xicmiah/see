@@ -20,18 +20,18 @@ import com.google.common.collect.Maps;
 import org.junit.Test;
 import see.See;
 import see.functions.VarArgFunction;
-import see.functions.service.MakeFunction;
 import see.tree.Node;
+
+import java.math.BigDecimal;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static see.parser.config.ConfigBuilder.defaultConfig;
 
 public class FunctionCreationTest {
-    See see = new See(defaultConfig().addFunction("def", new MakeFunction()).build());
+    See see = new See();
 
     @Test
     public void testReturnType() throws Exception {
@@ -44,6 +44,27 @@ public class FunctionCreationTest {
         Node<Object> tree = see.parseExpressionList("s = def(args, @tree a + b); s('crn', 'bka');");
 
         Object result = see.evaluate(tree, Maps.newHashMap(of("args", asList("a", "b"))));
-        assertEquals(result, "crn" + "bka");
+        assertEquals("crn" + "bka", result);
+    }
+
+    @Test
+    public void testFullForm() throws Exception {
+        Object f = see.eval("function(a, b) { a + b; }");
+        assertThat(f, instanceOf(VarArgFunction.class));
+    }
+
+    @Test
+    public void testFullFormDeclaration() throws Exception {
+        Node<Object> tree = see.parseExpressionList("s = function(a, b) { a + b; }; s('crn', 'bka');");
+        Object result = see.evaluate(tree);
+        assertEquals("crn" + "bka", result);
+    }
+
+    @Test
+    public void testRecursion() throws Exception {
+        Object f = see.eval("fact = function(n) { if(n <= 0, 1, n*fact(n - 1)); }");
+
+        Object result = see.eval("fact(5)", of("fact", f));
+        assertEquals(new BigDecimal(120), result);
     }
 }
