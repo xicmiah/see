@@ -330,7 +330,7 @@ class Expressions extends AbstractGrammar {
      * @return rule
      */
     Rule SpecialForm() {
-        return FirstOf(IsDefined(), MakeSignal());
+        return FirstOf(IsDefined(), MakeSignal(), Tree());
     }
 
     /**
@@ -340,6 +340,14 @@ class Expressions extends AbstractGrammar {
     Rule MakeSignal() {
         return Sequence(T("signal"), T("("), Expression(), T(")"),
                 push(makeSignalNode(pop())));
+    }
+
+    /**
+     * Special form for returning following expression as parsed tree.
+     * @return constructed rule
+     */
+    Rule Tree() {
+        return Sequence(T("@tree"), Expression(), push(ImmutableConstNode.<Object>constNode(pop())));
     }
 
     /**
