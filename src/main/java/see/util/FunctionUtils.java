@@ -16,11 +16,14 @@
 
 package see.util;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import see.functions.PartialFunction;
+import see.functions.VarArgFunction;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 
@@ -32,6 +35,32 @@ public abstract class FunctionUtils {
     }
     public static <A, R> PartialFunction<A, R> aggregate(PartialFunction<? super A, ? extends R>... functions) {
         return new AggregatingFunction<A, R>(asList(functions));
+    }
+
+    public static <A, R> VarArgFunction<A, R> toVarArg(final Function<? super List<A>, ? extends R> f) {
+        if (f instanceof VarArgFunction) {
+            return (VarArgFunction<A, R>) f;
+        } else {
+            return new VarArgFunction<A, R>() {
+                @Override
+                public R apply(@Nonnull List<A> input) {
+                    return f.apply(input);
+                }
+            };
+        }
+    }
+
+    public static <A, R> Function<List<A>, R> toFunction(final VarArgFunction<A, ? extends R> f) {
+        if (f instanceof Function) {
+            return (Function<List<A>, R>) f;
+        } else {
+            return new Function<List<A>, R>() {
+                @Override
+                public R apply(List<A> input) {
+                    return f.apply(input);
+                }
+            };
+        }
     }
 
     private static class IsDefinedPredicate<A, R> implements Predicate<PartialFunction<? super A, ? extends R>> {
