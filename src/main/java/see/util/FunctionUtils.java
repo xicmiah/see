@@ -30,37 +30,60 @@ import static java.util.Arrays.asList;
 public abstract class FunctionUtils {
     private FunctionUtils() {}
 
+    /**
+     * Return partial function, which delegates to first applicable function from supplied
+     * @param functions functions to aggregate
+     * @param <A> common argument supertype
+     * @param <R> common result supertype
+     * @return created aggregating function
+     */
     public static <A, R> PartialFunction<A, R> aggregate(final Iterable<? extends PartialFunction<? super A, ? extends R>> functions) {
         return new AggregatingFunction<A, R>(functions);
     }
+
+    /**
+     * Return partial function, which delegates to first applicable function from supplied
+     * @param functions functions to aggregate
+     * @param <A> common argument supertype
+     * @param <R> common result supertype
+     * @return created aggregating function
+     */
     public static <A, R> PartialFunction<A, R> aggregate(PartialFunction<? super A, ? extends R>... functions) {
         return new AggregatingFunction<A, R>(asList(functions));
     }
 
+    /**
+     * Convert guava {@link Function} to equivalent var arg function.
+     * @param f function to convert
+     * @param <A> argument type
+     * @param <R> result type
+     * @return converted function
+     */
     public static <A, R> VarArgFunction<A, R> toVarArg(final Function<? super List<A>, ? extends R> f) {
+        if (f instanceof VarArgToGuava) {
+            return ((VarArgToGuava) f).f; // Unwrap toFunction result
+        }
         if (f instanceof VarArgFunction) {
             return (VarArgFunction<A, R>) f;
-        } else {
-            return new VarArgFunction<A, R>() {
-                @Override
-                public R apply(@Nonnull List<A> input) {
-                    return f.apply(input);
-                }
-            };
         }
+        return new GuavaToVarArg<A, R>(f);
     }
 
+    /**
+     * Convert var arg function to equivalent guava function.
+     * @param f function to convert
+     * @param <A> argument type
+     * @param <R> result type
+     * @return converted function
+     */
     public static <A, R> Function<List<A>, R> toFunction(final VarArgFunction<A, ? extends R> f) {
+        if (f instanceof GuavaToVarArg) {
+            return ((GuavaToVarArg) f).f; // Unwrap toVarArg result
+        }
         if (f instanceof Function) {
             return (Function<List<A>, R>) f;
-        } else {
-            return new Function<List<A>, R>() {
-                @Override
-                public R apply(List<A> input) {
-                    return f.apply(input);
-                }
-            };
         }
+        return new VarArgToGuava<A, R>(f);
     }
 
     private static class IsDefinedPredicate<A, R> implements Predicate<PartialFunction<? super A, ? extends R>> {
@@ -91,6 +114,32 @@ public abstract class FunctionUtils {
         @Override
         public boolean isDefinedAt(final A input) {
             return Iterables.any(functions, new IsDefinedPredicate<A, R>(input));
+        }
+    }
+
+    private static class GuavaToVarArg<A, R> implements VarArgFunction<A, R> {
+        private final Function<? super List<A>, ? extends R> f;
+
+        public GuavaToVarArg(Function<? super List<A>, ? extends R> f) {
+            this.f = f;
+        }
+
+        @Override
+        public R apply(@Nonnull List<A> input) {
+            return f.apply(input);
+        }
+    }
+
+    private static class VarArgToGuava<A, R> implements Function<List<A>, R> {
+        private final VarArgFunction<A, ? extends R> f;
+
+        public VarArgToGuava(VarArgFunction<A, ? extends R> f) {
+            this.f = f;
+        }
+
+        @Override
+        public R apply(List<A> input) {
+            return f.apply(input);
         }
     }
 }
