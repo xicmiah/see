@@ -18,24 +18,15 @@ package see.integration;
 
 import org.junit.Test;
 import see.See;
-import see.functions.collections.MakeList;
-import see.functions.collections.MakeMap;
 
 import java.math.BigDecimal;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
-import static see.parser.config.ConfigBuilder.defaultConfig;
 
 public class CollectionsTest {
-    See see = new See(defaultConfig()
-            .addPureFunction("makeList", new MakeList())
-            .addAlias("[]", "makeList")
-            .addPureFunction("makeMap", new MakeMap())
-            .addAlias("{}", "makeMap")
-            .build()
-    );
+    See see = new See();
 
     @Test
     public void testLists() throws Exception {

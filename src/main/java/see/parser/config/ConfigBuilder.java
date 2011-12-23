@@ -10,6 +10,8 @@ import see.functions.arithmetic.*;
 import see.functions.bool.And;
 import see.functions.bool.Not;
 import see.functions.bool.Or;
+import see.functions.collections.MakeList;
+import see.functions.collections.MakeMap;
 import see.functions.common.Addition;
 import see.functions.compare.*;
 import see.functions.properties.GetProperty;
@@ -62,6 +64,7 @@ public class ConfigBuilder {
         builder.setNumberFactory(new BigDecimalFactory());
 
         addServiceFunctions(builder);
+        addCollections(builder);
         addLogic(builder);
         addArithmetic(builder);
         addCompare(builder);
@@ -71,6 +74,14 @@ public class ConfigBuilder {
         addCommon(builder);
         addString(builder);
         return builder;
+    }
+
+    private static void addCollections(ConfigBuilder builder) {
+        builder.addAlias("[]", "makeList");
+        builder.addAlias("{}", "makeMap");
+
+        builder.addPureFunction("makeList", new MakeList());
+        builder.addPureFunction("makeMap", new MakeMap());
     }
 
     private static void addBindings(final ConfigBuilder builder) {
