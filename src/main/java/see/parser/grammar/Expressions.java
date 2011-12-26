@@ -85,7 +85,7 @@ class Expressions extends AbstractGrammar {
      */
     Rule ForLoop() {
         return Sequence(
-                T("for"), T("("), VarName(), T(":"), Atom(), T(")"),
+                T("for"), T("("), VarName(), T(FirstOf(":", "in")), RightExpression(), T(")"),
                 Block(),
                 swap3() && push(makeFNode("for", of(pop(), pop(), pop())))
                 );

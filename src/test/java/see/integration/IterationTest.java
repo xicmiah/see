@@ -34,7 +34,7 @@ public class IterationTest {
     See see = new See();
 
     final List<?> testList = of(new StringBean("nine"), new StringBean("crno"), new StringBean("bka"));
-    final Map<String, ?> baseContext = ImmutableMap.of("list", testList);
+    final Map<String, ?> baseContext = ImmutableMap.of("list", testList, "map", ImmutableMap.of("list", testList));
     Map<String,?> context;
 
     @Before
@@ -48,6 +48,22 @@ public class IterationTest {
         see.evaluate(tree, context);
 
         assertEquals("11.0", context.get("a").toString());
+    }
+
+    @Test
+    public void testForLoopWithComplexExpressions() throws Exception {
+        Node<?> tree = see.parseExpressionList("a = 0; for(c : map.list) { a = a + 1; } a;");
+        Object result = see.evaluate(tree, context);
+
+        assertEquals(new BigDecimal(3.0), result);
+    }
+
+    @Test
+    public void testForLoopJavascriptSyntax() throws Exception {
+        Node<?> tree = see.parseExpressionList("a = 0; for(c in list) { a = a + 1; } a;");
+        Object result = see.evaluate(tree, context);
+        
+        assertEquals(new BigDecimal(3), result);
     }
 
     @Test
