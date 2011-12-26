@@ -41,6 +41,12 @@ public class CollectionsTest {
     }
 
     @Test
+    public void testExtendedMapKeys() throws Exception {
+        Object map = see.eval("{9: 'bka', 'cat': 'fine too', \"crn\": 'bka'}");
+        assertEquals(of("9", "bka", "cat", "fine too", "crn", "bka"), map);
+    }
+
+    @Test
     public void testMixed() throws Exception {
         Object mixed = see.eval("{list: ['omg', 'wtf', 'bbq'], " +
                 "map : {crn: 'bka', n: [9, 21*2, concat('100', '500')]}}"

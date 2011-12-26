@@ -279,15 +279,33 @@ class Expressions extends AbstractGrammar {
         ListVar<Node<?>> entries = new ListVar<Node<?>>();
         return Sequence(
                 T("{"), 
-                repsep(Sequence(
-                        T(Identifier(), push(constNode((Object) match()))), T(":"), RightExpression(),
-                        swap() && entries.append(pop()) && entries.append(pop())
-                ),
+                repsep(
+                        Sequence(KeyValuePair(), swap() && entries.append(pop()) && entries.append(pop())),
                         T(",")
                 ),
                 T("}"),
                 push(makeFNode("{}", entries.get()))
         );
+    }
+
+    /**
+     * Semicolon-separated key-value pair for use in JSON maps, pushes key and value
+     * @return constructed rule
+     */
+    Rule KeyValuePair() {
+        return Sequence(
+                FirstOf(
+                        T(JsonName(), push(constNode((Object) match()))),
+                        String()
+                ),
+                T(":"),
+                RightExpression()
+        );
+    }
+
+    @WhitespaceSafe
+    Rule JsonName() {
+        return OneOrMore(literals.LetterOrDigit());
     }
 
     Rule FunctionDefinition() {
