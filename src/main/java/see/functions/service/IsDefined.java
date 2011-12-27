@@ -19,7 +19,7 @@ public class IsDefined implements ContextCurriedFunction<VarArgFunction<String, 
 
                 String variable = strings.get(0);
                 
-                return context.getScope().get(variable) != null;
+                return context.getScope().contains(variable);
             }
         };
     }
