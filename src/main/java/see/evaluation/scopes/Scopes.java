@@ -16,6 +16,7 @@
 
 package see.evaluation.scopes;
 
+import com.google.common.collect.ImmutableMap;
 import see.evaluation.Scope;
 
 import java.util.Map;
@@ -25,6 +26,14 @@ import java.util.Map;
  */
 public abstract class Scopes {
     private Scopes() {}
+
+    /**
+     * Return empty immutable scope.
+     * @return empty, immutable scope.
+     */
+    public static Scope empty() {
+        return new ImmutableScope(ImmutableMap.<String, Object>of());
+    }
 
     /**
      * Create new immutable scope from supplied {@link Map}.
