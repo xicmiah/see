@@ -16,74 +16,33 @@
 
 package see.evaluation.evaluators;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import see.evaluation.Context;
-
-import java.util.Map;
-
-import static com.google.common.base.Optional.fromNullable;
+import see.evaluation.Scope;
 
 public class SimpleContext implements Context {
 
-    private final Map<String, Object> mutable;
-    private Map<String, ?> constants;
-    private final ClassToInstanceMap<Object> service;
+    private final Scope scope;
+    private final ClassToInstanceMap<Object> services;
 
-    public SimpleContext(Map<String, Object> mutable, Map<String, ?> constants, ClassToInstanceMap<Object> service) {
-        this.mutable = mutable;
-        this.constants = ImmutableMap.copyOf(constants);
-        this.service = ImmutableClassToInstanceMap.copyOf(service);
+    private SimpleContext(Scope scope, ClassToInstanceMap<Object> services) {
+        this.scope = scope;
+        this.services = ImmutableClassToInstanceMap.copyOf(services);
     }
 
-    @Override
-    public Object get(String key) {
-        return fromNullable(mutable.get(key)).or(fromNullable(constants.get(key))).orNull();
+    public static SimpleContext create(Scope scope, ClassToInstanceMap<Object> services) {
+        return new SimpleContext(scope, services);
     }
 
-    @Override
-    public void put(String key, Object value) {
-        Preconditions.checkArgument(!constants.containsKey(key), "Cannot reassign a constant");
-
-        mutable.put(key, value);
-    }
 
     @Override
-    public Map<String, ?> asMap() {
-        return ImmutableMap.<String, Object>builder().putAll(constants).putAll(mutable).build();
+    public Scope getScope() {
+        return scope;
     }
 
     @Override
     public ClassToInstanceMap<Object> getServices() {
-        return service;
-    }
-
-    public void addConstant(String name, Object constant) {
-        constants = ImmutableMap.<String, Object>builder().putAll(constants).put(name, constant).build();
-    }
-
-    /**
-     * Create new context from mutable part
-     * @param mutablePart mutable map of variables
-     * @return created context
-     */
-    public static SimpleContext fromMutable(Map<String, Object> mutablePart) {
-        Map<String, Object> constants = ImmutableMap.of();
-        ImmutableClassToInstanceMap<Object> services = ImmutableClassToInstanceMap.builder().build();
-
-        return new SimpleContext(mutablePart, constants, services);
-    }
-
-    /**
-     * Returns copy of this context with updated services.
-     * @param newServices new services
-     * @return updated copy of this context
-     */
-    public SimpleContext withServices(ClassToInstanceMap<?> newServices) {
-        ClassToInstanceMap<Object> services = MutableClassToInstanceMap.create(Maps.newHashMap(service));
-
-        services.putAll(newServices);
-
-        return new SimpleContext(mutable, constants, services);
+        return services;
     }
 }

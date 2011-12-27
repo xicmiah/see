@@ -73,7 +73,7 @@ public abstract class AbstractVisitor implements Visitor {
 	@Override
     @SuppressWarnings("unchecked")
     public <T> T visit(VarNode<T> node) {
-        Object value = context.get(node.getName());
+        Object value = context.getScope().get(node.getName());
 
         return (T) processValue(value);
 	}

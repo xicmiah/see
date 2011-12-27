@@ -2,26 +2,21 @@ package see.evaluation.evaluators;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ClassToInstanceMap;
-import com.google.common.collect.ImmutableMap;
-import see.evaluation.Context;
-import see.evaluation.Evaluator;
-import see.evaluation.ToFunction;
-import see.evaluation.ValueProcessor;
+import see.evaluation.*;
 import see.evaluation.conversions.VarArgIdentity;
 import see.evaluation.processors.NumberLifter;
 import see.evaluation.visitors.LazyVisitor;
 import see.exceptions.EvaluationException;
-import see.functions.Function;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
 import see.properties.ChainResolver;
 import see.tree.Node;
 
-import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableClassToInstanceMap.builder;
+import static see.evaluation.scopes.Scopes.*;
 
 public class SimpleEvaluator implements Evaluator {
 
@@ -44,17 +39,17 @@ public class SimpleEvaluator implements Evaluator {
      * Subclasses of [@link EvaluationException] are passed as-is, others are wrapped in [@link EvaluationException].
      * 
      * @param tree tree to evaluate
-     * @param context evaluation context
+     * @param initial evaluation context
      * @param <T> return type
      * @return evaluation result
      * @throws EvaluationException on error during evaluation
      */
     @Override
-    public <T> T evaluate(Node<T> tree, final Map<String, ?> context) throws EvaluationException {
+    public <T> T evaluate(Node<T> tree, final Map<String, ?> initial) throws EvaluationException {
         try {
             ValueProcessor numberLifter = new NumberLifter(Suppliers.ofInstance(numberFactory));
 
-            Context extendedContext = getExtendedContext((Map<String, Object>) context);
+            Context extendedContext = createContext(initial);
             
             return tree.accept(new LazyVisitor(extendedContext, numberLifter, chainResolver));
         } catch (EvaluationException e) {
@@ -64,18 +59,12 @@ public class SimpleEvaluator implements Evaluator {
         }
     }
 
-    private Context getExtendedContext(Map<String, Object> initial) {
-        ClassToInstanceMap<Object> services = createServices();
+    private Context createContext(Map<String, ?> initial) {
+        return SimpleContext.create(createScope(initial), createServices());
+    }
 
-        ImmutableMap<String, Object> empty = ImmutableMap.of();
-        SimpleContext context = new SimpleContext(initial, empty, services);
-
-        Map<String, Function<List<Object>, Object>> boundFunctions = functionResolver.getBoundFunctions(context);
-        for (Map.Entry<String, Function<List<Object>, Object>> entry : boundFunctions.entrySet()) {
-            context.addConstant(entry.getKey(), entry.getValue());
-        }
-
-        return context;
+    private Scope createScope(Map<String, ?> initial) {
+        return defCapture(mutableOverride(fromMap(functionResolver.getFunctions()), initial));
     }
 
     private ClassToInstanceMap<Object> createServices() {

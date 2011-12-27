@@ -85,14 +85,13 @@ public class MakeSignal implements ContextCurriedFunction<VarArgFunction<Object,
             }
 
             private Context getPatchedContext(ToFunction signalFunction) {
-                SimpleContext simpleContext = (SimpleContext) context; // TODO: do proper copy here
-                ToFunction old = simpleContext.getServices().getInstance(ToFunction.class);
+                ToFunction old = context.getServices().getInstance(ToFunction.class);
 
                 ClassToInstanceMap<Object> altServices = builder()
                         .put(ToFunction.class, concat(signalFunction, old))
                         .build();
 
-                return simpleContext.withServices(altServices);
+                return SimpleContext.create(context.getScope(), altServices);
             }
 
             private ValueProcessor getProcessor() {

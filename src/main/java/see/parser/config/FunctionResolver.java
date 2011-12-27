@@ -50,4 +50,7 @@ public class FunctionResolver {
         return bound;
     }
 
+    public Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> getFunctions() {
+        return functions;
+    }
 }

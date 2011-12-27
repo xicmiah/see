@@ -17,15 +17,13 @@
 package see.evaluation.evaluators;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import see.evaluation.Evaluator;
+import see.evaluation.Scope;
 import see.evaluation.ToFunction;
 import see.evaluation.ValueProcessor;
 import see.evaluation.conversions.VarArgIdentity;
 import see.evaluation.visitors.LazyVisitor;
 import see.exceptions.EvaluationException;
-import see.functions.Function;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
@@ -33,8 +31,9 @@ import see.properties.ChainResolver;
 import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
 
-import java.util.List;
 import java.util.Map;
+
+import static see.evaluation.scopes.Scopes.*;
 
 public class ReactiveEvaluator implements Evaluator {
 
@@ -58,17 +57,13 @@ public class ReactiveEvaluator implements Evaluator {
 
     @Override
     public <T> T evaluate(Node<T> tree, Map<String, ?> initial) throws EvaluationException {
-        Map<String, Object> mutable = Maps.newHashMap(initial);
-        Map<String, ?> constants = ImmutableMap.of();
-
-        SimpleContext context = new SimpleContext(mutable, constants, createServices());
-
-        Map<String, Function<List<Object>, Object>> boundFunctions = functionResolver.getBoundFunctions(context);
-        for (Map.Entry<String, Function<List<Object>, Object>> entry : boundFunctions.entrySet()) {
-            context.addConstant(entry.getKey(), entry.getValue());
-        }
+        SimpleContext context = SimpleContext.create(createScope(initial), createServices());
 
         return tree.accept(new LazyVisitor(context, valueProcessor, resolver));
+    }
+
+    private Scope createScope(Map<String, ?> initial) {
+        return defCapture(mutableOverride(fromMap(functionResolver.getFunctions()), initial));
     }
 
     private ImmutableClassToInstanceMap<Object> createServices() {

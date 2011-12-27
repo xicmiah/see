@@ -48,7 +48,7 @@ public class Iterate implements ContextCurriedFunction<VarArgFunction<Object, Ob
 
                 Object lastValue = null;
                 for (Object item : list) {
-                    context.put(varName, item);
+                    context.getScope().put(varName, item);
                     lastValue = input.get(2); // **WILL** re-evaluate argument
                 }
                 

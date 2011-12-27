@@ -40,7 +40,7 @@ public class VarAsSettable implements ContextCurriedFunction<VarArgFunction<Stri
                 return new Settable<Object>() {
                     @Override
                     public void set(Object value) {
-                        context.put(varName, value);
+                        context.getScope().put(varName, value);
                     }
                 };
             }

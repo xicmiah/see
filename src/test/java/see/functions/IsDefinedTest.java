@@ -1,8 +1,11 @@
 package see.functions;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.MutableClassToInstanceMap;
 import org.junit.Test;
 import see.evaluation.Context;
+import see.evaluation.evaluators.SimpleContext;
+import see.evaluation.scopes.Scopes;
 import see.functions.service.IsDefined;
 
 import java.util.HashMap;
@@ -12,7 +15,6 @@ import java.util.Map;
 import static com.google.common.collect.ImmutableList.of;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static see.evaluation.evaluators.SimpleContext.fromMutable;
 
 public class IsDefinedTest {
     private IsDefined isDefined = new IsDefined();
@@ -34,6 +36,10 @@ public class IsDefinedTest {
         assertFalse(partial.apply(of("c")));
         context.put("c", 9);
         assertTrue(partial.apply(of("c")));
+    }
+
+    private Context fromMutable(Map<String, ?> contents) {
+        return SimpleContext.create(Scopes.fromMap(contents), MutableClassToInstanceMap.create());
     }
 
 }

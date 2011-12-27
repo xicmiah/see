@@ -18,29 +18,13 @@ package see.evaluation;
 
 import com.google.common.collect.ClassToInstanceMap;
 
-import java.util.Map;
-
 public interface Context {
 
     /**
-     * Get value associated with given key
-     * @param key name of variable or constant
-     * @return variable value, null if absent
+     * Get variables present in this context
+     * @return variables
      */
-    Object get(String key);
-
-    /**
-     * Set variable to given value
-     * @param key variable
-     * @param value new value
-     */
-    void put(String key, Object value);
-
-    /**
-     * Get immutable view of all variables in context
-     * @return immutable view
-     */
-    Map<String, ?> asMap();
+    Scope getScope();
 
     /**
      * Get services present in this context

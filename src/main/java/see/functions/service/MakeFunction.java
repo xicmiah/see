@@ -83,7 +83,8 @@ public class MakeFunction implements ContextCurriedFunction<VarArgFunction<Objec
             }
 
             private Map<String, ?> createPatchedContext(List<Object> args) {
-                Map<String,Object> patchedContext = Maps.newHashMap(context.asMap());
+                //TODO: replace with proper local context
+                Map<String,Object> patchedContext = Maps.newHashMap(context.getScope().asMap());
 
                 Iterator<Object> objects = args.iterator();
                 for (String argName : argNames) {
