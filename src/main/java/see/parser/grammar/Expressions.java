@@ -7,7 +7,6 @@ import org.parboiled.annotations.SuppressSubnodes;
 import org.parboiled.errors.ParsingException;
 import org.parboiled.support.Var;
 import see.functions.ContextCurriedFunction;
-import see.functions.Function;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
@@ -366,7 +365,7 @@ class Expressions extends AbstractGrammar {
      * @return constructed node
      */
     FunctionNode<Object, Object> makeFNode(String name, List<? extends Node<?>> args) {
-        ContextCurriedFunction<Function<List<Object>,Object>> function = functions.get(name);
+        ContextCurriedFunction<Object, Object> function = functions.get(name);
         if (function == null) {
             throw new ParsingException("Function not found: " + name);
         }

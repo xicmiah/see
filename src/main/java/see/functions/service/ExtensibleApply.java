@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Function application, which tries to convert input to function via {@link ToFunction}, obtained from context.
  */
-public class ExtensibleApply implements ContextCurriedFunction<VarArgFunction<Object, Object>> {
+public class ExtensibleApply implements ContextCurriedFunction<Object, Object> {
     @Override
     public VarArgFunction<Object, Object> apply(@Nonnull final Context context) {
         return new VarArgFunction<Object, Object>() {

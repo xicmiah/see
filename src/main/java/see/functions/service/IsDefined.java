@@ -9,7 +9,7 @@ import see.functions.VarArgFunction;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class IsDefined implements ContextCurriedFunction<VarArgFunction<String, Boolean>> {
+public class IsDefined implements ContextCurriedFunction<String, Boolean> {
     @Override
     public VarArgFunction<String, Boolean> apply(@Nonnull final Context context) {
         return new VarArgFunction<String, Boolean>() {

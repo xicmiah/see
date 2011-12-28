@@ -30,7 +30,7 @@ import java.util.List;
 
 import static com.google.common.collect.ImmutableList.of;
 
-public class Bind implements ContextCurriedFunction<VarArgFunction<Object, Signal<?>>> {
+public class Bind implements ContextCurriedFunction<Object, Signal<?>> {
     @Override
     public VarArgFunction<Object, Signal<?>> apply(@Nonnull final Context context) {
         return new VarArgFunction<Object, Signal<?>>() {

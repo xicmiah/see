@@ -33,7 +33,7 @@ import java.util.Map;
  * Function creation. Takes list of argument names and tree, returns function,
  * which takes same number of arguments and evaluates tree against context with these arguments.
  */
-public class MakeFunction implements ContextCurriedFunction<VarArgFunction<Object, VarArgFunction<Object, Object>>> {
+public class MakeFunction implements ContextCurriedFunction<Object, VarArgFunction<Object, Object>> {
     @Override
     public VarArgFunction<Object, VarArgFunction<Object, Object>> apply(@Nonnull final Context context) {
         return new ContextClosure(context);

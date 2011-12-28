@@ -4,9 +4,10 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 import see.See;
-import see.functions.Function;
+import see.functions.VarArgFunction;
 import see.parser.config.ConfigBuilder;
 
+import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -22,9 +23,9 @@ public class ArithmeticTest {
 
     @Before
     public void setUp() throws Exception {
-        see = new See(ConfigBuilder.defaultConfig().addPureFunction("fail", new Function<List<Object>, Boolean>() {
+        see = new See(ConfigBuilder.defaultConfig().addPureFunction("fail", new VarArgFunction<Object, Void>() {
             @Override
-            public Boolean apply(List<Object> input) {
+            public Void apply(@Nonnull List<Object> input) {
                 throw new IllegalStateException("Fail evaluated");
             }
         }).build());

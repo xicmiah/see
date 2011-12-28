@@ -4,8 +4,8 @@ import com.google.common.base.Supplier;
 import see.evaluation.ValueProcessor;
 import see.evaluation.processors.NumberLifter;
 import see.functions.ContextCurriedFunction;
-import see.functions.Function;
 import see.functions.PureFunction;
+import see.functions.VarArgFunction;
 import see.functions.arithmetic.*;
 import see.functions.bool.And;
 import see.functions.bool.Not;
@@ -41,7 +41,7 @@ import static see.properties.PropertyResolvers.universalResolver;
 
 public class ConfigBuilder {
     private Map<String, String> aliases;
-    private Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions;
+    private Map<String, ContextCurriedFunction<Object, Object>> functions;
     
     private List<? extends ValueProcessor> valueProcessors = of(new NumberLifter(new Supplier<NumberFactory>() {
         @Override
@@ -54,7 +54,7 @@ public class ConfigBuilder {
     private ChainResolver propertyResolver = new SingularChainResolver(aggregate(of(new MethodResolver(), universalResolver(new PropertyUtilsResolver()))));
 
     private ConfigBuilder(Map<String, String> aliases,
-                          Map<String, ContextCurriedFunction<Function<List<Object>, Object>>> functions) {
+                          Map<String, ContextCurriedFunction<Object, Object>> functions) {
         this.aliases = aliases;
         this.functions = functions;
     }
@@ -167,7 +167,7 @@ public class ConfigBuilder {
     public static ConfigBuilder emptyConfig() {
         return new ConfigBuilder(
                 new HashMap<String, String>(),
-                new HashMap<String, ContextCurriedFunction<Function<List<Object>, Object>>>()
+                new HashMap<String, ContextCurriedFunction<Object, Object>>()
         );
     }
 
@@ -186,7 +186,7 @@ public class ConfigBuilder {
      * @param <R>      function result type
      * @return this instance
      */
-    public <T, R> ConfigBuilder addFunction(String name, ContextCurriedFunction<? extends Function<List<T>, R>> function) {
+    public <T, R> ConfigBuilder addFunction(String name, ContextCurriedFunction<T, R> function) {
         functions.put(name, wrap(function));
         return this;
     }
@@ -196,11 +196,11 @@ public class ConfigBuilder {
      *
      * @param name     function name
      * @param function function to add
-     * @param <T>      function argument type
+     * @param <A>      function argument type
      * @param <R>      function result type
      * @return this instance
      */
-    public <T, R> ConfigBuilder addPureFunction(String name, Function<List<T>, R> function) {
+    public <A, R> ConfigBuilder addPureFunction(String name, VarArgFunction<A, R> function) {
         functions.put(name, wrap(function));
         return this;
     }
@@ -257,13 +257,13 @@ public class ConfigBuilder {
      * @return wrapped function
      */
     @SuppressWarnings("unchecked")
-    private static <Arg, Result> ContextCurriedFunction<Function<List<Object>, Object>> wrap(final ContextCurriedFunction<? extends Function<List<Arg>, Result>> function) {
+    private static <Arg, Result> ContextCurriedFunction<Object, Object> wrap(final ContextCurriedFunction<Arg, Result> function) {
         // Intentional raw type usage
         return (ContextCurriedFunction) function;
     }
 
     @SuppressWarnings("unchecked")
-    private static <Arg, Result> ContextCurriedFunction<Function<List<Object>, Object>> wrap(final Function<List<Arg>, Result> function) {
+    private static <Arg, Result> ContextCurriedFunction<Object, Object> wrap(final VarArgFunction<Arg, Result> function) {
         // Intentional raw type usage
         return new PureFunction(function);
     }

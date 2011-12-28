@@ -11,11 +11,12 @@ import javax.annotation.Nonnull;
  * and return a function which accepts rest of arguments and returns result.
  *
  * TL;DR Context => [Args] => result
- * 
- * @param <F> curried remainder
+ *
  * @see PureFunction
+ * @param <Arg> common argument supertype
+ * @param <Result> result type
  */
-public interface ContextCurriedFunction<F extends Function<?, ?>> extends Function<Context, F> {
+public interface ContextCurriedFunction<Arg, Result> extends Function<Context, VarArgFunction<Arg, Result>> {
     @Override
-    F apply(@Nonnull final Context context);
+    VarArgFunction<Arg, Result> apply(@Nonnull final Context context);
 }

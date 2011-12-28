@@ -6,8 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 import see.evaluation.evaluators.SimpleEvaluator;
 import see.functions.ContextCurriedFunction;
-import see.functions.Function;
 import see.functions.PureFunction;
+import see.functions.VarArgFunction;
 import see.parser.config.ConfigBuilder;
 import see.parser.numbers.IntegerFactory;
 import see.tree.Node;
@@ -24,15 +24,15 @@ import static org.junit.Assert.assertEquals;
 
 public class LazyVisitorTest {
 
-    ContextCurriedFunction<Function<List<Integer>, Integer>> plus;
-    ContextCurriedFunction<Function<List<Integer>, Integer>> fail;
-    ContextCurriedFunction<Function<List<Integer>, Integer>> cond;
+    ContextCurriedFunction<Integer, Integer> plus;
+    ContextCurriedFunction<Integer, Integer> fail;
+    ContextCurriedFunction<Integer, Integer> cond;
 
     Evaluator evaluator;
 
     @Before
     public void setUp() throws Exception {
-        plus = new PureFunction<Function<List<Integer>, Integer>>(new Function<List<Integer>, Integer>() {
+        plus = PureFunction.wrap(new VarArgFunction<Integer, Integer>() {
             @Override
             public Integer apply(@Nonnull List<Integer> input) {
                 int result = 0;
@@ -42,13 +42,13 @@ public class LazyVisitorTest {
                 return result;
             }
         });
-        fail = new PureFunction<Function<List<Integer>, Integer>>(new Function<List<Integer>, Integer>() {
+        fail = PureFunction.wrap(new VarArgFunction<Integer, Integer>() {
             @Override
             public Integer apply(@Nonnull List<Integer> input) {
                 throw new UnsupportedOperationException("Fail");
             }
         });
-        cond = new PureFunction<Function<List<Integer>, Integer>>(new Function<List<Integer>, Integer>() {
+        cond = PureFunction.wrap(new VarArgFunction<Integer, Integer>() {
             @Override
             public Integer apply(@Nonnull List<Integer> input) {
                 if (input.get(0) != 0) {

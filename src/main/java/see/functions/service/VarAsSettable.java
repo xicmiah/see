@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Exposes variable assignment as {@link Settable} interface.
  */
-public class VarAsSettable implements ContextCurriedFunction<VarArgFunction<String, Settable<Object>>> {
+public class VarAsSettable implements ContextCurriedFunction<String, Settable<Object>> {
     @Override
     public VarArgFunction<String, Settable<Object>> apply(@Nonnull final Context context) {
         return new VarArgFunction<String, Settable<Object>>() {

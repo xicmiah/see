@@ -35,7 +35,7 @@ import java.util.List;
  * This implementation assumes that evaluator doesn't cache evaluation results,
  * i.e. each time get(int) is called on arguments, corresponding sub-tree is evaluated.
  */
-public class Iterate implements ContextCurriedFunction<VarArgFunction<Object, Object>> {
+public class Iterate implements ContextCurriedFunction<Object, Object> {
     @Override
     public VarArgFunction<Object, Object> apply(@Nonnull final Context context) {
         return new VarArgFunction<Object, Object>() {

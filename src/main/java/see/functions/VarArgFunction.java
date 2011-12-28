@@ -1,5 +1,6 @@
 package see.functions;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -8,4 +9,6 @@ import java.util.List;
  * @param <Result> result type
  */
 public interface VarArgFunction<Arg, Result> extends Function<List<Arg>, Result> {
+    @Override
+    Result apply(@Nonnull List<Arg> args);
 }

@@ -45,7 +45,7 @@ import static see.evaluation.conversions.FunctionConversions.concat;
  * Signal creation. Expects second argument to be a tree.
  * Creates a signal bound to signals present in tree.
  */
-public class MakeSignal implements ContextCurriedFunction<VarArgFunction<Object, Signal<?>>> {
+public class MakeSignal implements ContextCurriedFunction<Object, Signal<?>> {
     @Override
     public VarArgFunction<Object, Signal<?>> apply(@Nonnull final Context context) {
         return new VarArgFunction<Object, Signal<?>>() {
