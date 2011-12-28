@@ -17,12 +17,8 @@
 package see.evaluation.evaluators;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
-import see.evaluation.Evaluator;
-import see.evaluation.Scope;
-import see.evaluation.ToFunction;
-import see.evaluation.ValueProcessor;
+import see.evaluation.*;
 import see.evaluation.conversions.BuiltinConversions;
-import see.evaluation.visitors.LazyVisitor;
 import see.exceptions.EvaluationException;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
@@ -57,9 +53,15 @@ public class ReactiveEvaluator implements Evaluator {
 
     @Override
     public <T> T evaluate(Node<T> tree, Map<String, ?> initial) throws EvaluationException {
-        SimpleContext context = SimpleContext.create(createScope(initial), createServices());
+        try {
+            Context context = SimpleContext.create(createScope(initial), createServices());
 
-        return tree.accept(new LazyVisitor(context, valueProcessor, resolver));
+            return new LazyContextEvaluator().evaluate(tree, context);
+        } catch (EvaluationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new EvaluationException(e);
+        }
     }
 
     private Scope createScope(Map<String, ?> initial) {

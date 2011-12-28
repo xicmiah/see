@@ -47,7 +47,10 @@ public class SimpleContext implements Context {
         return create(variables, context.getServices());
     }
 
-    public static <T> SimpleContext addService(Context context, Class<T> serviceClass, T service) {
+    public static <T> Context addService(Context context, Class<T> serviceClass, T service) {
+        if (service == context.getServices().getInstance(serviceClass))
+            return context; // Return context, if it contains same instance
+
         return withServices(context, ImmutableClassToInstanceMap.builder()
                 .putAll(filterKeys(context.getServices(), not(Predicates.<Object>equalTo(serviceClass))))
                 .put(serviceClass, service)

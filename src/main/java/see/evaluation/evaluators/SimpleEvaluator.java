@@ -1,11 +1,8 @@
 package see.evaluation.evaluators;
 
-import com.google.common.base.Suppliers;
 import com.google.common.collect.ClassToInstanceMap;
 import see.evaluation.*;
 import see.evaluation.conversions.BuiltinConversions;
-import see.evaluation.processors.NumberLifter;
-import see.evaluation.visitors.LazyVisitor;
 import see.exceptions.EvaluationException;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
@@ -23,15 +20,22 @@ public class SimpleEvaluator implements Evaluator {
     private final NumberFactory numberFactory;
     private final FunctionResolver functionResolver;
     private final ChainResolver chainResolver;
+    private final ValueProcessor valueProcessor;
 
-    public SimpleEvaluator(NumberFactory numberFactory, FunctionResolver functionResolver, ChainResolver chainResolver) {
+    public SimpleEvaluator(NumberFactory numberFactory, FunctionResolver functionResolver, ChainResolver chainResolver, ValueProcessor valueProcessor) {
         this.numberFactory = numberFactory;
         this.functionResolver = functionResolver;
         this.chainResolver = chainResolver;
+        this.valueProcessor = valueProcessor;
     }
 
     public static SimpleEvaluator fromConfig(GrammarConfiguration config) {
-        return new SimpleEvaluator(config.getNumberFactory(), config.getFunctions(), config.getChainResolver());
+        return new SimpleEvaluator(
+                config.getNumberFactory(),
+                config.getFunctions(),
+                config.getChainResolver(),
+                config.getValueProcessor()
+        );
     }
 
     /**
@@ -47,20 +51,14 @@ public class SimpleEvaluator implements Evaluator {
     @Override
     public <T> T evaluate(Node<T> tree, final Map<String, ?> initial) throws EvaluationException {
         try {
-            ValueProcessor numberLifter = new NumberLifter(Suppliers.ofInstance(numberFactory));
+            Context context = SimpleContext.create(createScope(initial), createServices());
 
-            Context extendedContext = createContext(initial);
-            
-            return tree.accept(new LazyVisitor(extendedContext, numberLifter, chainResolver));
+            return new LazyContextEvaluator().evaluate(tree, context);
         } catch (EvaluationException e) {
             throw e;
         } catch (Exception e) {
             throw new EvaluationException(e);
         }
-    }
-
-    private Context createContext(Map<String, ?> initial) {
-        return SimpleContext.create(createScope(initial), createServices());
     }
 
     private Scope createScope(Map<String, ?> initial) {
@@ -71,6 +69,7 @@ public class SimpleEvaluator implements Evaluator {
         return builder()
                 .put(NumberFactory.class, numberFactory)
                 .put(ChainResolver.class, chainResolver)
+                .put(ValueProcessor.class, valueProcessor)
                 .put(ToFunction.class, BuiltinConversions.all())
                 .put(Evaluator.class, this)
                 .build();
