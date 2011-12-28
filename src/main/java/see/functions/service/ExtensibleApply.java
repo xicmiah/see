@@ -46,7 +46,7 @@ public class ExtensibleApply implements ContextCurriedFunction<VarArgFunction<Ob
                 final ToFunction toFunction = context.getServices().getInstance(ToFunction.class);
 
                 if (!toFunction.isDefinedAt(f)) {
-                    throw new IllegalArgumentException("Input is not convertible to function");
+                    throw new IllegalArgumentException("Cannot convert to function " + f);
                 }
 
                 return toFunction.apply(f);
