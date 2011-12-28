@@ -18,6 +18,8 @@ package see.evaluation.conversions;
 
 import see.evaluation.ToFunction;
 import see.functions.ContextCurriedFunction;
+import see.functions.PureFunction;
+import see.functions.VarArgFunction;
 
 import javax.annotation.Nonnull;
 
@@ -46,6 +48,20 @@ public abstract class BuiltinConversions {
         @Override
         public boolean isDefinedAt(Object input) {
             return input instanceof ContextCurriedFunction<?, ?>;
+        }
+    }
+
+    private static class VarArgIdentity implements ToFunction {
+        @Nonnull
+        @Override
+        public ContextCurriedFunction<Object, ?> apply(@Nonnull Object input) {
+            VarArgFunction<Object, ?> vaf = (VarArgFunction<Object, ?>) input;
+            return PureFunction.wrap(vaf);
+        }
+
+        @Override
+        public boolean isDefinedAt(Object input) {
+            return input instanceof VarArgFunction<?, ?>;
         }
     }
 }
