@@ -1,14 +1,15 @@
 package see.functions.compare;
 
-import see.functions.Function;
+import see.functions.VarArgFunction;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class Geq implements Function<List<Comparable>, Boolean> {
+public class Geq implements VarArgFunction<Comparable, Boolean> {
     @Override
-    public Boolean apply(List<Comparable> input) {
+    public Boolean apply(@Nonnull List<Comparable> input) {
         checkArgument(input.size() == 2, "Geq takes only two arguments");
 
         boolean value = input.get(0).compareTo(input.get(1)) >= 0;

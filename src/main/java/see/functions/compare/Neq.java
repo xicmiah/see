@@ -1,12 +1,12 @@
 package see.functions.compare;
 
-import see.functions.Function;
+import see.functions.VarArgFunction;
 
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class Neq implements Function<List<Object>, Boolean> {
+public class Neq implements VarArgFunction<Object, Boolean> {
     private final Eq eq = new Eq();
 
     @Override

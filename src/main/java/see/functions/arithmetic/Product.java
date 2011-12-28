@@ -1,13 +1,14 @@
 package see.functions.arithmetic;
 
-import see.functions.Function;
+import see.functions.VarArgFunction;
 
+import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class Product implements Function<List<BigDecimal>, BigDecimal> {
+public class Product implements VarArgFunction<BigDecimal, BigDecimal> {
     @Override
-    public BigDecimal apply(List<BigDecimal> input) {
+    public BigDecimal apply(@Nonnull List<BigDecimal> input) {
         BigDecimal result = BigDecimal.ONE;
 
         for (BigDecimal value : input) {

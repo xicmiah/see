@@ -1,7 +1,7 @@
 package see.functions.arithmetic;
 
 import com.google.common.base.Supplier;
-import see.functions.Function;
+import see.functions.VarArgFunction;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -12,7 +12,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * Divide function for BigDecimals.
  */
-public class Divide implements Function<List<BigDecimal>, BigDecimal> {
+public class Divide implements VarArgFunction<BigDecimal, BigDecimal> {
 
     private final Supplier<MathContext> mathContext;
 

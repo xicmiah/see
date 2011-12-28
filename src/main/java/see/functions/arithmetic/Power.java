@@ -1,7 +1,8 @@
 package see.functions.arithmetic;
 
-import see.functions.Function;
+import see.functions.VarArgFunction;
 
+import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -11,9 +12,9 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Power function. Returns first argument raised to the power of the second argument.
  * Special case: if base is less than zero and exponent is fractional, apply throws IllegalArgumentException.
  */
-public class Power implements Function<List<BigDecimal>, Number> {
+public class Power implements VarArgFunction<BigDecimal, Number> {
     @Override
-    public Number apply(List<BigDecimal> input) {
+    public Number apply(@Nonnull List<BigDecimal> input) {
         checkArgument(input.size() == 2, "Power takes only two arguments");
 
         return power(input.get(0), input.get(1));

@@ -1,12 +1,12 @@
 package see.functions.compare;
 
-import see.functions.Function;
+import see.functions.VarArgFunction;
 
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class Leq implements Function<List<Comparable>, Boolean> {
+public class Leq implements VarArgFunction<Comparable, Boolean> {
     @Override
     public Boolean apply(List<Comparable> input) {
         checkArgument(input.size() == 2, "Leq takes only two arguments");

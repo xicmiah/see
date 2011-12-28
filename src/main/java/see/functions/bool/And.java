@@ -1,15 +1,16 @@
 package see.functions.bool;
 
-import see.functions.Function;
+import see.functions.VarArgFunction;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
  * Logical And function. Short-circuits.
  */
-public class And implements Function<List<Boolean>, Boolean> {
+public class And implements VarArgFunction<Boolean, Boolean> {
     @Override
-    public Boolean apply(List<Boolean> input) {
+    public Boolean apply(@Nonnull List<Boolean> input) {
         for (Boolean value : input) {
             if (!value) return false;
         }

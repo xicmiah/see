@@ -1,7 +1,8 @@
 package see.functions.arithmetic;
 
-import see.functions.Function;
+import see.functions.VarArgFunction;
 
+import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -11,9 +12,9 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Binary/unary minus operation.
  * Differentiates by argument count.
  */
-public class Minus implements Function<List<BigDecimal>, BigDecimal> {
+public class Minus implements VarArgFunction<BigDecimal, BigDecimal> {
     @Override
-    public BigDecimal apply(List<BigDecimal> input) {
+    public BigDecimal apply(@Nonnull List<BigDecimal> input) {
         int size = input.size();
         checkArgument(size == 1 || size == 2, "Minus takes one or two arguments");
 
