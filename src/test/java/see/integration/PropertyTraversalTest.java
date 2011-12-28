@@ -78,13 +78,12 @@ public class PropertyTraversalTest {
 
     @Test
     public void testChainedAssignment() throws Exception {
-        Node<?> tree = see.parseExpressionList("b = a.name = a.next.name = \"omg\";");
+        Node<?> tree = see.parseExpressionList("a.name = a.next.name = \"omg\";");
 
         context = new HashMap<String, Object>(context); // Make context mutable
         
         see.evaluate(tree, context);
 
-        assertEquals("omg", context.get("b"));
         assertEquals("omg", bean.getName());
         assertEquals("omg", bean.getNext().getName());
     }
