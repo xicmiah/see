@@ -44,10 +44,10 @@ public class IterationTest {
 
     @Test
     public void testForLoop() throws Exception {
-        Node<?> tree = see.parseExpressionList("a = 0; for(s : list) a = a + s.length;");
-        see.evaluate(tree, context);
+        Node<?> tree = see.parseExpressionList("a = 0; for(s : list) a = a + s.length; a;");
+        Object result = see.evaluate(tree, context);
 
-        assertEquals("11.0", context.get("a").toString());
+        assertEquals("11.0", result.toString());
     }
 
     @Test
@@ -68,11 +68,10 @@ public class IterationTest {
 
     @Test
     public void testWhileLoop() throws Exception {
-        Node<?> tree = see.parseExpressionList("a = 3; b = 3; while(a > 0) { a = a - 1; b = b + 2; }");
-        see.evaluate(tree, context);
+        Node<?> tree = see.parseExpressionList("a = 3; b = 3; while(a > 0) { a = a - 1; b = b + 2; } b;");
+        Object result = see.evaluate(tree, context);
 
-        assertEquals(BigDecimal.ZERO, context.get("a"));
-        assertEquals(new BigDecimal(9), context.get("b"));
+        assertEquals(new BigDecimal(9), result);
     }
 
     public static class StringBean {
