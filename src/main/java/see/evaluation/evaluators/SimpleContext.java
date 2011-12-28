@@ -16,10 +16,14 @@
 
 package see.evaluation.evaluators;
 
+import com.google.common.base.Predicates;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import see.evaluation.Context;
 import see.evaluation.Scope;
+
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Maps.filterKeys;
 
 public class SimpleContext implements Context {
 
@@ -35,6 +39,21 @@ public class SimpleContext implements Context {
         return new SimpleContext(scope, services);
     }
 
+    public static SimpleContext withServices(Context context, ClassToInstanceMap<Object> services) {
+        return create(context.getScope(), services);
+    }
+
+    public static SimpleContext withVariables(Context context, Scope variables) {
+        return create(variables, context.getServices());
+    }
+
+    public static <T> SimpleContext addService(Context context, Class<T> serviceClass, T service) {
+        return withServices(context, ImmutableClassToInstanceMap.builder()
+                .putAll(filterKeys(context.getServices(), not(Predicates.<Object>equalTo(serviceClass))))
+                .put(serviceClass, service)
+                .build()
+        );
+    }
 
     @Override
     public Scope getScope() {
