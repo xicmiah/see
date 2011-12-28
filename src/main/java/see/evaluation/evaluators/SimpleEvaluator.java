@@ -3,7 +3,7 @@ package see.evaluation.evaluators;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ClassToInstanceMap;
 import see.evaluation.*;
-import see.evaluation.conversions.VarArgIdentity;
+import see.evaluation.conversions.BuiltinConversions;
 import see.evaluation.processors.NumberLifter;
 import see.evaluation.visitors.LazyVisitor;
 import see.exceptions.EvaluationException;
@@ -71,7 +71,7 @@ public class SimpleEvaluator implements Evaluator {
         return builder()
                 .put(NumberFactory.class, numberFactory)
                 .put(ChainResolver.class, chainResolver)
-                .put(ToFunction.class, new VarArgIdentity())
+                .put(ToFunction.class, BuiltinConversions.all())
                 .put(Evaluator.class, this)
                 .build();
     }

@@ -17,18 +17,19 @@
 package see.evaluation.conversions;
 
 import see.evaluation.ToFunction;
-import see.functions.Function;
+import see.functions.ContextCurriedFunction;
+import see.functions.PureFunction;
 import see.functions.VarArgFunction;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
 public class VarArgIdentity implements ToFunction {
     @Nonnull
     @SuppressWarnings("unchecked")
     @Override
-    public Function<List<Object>, ?> apply(@Nonnull Object input) {
-        return (VarArgFunction<Object, ?>) input;
+    public ContextCurriedFunction<Object, ?> apply(@Nonnull Object input) {
+        VarArgFunction<Object, ?> vaf = (VarArgFunction<Object, ?>) input;
+        return PureFunction.wrap(vaf);
     }
 
     @Override

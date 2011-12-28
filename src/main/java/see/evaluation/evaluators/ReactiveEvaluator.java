@@ -21,7 +21,7 @@ import see.evaluation.Evaluator;
 import see.evaluation.Scope;
 import see.evaluation.ToFunction;
 import see.evaluation.ValueProcessor;
-import see.evaluation.conversions.VarArgIdentity;
+import see.evaluation.conversions.BuiltinConversions;
 import see.evaluation.visitors.LazyVisitor;
 import see.exceptions.EvaluationException;
 import see.parser.config.FunctionResolver;
@@ -72,7 +72,7 @@ public class ReactiveEvaluator implements Evaluator {
                 .put(ChainResolver.class, resolver)
                 .put(ValueProcessor.class, valueProcessor)
                 .put(ReactiveFactory.class, reactiveFactory)
-                .put(ToFunction.class, new VarArgIdentity())
+                .put(ToFunction.class, BuiltinConversions.all())
                 .put(Evaluator.class, this)
                 .build();
     }

@@ -16,22 +16,22 @@
 
 package see.evaluation;
 
-import see.functions.Function;
+import see.functions.ContextCurriedFunction;
 import see.functions.PartialFunction;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
-public interface ToFunction extends PartialFunction<Object, Function<List<Object>, ?>> {
+public interface ToFunction extends PartialFunction<Object, ContextCurriedFunction<Object, ?>> {
 
     /**
      * Try to convert given object to function.
+     *
      * @param input object to convert
      * @return function
      */
     @Override
     @Nonnull
-    Function<List<Object>, ?> apply(@Nonnull Object input);
+    ContextCurriedFunction<Object, ?> apply(@Nonnull Object input);
 
     /**
      * Return, if this object can be converted to function.

@@ -27,7 +27,6 @@ import see.evaluation.evaluators.SimpleContext;
 import see.evaluation.visitors.EagerVisitor;
 import see.evaluation.visitors.LazyVisitor;
 import see.functions.ContextCurriedFunction;
-import see.functions.Function;
 import see.functions.VarArgFunction;
 import see.properties.ChainResolver;
 import see.reactive.Signal;
@@ -129,12 +128,17 @@ public class MakeSignal implements ContextCurriedFunction<Object, Signal<?>> {
     private static class SignalToFunction implements ToFunction {
         @Nonnull
         @Override
-        public Function<List<Object>, ?> apply(@Nonnull Object input) {
+        public ContextCurriedFunction<Object, ?> apply(@Nonnull Object input) {
             final Signal<?> signal = (Signal<?>) input;
-            return new VarArgFunction<Object, Object>() {
+            return new ContextCurriedFunction<Object, Object>() {
                 @Override
-                public Object apply(@Nonnull List<Object> input) {
-                    return signal.now();
+                public VarArgFunction<Object, Object> apply(@Nonnull Context context) {
+                    return new VarArgFunction<Object, Object>() {
+                        @Override
+                        public Object apply(@Nonnull List<Object> objects) {
+                            return signal.now();
+                        }
+                    };
                 }
             };
         }

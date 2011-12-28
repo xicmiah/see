@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import see.evaluation.Context;
 import see.evaluation.ToFunction;
 import see.functions.ContextCurriedFunction;
-import see.functions.Function;
 import see.functions.VarArgFunction;
 
 import javax.annotation.Nonnull;
@@ -37,12 +36,12 @@ public class ExtensibleApply implements ContextCurriedFunction<Object, Object> {
             public Object apply(@Nonnull List<Object> args) {
                 Preconditions.checkArgument(args.size() >= 1, "Apply takes one or more arguments");
 
-                Function<List<Object>, ?> function = convertToFunction(args.get(0));
+                ContextCurriedFunction<Object, ?> function = convertToFunction(args.get(0));
 
-                return function.apply(args.subList(1, args.size()));
+                return function.apply(context).apply(args.subList(1, args.size()));
             }
 
-            private Function<List<Object>, ?> convertToFunction(Object f) {
+            private ContextCurriedFunction<Object, ?> convertToFunction(Object f) {
                 final ToFunction toFunction = context.getServices().getInstance(ToFunction.class);
 
                 if (!toFunction.isDefinedAt(f)) {

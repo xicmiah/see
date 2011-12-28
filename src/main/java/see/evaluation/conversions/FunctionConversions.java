@@ -17,19 +17,18 @@
 package see.evaluation.conversions;
 
 import see.evaluation.ToFunction;
-import see.functions.Function;
+import see.functions.ContextCurriedFunction;
 import see.functions.PartialFunction;
 import see.util.FunctionUtils;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
 import static java.util.Arrays.asList;
 
 public abstract class FunctionConversions {
     private FunctionConversions() {}
 
-    public static ToFunction lift(final PartialFunction<Object, Function<List<Object>, ?>> f) {
+    public static ToFunction lift(final PartialFunction<Object, ContextCurriedFunction<Object, ?>> f) {
         if (f instanceof ToFunction) {
             return (ToFunction) f;
         }
@@ -37,12 +36,8 @@ public abstract class FunctionConversions {
         return new LiftedFunction(f);
     }
 
-    public static ToFunction noOp() {
-        return new NoOpFunction();
-    }
-
     public static ToFunction concat(Iterable<? extends ToFunction> functions) {
-        PartialFunction<Object, Function<List<Object>, ?>> aggregated = FunctionUtils.aggregate(functions);
+        PartialFunction<Object, ContextCurriedFunction<Object, ?>> aggregated = FunctionUtils.aggregate(functions);
         return lift(aggregated);
     }
 
@@ -51,34 +46,21 @@ public abstract class FunctionConversions {
     }
 
     private static class LiftedFunction implements ToFunction {
-        private final PartialFunction<Object, Function<List<Object>, ?>> f;
+        private final PartialFunction<Object, ContextCurriedFunction<Object, ?>> f;
 
-        public LiftedFunction(PartialFunction<Object, Function<List<Object>, ?>> f) {
+        public LiftedFunction(PartialFunction<Object, ContextCurriedFunction<Object, ?>> f) {
             this.f = f;
         }
 
         @Nonnull
         @Override
-        public Function<List<Object>, ?> apply(@Nonnull Object input) {
+        public ContextCurriedFunction<Object, ?> apply(@Nonnull Object input) {
             return f.apply(input);
         }
 
         @Override
         public boolean isDefinedAt(Object input) {
             return f.isDefinedAt(input);
-        }
-    }
-
-    private static class NoOpFunction implements ToFunction {
-        @Nonnull
-        @Override
-        public Function<List<Object>, ?> apply(@Nonnull Object input) {
-            throw new IllegalStateException("Requested conversion not supported");
-        }
-
-        @Override
-        public boolean isDefinedAt(Object input) {
-            return false;
         }
     }
 }
