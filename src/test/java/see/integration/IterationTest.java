@@ -67,6 +67,14 @@ public class IterationTest {
     }
 
     @Test
+    public void testForLoopScope() throws Exception {
+        Node<?> tree = see.parseExpressionList("a = 9; for(a in list) {} a;");
+        Object result = see.evaluate(tree, context);
+        
+        assertEquals(new BigDecimal(9), result);
+    }
+
+    @Test
     public void testWhileLoop() throws Exception {
         Node<?> tree = see.parseExpressionList("a = 3; b = 3; while(a > 0) { a = a - 1; b = b + 2; } b;");
         Object result = see.evaluate(tree, context);

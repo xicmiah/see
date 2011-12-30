@@ -86,8 +86,8 @@ class Expressions extends AbstractGrammar {
         return Sequence(
                 T("for"), T("("), VarName(), T(FirstOf(":", "in")), RightExpression(), T(")"),
                 Block(),
-                swap3() && push(makeFNode("for", of(pop(), pop(), pop())))
-                );
+                swap3() && push(makeFNode("for", of(pop(), pop(), constNode(pop()))))
+        );
     }
 
     /**

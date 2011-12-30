@@ -18,11 +18,18 @@ package see.functions.service;
 
 import com.google.common.base.Preconditions;
 import see.evaluation.Context;
+import see.evaluation.ContextEvaluator;
+import see.evaluation.Scope;
 import see.functions.ContextCurriedFunction;
 import see.functions.VarArgFunction;
+import see.tree.Node;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+
+import static com.google.common.collect.ImmutableMap.of;
+import static see.evaluation.evaluators.SimpleContext.withVariables;
+import static see.evaluation.scopes.Scopes.override;
 
 
 /**
@@ -45,11 +52,14 @@ public class Iterate implements ContextCurriedFunction<Object, Object> {
 
                 String varName = (String) input.get(0);
                 Iterable<?> list = (Iterable<?>) input.get(1);
+                Node<?> tree = (Node<?>) input.get(2);
+
+                ContextEvaluator evaluator = context.getServices().getInstance(ContextEvaluator.class);
 
                 Object lastValue = null;
                 for (Object item : list) {
-                    context.getScope().put(varName, item);
-                    lastValue = input.get(2); // **WILL** re-evaluate argument
+                    Scope scope = override(context.getScope(), of(varName, item));
+                    lastValue = evaluator.evaluate(tree, withVariables(context, scope));
                 }
                 
                 return lastValue;
