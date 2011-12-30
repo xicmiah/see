@@ -19,16 +19,17 @@ package see.integration;
 import com.google.common.collect.Maps;
 import org.junit.Test;
 import see.See;
+import see.exceptions.PropagatedException;
 import see.functions.VarArgFunction;
 import see.tree.Node;
 
 import java.math.BigDecimal;
+import java.util.NoSuchElementException;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public class FunctionCreationTest {
     See see = new See();
@@ -66,5 +67,27 @@ public class FunctionCreationTest {
 
         Object result = see.eval("fact(5)", of("fact", f));
         assertEquals(new BigDecimal(120), result);
+    }
+
+    @Test
+    public void testVariableScopes() throws Exception {
+        Node<Object> tree = see.parseExpressionList("function() { a = 42; } (); a;");
+
+        try {
+            see.evaluate(tree);
+            fail("Exception expected");
+        } catch (PropagatedException e) {
+            assertThat(e.getLastCause(), instanceOf(NoSuchElementException.class));
+        }
+    }
+
+    @Test
+    public void testParameterImmutability() throws Exception {
+        try {
+            see.eval("function(a) { a = 42; } (9)");
+            fail("Exception expected");
+        } catch (PropagatedException e) {
+            assertThat(e.getLastCause(), instanceOf(UnsupportedOperationException.class));
+        }
     }
 }
