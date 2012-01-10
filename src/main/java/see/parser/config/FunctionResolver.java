@@ -5,6 +5,9 @@ import see.functions.ContextCurriedFunction;
 
 import java.util.Map;
 
+import static com.google.common.base.Functions.forMap;
+import static com.google.common.collect.Maps.transformValues;
+
 public class FunctionResolver {
     private final Map<String, ContextCurriedFunction<Object, Object>> functions;
     private final Map<String, String> aliases;
@@ -29,6 +32,10 @@ public class FunctionResolver {
     }
 
     public Map<String, ContextCurriedFunction<Object, Object>> getFunctions() {
-        return functions;
+        ImmutableMap.Builder<String, ContextCurriedFunction<Object, Object>> builder = ImmutableMap.builder();
+        return builder
+                .putAll(functions)
+                .putAll(transformValues(aliases, forMap(functions)))
+                .build();
     }
 }
