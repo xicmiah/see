@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class Addition implements VarArgFunction<Comparable, Comparable> {
+public class AddOrConcat implements VarArgFunction<Comparable, Comparable> {
     @Override
     public Comparable apply(@Nonnull List<Comparable> input) {
         Comparable firstElement = input.get(0);
