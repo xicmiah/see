@@ -29,7 +29,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Predicates.instanceOf;
 import static com.google.common.collect.Iterables.all;
 
-public abstract class AbstractObserverSignal<T> implements Signal<T> {
+/**
+ * Listener-based {@link Signal} implementation.
+ * Delegates to {@link PropertyChangeSupport} for listener keeping.
+ *
+ * @param <T> value type
+ */
+abstract class AbstractObserverSignal<T> implements Signal<T> {
     
     private final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
     

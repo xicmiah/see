@@ -19,7 +19,7 @@ package see.reactive.impl2;
 import com.google.common.collect.ImmutableSet;
 import see.reactive.VariableSignal;
 
-public class Var<T> extends AbstractObserverSignal<T> implements VariableSignal<T> {
+class Var<T> extends AbstractObserverSignal<T> implements VariableSignal<T> {
 
     public Var(T initialValue) {
         super(ImmutableSet.<AbstractObserverSignal<?>>of(), initialValue);

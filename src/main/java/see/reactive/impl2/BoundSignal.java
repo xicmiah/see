@@ -21,7 +21,7 @@ import see.reactive.Signal;
 
 import java.util.Collection;
 
-public class BoundSignal<T> extends AbstractObserverSignal<T> {
+class BoundSignal<T> extends AbstractObserverSignal<T> {
 
     private Supplier<T> evaluation;
 

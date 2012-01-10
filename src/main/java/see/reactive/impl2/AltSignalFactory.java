@@ -23,6 +23,9 @@ import see.reactive.VariableSignal;
 
 import java.util.Collection;
 
+/**
+ * Implementation of {@link SignalFactory}, which creates observer-based signals.
+ */
 public class AltSignalFactory implements SignalFactory {
     @Override
     public <T> VariableSignal<T> var(T initialValue) {
