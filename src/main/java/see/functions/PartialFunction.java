@@ -18,8 +18,7 @@ package see.functions;
 
 import javax.annotation.Nonnull;
 
-public interface PartialFunction<A, R> extends Function<A, R> {
-    @Override
+public interface PartialFunction<A, R> {
     R apply(@Nonnull A input);
 
     boolean isDefinedAt(A input);

@@ -21,6 +21,7 @@ import see.evaluation.Context;
 import see.evaluation.ValueProcessor;
 import see.exceptions.PropagatedException;
 import see.functions.Property;
+import see.functions.VarArgFunction;
 import see.parser.grammar.PropertyAccess;
 import see.parser.grammar.PropertyDescriptor;
 import see.properties.ChainResolver;
@@ -48,7 +49,7 @@ public abstract class AbstractVisitor implements Visitor {
             List<Arg> evaluatedArgs = evaluateArgs(node.getArguments());
 
             // Note: evaluatedArgs are lazy
-            see.functions.Function<List<Arg>, Result> partial = node.getFunction().apply(context);
+            VarArgFunction<Arg, Result> partial = node.getFunction().apply(context);
             Result result = partial.apply(evaluatedArgs);
 
             return processValue(result);

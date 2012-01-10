@@ -8,7 +8,6 @@ import java.util.List;
  * @param <Arg> type of arguments
  * @param <Result> result type
  */
-public interface VarArgFunction<Arg, Result> extends Function<List<Arg>, Result> {
-    @Override
+public interface VarArgFunction<Arg, Result> {
     Result apply(@Nonnull List<Arg> args);
 }

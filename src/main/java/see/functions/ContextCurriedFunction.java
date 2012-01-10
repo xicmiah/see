@@ -16,7 +16,6 @@ import javax.annotation.Nonnull;
  * @param <Arg> common argument supertype
  * @param <Result> result type
  */
-public interface ContextCurriedFunction<Arg, Result> extends Function<Context, VarArgFunction<Arg, Result>> {
-    @Override
+public interface ContextCurriedFunction<Arg, Result> {
     VarArgFunction<Arg, Result> apply(@Nonnull final Context context);
 }
