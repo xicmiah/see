@@ -1,52 +1,40 @@
+/*
+ * Copyright 2011 Vasily Shiyan
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package see.exceptions;
 
-import org.parboiled.errors.ParseError;
+import org.parboiled.errors.ErrorUtils;
 import org.parboiled.support.ParsingResult;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
- * An exception which happened during expression parsing
+ * Parboiled-specific pretty parsing exception
  */
 public class ParseException extends SeeException {
-    private final List<ParseErrorDescription> errors;
+    private final ParsingResult<?> parsingResult;
 
-    public ParseException(ParseErrorDescription error) {
-        errors = Collections.singletonList(error);
+    /**
+     * Construct instance from parse result
+     * @param result parse result
+     */
+    public ParseException(ParsingResult<?> result) {
+        super(ErrorUtils.printParseErrors(result));
+        this.parsingResult = result;
     }
 
-    public ParseException(ParseErrorDescription error, Throwable cause) {
-        super(cause);
-        this.errors = Collections.singletonList(error);
-    }
-
-    public ParseException(List<ParseErrorDescription> errors) {
-        this.errors = errors;
-    }
-
-    public ParseException(List<ParseErrorDescription> errors, Throwable cause) {
-        super(cause);
-        this.errors = errors;
-    }
-
-    public ParseErrorDescription getFirstError(){
-        if (errors != null && errors.size() > 0){
-            return errors.get(0);
-        }else{
-            return null;
-        }
-    }
-
-    public List<ParseErrorDescription> getErrors() {
-        return errors;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("ParseException");
-        sb.append("{").append(errors).append('}');
-        return sb.toString();
+    public ParsingResult<?> getParsingResult() {
+        return parsingResult;
     }
 }
