@@ -22,18 +22,21 @@ import see.reactive.Signal;
 import see.reactive.SignalFactory;
 import see.reactive.VariableSignal;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 
 public class ReactiveFactory implements SignalFactory {
     private final EventBus eventBus = new EventBus();
 
+    @Nonnull
     @Override
     public <T> VariableSignal<T> var(T initialValue) {
         return new Var<T>(eventBus, initialValue);
     }
 
+    @Nonnull
     @Override
-    public <T> Signal<T> bind(Collection<? extends Signal<?>> dependencies, Supplier<T> evaluation) {
+    public <T> Signal<T> bind(@Nonnull Collection<? extends Signal<?>> dependencies, @Nonnull Supplier<T> evaluation) {
         return new StatefulSignal<T>(eventBus, dependencies, evaluation);
     }
 

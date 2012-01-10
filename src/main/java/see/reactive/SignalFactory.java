@@ -18,6 +18,8 @@ package see.reactive;
 
 import com.google.common.base.Supplier;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 
 public interface SignalFactory {
@@ -27,7 +29,8 @@ public interface SignalFactory {
      * @param <T> value type
      * @return variable signal
      */
-    <T> VariableSignal<T> var(T initialValue);
+    @Nonnull
+    <T> VariableSignal<T> var(@Nullable T initialValue);
 
     /**
      * Bind expression evaluation to specified dependencies.
@@ -38,5 +41,6 @@ public interface SignalFactory {
      * @param <T> expression return type
      * @return constructed signal
      */
-    <T> Signal<T> bind(Collection<? extends Signal<?>> dependencies, Supplier<T> evaluation);
+    @Nonnull
+    <T> Signal<T> bind(@Nonnull Collection<? extends Signal<?>> dependencies, @Nonnull Supplier<T> evaluation);
 }

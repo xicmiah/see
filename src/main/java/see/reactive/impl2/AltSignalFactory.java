@@ -21,19 +21,22 @@ import see.reactive.Signal;
 import see.reactive.SignalFactory;
 import see.reactive.VariableSignal;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 
 /**
  * Implementation of {@link SignalFactory}, which creates observer-based signals.
  */
 public class AltSignalFactory implements SignalFactory {
+    @Nonnull
     @Override
     public <T> VariableSignal<T> var(T initialValue) {
         return new Var<T>(initialValue);
     }
 
+    @Nonnull
     @Override
-    public <T> Signal<T> bind(Collection<? extends Signal<?>> dependencies, Supplier<T> evaluation) {
+    public <T> Signal<T> bind(@Nonnull Collection<? extends Signal<?>> dependencies, @Nonnull Supplier<T> evaluation) {
         return new BoundSignal<T>(dependencies, evaluation);
     }
 }
