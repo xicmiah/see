@@ -1,6 +1,4 @@
-package see.parser.config;
-
-import see.parser.numbers.BigDecimalFactory;
+package see.parser.numbers;
 
 import java.math.BigDecimal;
 import java.math.MathContext;

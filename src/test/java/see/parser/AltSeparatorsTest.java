@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import see.See;
 import see.parser.config.ConfigBuilder;
-import see.parser.config.LocalizedBigDecimalFactory;
+import see.parser.numbers.LocalizedBigDecimalFactory;
 
 import java.math.MathContext;
 import java.util.Locale;
