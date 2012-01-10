@@ -4,7 +4,6 @@ import com.google.common.collect.ClassToInstanceMap;
 import see.evaluation.*;
 import see.evaluation.conversions.BuiltinConversions;
 import see.exceptions.EvaluationException;
-import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
 import see.properties.ChainResolver;
@@ -17,25 +16,32 @@ import static see.evaluation.scopes.Scopes.*;
 
 public class SimpleEvaluator implements Evaluator {
 
-    private final NumberFactory numberFactory;
-    private final FunctionResolver functionResolver;
-    private final ChainResolver chainResolver;
-    private final ValueProcessor valueProcessor;
+    private final Scope functionScope;
+    private final ClassToInstanceMap<Object> services;
 
-    public SimpleEvaluator(NumberFactory numberFactory, FunctionResolver functionResolver, ChainResolver chainResolver, ValueProcessor valueProcessor) {
-        this.numberFactory = numberFactory;
-        this.functionResolver = functionResolver;
-        this.chainResolver = chainResolver;
-        this.valueProcessor = valueProcessor;
+    public SimpleEvaluator(Scope initialScope, ClassToInstanceMap<Object> services) {
+        this.functionScope = initialScope;
+        this.services = services;
     }
 
-    public static SimpleEvaluator fromConfig(GrammarConfiguration config) {
+    public static Evaluator fromConfig(GrammarConfiguration config) {
         return new SimpleEvaluator(
-                config.getNumberFactory(),
-                config.getFunctions(),
-                config.getChainResolver(),
-                config.getValueProcessor()
+                extractScope(config),
+                extractServices(config)
         );
+    }
+
+    public static Scope extractScope(GrammarConfiguration config) {
+        return fromMap(config.getFunctions().getFunctions());
+    }
+
+    public static ClassToInstanceMap<Object> extractServices(GrammarConfiguration config) {
+        return builder()
+                .put(NumberFactory.class, config.getNumberFactory())
+                .put(ChainResolver.class, config.getChainResolver())
+                .put(ValueProcessor.class, config.getValueProcessor())
+                .put(ToFunction.class, BuiltinConversions.all())
+                .build();
     }
 
     /**
@@ -51,7 +57,7 @@ public class SimpleEvaluator implements Evaluator {
     @Override
     public <T> T evaluate(Node<T> tree, final Map<String, ?> initial) throws EvaluationException {
         try {
-            Context context = SimpleContext.create(createScope(initial), createServices());
+            Context context = SimpleContext.create(createLocalScope(initial), services);
 
             return new LazyContextEvaluator().evaluate(tree, context);
         } catch (EvaluationException e) {
@@ -61,17 +67,7 @@ public class SimpleEvaluator implements Evaluator {
         }
     }
 
-    private Scope createScope(Map<String, ?> initial) {
-        return defCapture(mutableOverride(fromMap(functionResolver.getFunctions()), initial));
-    }
-
-    private ClassToInstanceMap<Object> createServices() {
-        return builder()
-                .put(NumberFactory.class, numberFactory)
-                .put(ChainResolver.class, chainResolver)
-                .put(ValueProcessor.class, valueProcessor)
-                .put(ToFunction.class, BuiltinConversions.all())
-                .put(Evaluator.class, this)
-                .build();
+    private Scope createLocalScope(Map<String, ?> initial) {
+        return defCapture(mutableOverride(functionScope, initial));
     }
 }

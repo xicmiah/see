@@ -18,7 +18,7 @@ package see;
 
 import com.google.common.collect.Maps;
 import see.evaluation.Evaluator;
-import see.evaluation.evaluators.ReactiveEvaluator;
+import see.evaluation.evaluators.SimpleEvaluator;
 import see.parser.config.ConfigBuilder;
 import see.parser.config.GrammarConfiguration;
 import see.reactive.SignalFactory;
@@ -26,6 +26,10 @@ import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
 
 import java.util.Map;
+
+import static com.google.common.collect.ImmutableClassToInstanceMap.builder;
+import static see.evaluation.evaluators.SimpleEvaluator.extractScope;
+import static see.evaluation.evaluators.SimpleEvaluator.extractServices;
 
 /**
  * Public API for working with reactive extensions(signals, bindings, etc.).
@@ -110,7 +114,12 @@ public class ReactiveSee {
      * @return evaluated value
      */
     public <T> T evaluate(Node<T> tree, final Map<String, Object> context) {
-        Evaluator evaluator = new ReactiveEvaluator(config, signalFactory);
+        Evaluator evaluator = new SimpleEvaluator(
+                extractScope(config),
+                builder().putAll(extractServices(config))
+                        .put(SignalFactory.class, signalFactory)
+                        .build()
+        );
         return evaluator.evaluate(tree, context);
     }
 
