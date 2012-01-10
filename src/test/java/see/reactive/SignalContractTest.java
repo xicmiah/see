@@ -19,7 +19,6 @@ package see.reactive;
 import com.google.common.base.Supplier;
 import org.junit.Before;
 import org.junit.Test;
-import see.reactive.impl.ReactiveFactory;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -27,14 +26,16 @@ import static com.google.common.collect.ImmutableSet.of;
 import static java.lang.Integer.valueOf;
 import static junit.framework.Assert.assertEquals;
 
-public class ReactiveTest {
+public abstract class SignalContractTest {
 
     SignalFactory signalFactory;
 
     @Before
     public void setUp() throws Exception {
-        signalFactory = new ReactiveFactory();
+        signalFactory = getSignalFactory();
     }
+
+    protected abstract SignalFactory getSignalFactory();
 
     @Test
     public void testInteraction() throws Exception {
