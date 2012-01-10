@@ -18,7 +18,6 @@ package see.functions.reactive;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
-import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.Sets;
 import see.evaluation.Context;
 import see.evaluation.ToFunction;
@@ -37,7 +36,6 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 
-import static com.google.common.collect.ImmutableClassToInstanceMap.builder;
 import static see.evaluation.conversions.FunctionConversions.concat;
 
 /**
@@ -86,11 +84,7 @@ public class MakeSignal implements ContextCurriedFunction<Object, Signal<?>> {
             private Context getPatchedContext(ToFunction signalFunction) {
                 ToFunction old = context.getServices().getInstance(ToFunction.class);
 
-                ClassToInstanceMap<Object> altServices = builder()
-                        .put(ToFunction.class, concat(signalFunction, old))
-                        .build();
-
-                return SimpleContext.create(context.getScope(), altServices);
+                return SimpleContext.addService(context, ToFunction.class, concat(signalFunction, old));
             }
 
             private ValueProcessor getProcessor() {
