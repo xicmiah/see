@@ -30,7 +30,7 @@ import see.functions.ContextCurriedFunction;
 import see.functions.VarArgFunction;
 import see.properties.ChainResolver;
 import see.reactive.Signal;
-import see.reactive.impl.ReactiveFactory;
+import see.reactive.SignalFactory;
 import see.tree.Node;
 
 import javax.annotation.Nonnull;
@@ -57,7 +57,7 @@ public class MakeSignal implements ContextCurriedFunction<Object, Signal<?>> {
                 Collection<Signal<?>> dependencies = extractDependencies(tree);
 
                 final LazyVisitor lazyVisitor = createVisitor();
-                return context.getServices().getInstance(ReactiveFactory.class).bind(dependencies, new Supplier<Object>() {
+                return context.getServices().getInstance(SignalFactory.class).bind(dependencies, new Supplier<Object>() {
                     @Override
                     public Object get() {
                         return tree.accept(lazyVisitor);

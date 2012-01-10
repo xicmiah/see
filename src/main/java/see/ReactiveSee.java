@@ -21,6 +21,7 @@ import see.evaluation.Evaluator;
 import see.evaluation.evaluators.ReactiveEvaluator;
 import see.parser.config.ConfigBuilder;
 import see.parser.config.GrammarConfiguration;
+import see.reactive.SignalFactory;
 import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
 
@@ -34,7 +35,7 @@ import java.util.Map;
 @SuppressWarnings("UnusedDeclaration")
 public class ReactiveSee {
     private final See see;
-    private final ReactiveFactory reactiveFactory;
+    private final SignalFactory signalFactory;
     private final GrammarConfiguration config;
 
     /**
@@ -42,9 +43,9 @@ public class ReactiveSee {
      * @param configuration see configuration
      * @param factory reactive factory
      */
-    public ReactiveSee(GrammarConfiguration configuration, ReactiveFactory factory) {
+    public ReactiveSee(GrammarConfiguration configuration, SignalFactory factory) {
         this.see = new See(configuration);
-        this.reactiveFactory = factory;
+        this.signalFactory = factory;
         this.config = configuration;
     }
 
@@ -58,10 +59,10 @@ public class ReactiveSee {
 
     /**
      * Create new instance, default See configuration, external ReactiveFactory.
-     * @param reactiveFactory reactive factory
+     * @param signalFactory reactive factory
      */
-    public ReactiveSee(ReactiveFactory reactiveFactory) {
-        this(ConfigBuilder.defaultConfig().build(), reactiveFactory);
+    public ReactiveSee(SignalFactory signalFactory) {
+        this(ConfigBuilder.defaultConfig().build(), signalFactory);
     }
 
     /**
@@ -75,8 +76,8 @@ public class ReactiveSee {
      * Get inner reactive factory.
      * @return reactive factory
      */
-    public ReactiveFactory getReactiveFactory() {
-        return reactiveFactory;
+    public SignalFactory getReactiveFactory() {
+        return signalFactory;
     }
 
     /**
@@ -109,7 +110,7 @@ public class ReactiveSee {
      * @return evaluated value
      */
     public <T> T evaluate(Node<T> tree, final Map<String, Object> context) {
-        Evaluator evaluator = new ReactiveEvaluator(config, reactiveFactory);
+        Evaluator evaluator = new ReactiveEvaluator(config, signalFactory);
         return evaluator.evaluate(tree, context);
     }
 

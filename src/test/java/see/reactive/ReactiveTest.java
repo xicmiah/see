@@ -29,17 +29,17 @@ import static junit.framework.Assert.assertEquals;
 
 public class ReactiveTest {
 
-    ReactiveFactory reactiveFactory;
+    SignalFactory signalFactory;
 
     @Before
     public void setUp() throws Exception {
-        reactiveFactory = new ReactiveFactory();
+        signalFactory = new ReactiveFactory();
     }
 
     @Test
     public void testInteraction() throws Exception {
-        final VariableSignal<String> a = reactiveFactory.var("asd");
-        Signal<Integer> b = reactiveFactory.bind(of(a), new Supplier<Integer>() {
+        final VariableSignal<String> a = signalFactory.var("asd");
+        Signal<Integer> b = signalFactory.bind(of(a), new Supplier<Integer>() {
             @Override
             public Integer get() {
                 return a.now().length();
@@ -55,10 +55,10 @@ public class ReactiveTest {
 
     @Test
     public void testMultipleDeps() throws Exception {
-        final VariableSignal<Integer> a = reactiveFactory.var(1);
-        final VariableSignal<Integer> b = reactiveFactory.var(2);
+        final VariableSignal<Integer> a = signalFactory.var(1);
+        final VariableSignal<Integer> b = signalFactory.var(2);
 
-        Signal<Integer> sum = reactiveFactory.bind(of(a, b), new Supplier<Integer>() {
+        Signal<Integer> sum = signalFactory.bind(of(a, b), new Supplier<Integer>() {
             @Override
             public Integer get() {
                 return a.now() + b.now();
@@ -76,10 +76,10 @@ public class ReactiveTest {
 
     @Test
     public void testStatefulSignal() throws Exception {
-        final VariableSignal<String> a = reactiveFactory.var("crno");
+        final VariableSignal<String> a = signalFactory.var("crno");
         final AtomicInteger lengthCounter = new AtomicInteger(0);
 
-        final Signal<Integer> length = reactiveFactory.bind(of(a), new Supplier<Integer>() {
+        final Signal<Integer> length = signalFactory.bind(of(a), new Supplier<Integer>() {
             @Override
             public Integer get() {
                 lengthCounter.incrementAndGet();
@@ -90,7 +90,7 @@ public class ReactiveTest {
         assertEquals(1, lengthCounter.get());
 
         final AtomicInteger plusCounter = new AtomicInteger(0);
-        final Signal<Integer> plusOne = reactiveFactory.bind(of(length), new Supplier<Integer>() {
+        final Signal<Integer> plusOne = signalFactory.bind(of(length), new Supplier<Integer>() {
             @Override
             public Integer get() {
                 plusCounter.incrementAndGet();

@@ -24,7 +24,7 @@ import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
 import see.properties.ChainResolver;
-import see.reactive.impl.ReactiveFactory;
+import see.reactive.SignalFactory;
 import see.tree.Node;
 
 import java.util.Map;
@@ -39,16 +39,16 @@ public class ReactiveEvaluator implements Evaluator {
     private final ChainResolver resolver;
     private final ValueProcessor valueProcessor;
 
-    private final ReactiveFactory reactiveFactory;
+    private final SignalFactory signalFactory;
 
-    public ReactiveEvaluator(GrammarConfiguration config, ReactiveFactory reactiveFactory) {
+    public ReactiveEvaluator(GrammarConfiguration config, SignalFactory signalFactory) {
         this.functionResolver = config.getFunctions();
 
         this.numberFactory = config.getNumberFactory();
         this.resolver = config.getChainResolver();
         this.valueProcessor = config.getValueProcessor();
 
-        this.reactiveFactory = reactiveFactory;
+        this.signalFactory = signalFactory;
     }
 
     @Override
@@ -73,7 +73,7 @@ public class ReactiveEvaluator implements Evaluator {
                 .put(NumberFactory.class, numberFactory)
                 .put(ChainResolver.class, resolver)
                 .put(ValueProcessor.class, valueProcessor)
-                .put(ReactiveFactory.class, reactiveFactory)
+                .put(SignalFactory.class, signalFactory)
                 .put(ToFunction.class, BuiltinConversions.all())
                 .put(Evaluator.class, this)
                 .build();

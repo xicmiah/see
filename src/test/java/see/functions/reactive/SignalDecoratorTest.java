@@ -27,6 +27,7 @@ import see.ReactiveSee;
 import see.parser.config.ConfigBuilder;
 import see.parser.grammar.PropertyAccess;
 import see.properties.impl.PropertyUtilsResolver;
+import see.reactive.SignalFactory;
 import see.reactive.VariableSignal;
 import see.reactive.impl.ReactiveFactory;
 
@@ -36,13 +37,13 @@ import static org.junit.Assert.assertEquals;
 
 public class SignalDecoratorTest {
     SignalResolver signalResolver;
-    ReactiveFactory reactiveFactory;
+    SignalFactory signalFactory;
     ReactiveSee see;
 
     private Cache<SimpleBean, VariableSignal<Object>> signals = CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<SimpleBean, VariableSignal<Object>>() {
         @Override
         public VariableSignal<Object> load(SimpleBean key) throws Exception {
-            return reactiveFactory.<Object>var(key.getName());
+            return signalFactory.<Object>var(key.getName());
         }
     });
 
@@ -63,8 +64,8 @@ public class SignalDecoratorTest {
         };
 
         config.setPropertyResolver(new SignalDecorator(new PropertyUtilsResolver(), signalResolver));
-        reactiveFactory = new ReactiveFactory();
-        see = new ReactiveSee(config.build(), reactiveFactory);
+        signalFactory = new ReactiveFactory();
+        see = new ReactiveSee(config.build(), signalFactory);
     }
 
     @Test

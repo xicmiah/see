@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import org.junit.Test;
 import see.ReactiveSee;
 import see.reactive.Signal;
+import see.reactive.SignalFactory;
 import see.reactive.VariableSignal;
 import see.reactive.impl.ReactiveFactory;
 import see.tree.Node;
@@ -31,12 +32,12 @@ import static com.google.common.collect.ImmutableMap.of;
 import static org.junit.Assert.*;
 
 public class BindingTest {
-    ReactiveFactory reactiveFactory = new ReactiveFactory();
-    ReactiveSee see = new ReactiveSee(reactiveFactory);
+    SignalFactory signalFactory = new ReactiveFactory();
+    ReactiveSee see = new ReactiveSee(signalFactory);
 
     @Test
     public void testBindings() throws Exception {
-        VariableSignal<String> var = reactiveFactory.var("crno");
+        VariableSignal<String> var = signalFactory.var("crno");
         PropertyTraversalTest.TestBean bean = new PropertyTraversalTest.TestBean("omg", null);
 
         Map<String, Object> context = of("a", bean, "v", var);
@@ -50,8 +51,8 @@ public class BindingTest {
 
     @Test
     public void testMultipleBindings() throws Exception {
-        VariableSignal<Integer> a = reactiveFactory.var(1);
-        VariableSignal<Integer> b = reactiveFactory.var(2);
+        VariableSignal<Integer> a = signalFactory.var(1);
+        VariableSignal<Integer> b = signalFactory.var(2);
         TestBean bean = new TestBean();
 
         Map<String, Object> context = of("a", a, "b", b, "bean", bean);
@@ -68,7 +69,7 @@ public class BindingTest {
 
     @Test
     public void testBindingContext() throws Exception {
-        VariableSignal<Integer> a = reactiveFactory.var(7);
+        VariableSignal<Integer> a = signalFactory.var(7);
         TestBean bean = new TestBean();
 
         Map<String, Object> context = Maps.newHashMap(of("a", a, "b", 2, "bean", bean));
@@ -85,7 +86,7 @@ public class BindingTest {
 
     @Test
     public void testNowBindings() throws Exception {
-        VariableSignal<Integer> a = reactiveFactory.var(7);
+        VariableSignal<Integer> a = signalFactory.var(7);
         TestBean bean = new TestBean();
 
         Map<String, Object> context = of("a", a, "bean", bean);
@@ -100,7 +101,7 @@ public class BindingTest {
 
     @Test
     public void testImplicitSignalCreation() throws Exception {
-        VariableSignal<Integer> a = reactiveFactory.var(4);
+        VariableSignal<Integer> a = signalFactory.var(4);
         TestBean bean = new TestBean();
 
         Map<String, Object> context = of("a", a, "bean", bean);
@@ -114,8 +115,8 @@ public class BindingTest {
 
     @Test
     public void testEagerness() throws Exception {
-        VariableSignal<Boolean> a = reactiveFactory.var(false);
-        VariableSignal<Boolean> b = reactiveFactory.var(false);
+        VariableSignal<Boolean> a = signalFactory.var(false);
+        VariableSignal<Boolean> b = signalFactory.var(false);
 
         Map<String, Object> context = ImmutableMap.<String, Object>of("a", a, "b", b);
         Signal<Boolean> result = (Signal<Boolean>) see.eval("signal(a() && b())", context); // b is not evaluated normally
@@ -131,7 +132,7 @@ public class BindingTest {
 
     @Test
     public void testNullDuringDependencyResolution() throws Exception {
-        VariableSignal<String> a = reactiveFactory.var(null);
+        VariableSignal<String> a = signalFactory.var(null);
 
         Map<String, Object> context = ImmutableMap.<String, Object>of("a", a);
         Signal<?> result = (Signal<?>) see.eval("signal(a() == null)", context);
@@ -143,7 +144,7 @@ public class BindingTest {
 
     @Test
     public void testErrorsDuringDependencyResolution() throws Exception {
-        VariableSignal<String> s = reactiveFactory.var(null);
+        VariableSignal<String> s = signalFactory.var(null);
 
         Map<String, Object> context = ImmutableMap.<String, Object>of("s", s);
         Signal<?> result = (Signal<?>) see.eval("signal(if(s() != null, s().class, 'empty'))", context);

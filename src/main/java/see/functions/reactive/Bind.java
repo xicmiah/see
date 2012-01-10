@@ -23,7 +23,7 @@ import see.functions.ContextCurriedFunction;
 import see.functions.Settable;
 import see.functions.VarArgFunction;
 import see.reactive.Signal;
-import see.reactive.impl.ReactiveFactory;
+import see.reactive.SignalFactory;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -42,7 +42,7 @@ public class Bind implements ContextCurriedFunction<Object, Signal<?>> {
 
                 final Signal<?> signal = (Signal<?>) input.get(1);
 
-                context.getServices().getInstance(ReactiveFactory.class).bind(of(signal), new Supplier<Object>() {
+                context.getServices().getInstance(SignalFactory.class).bind(of(signal), new Supplier<Object>() {
                     @Override
                     public Object get() {
                         Object now = signal.now();
