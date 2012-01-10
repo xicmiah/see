@@ -3,6 +3,7 @@ package see.functions.arithmetic;
 import com.google.common.base.Supplier;
 import see.functions.VarArgFunction;
 
+import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
@@ -25,7 +26,7 @@ public class Divide implements VarArgFunction<BigDecimal, BigDecimal> {
     }
 
     @Override
-    public BigDecimal apply(List<BigDecimal> input) {
+    public BigDecimal apply(@Nonnull List<BigDecimal> input) {
         checkArgument(input.size() == 2, "Divide takes only two arguments");
 
         BigDecimal decimal = input.get(0);

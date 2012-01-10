@@ -12,9 +12,7 @@ public class Geq implements VarArgFunction<Comparable, Boolean> {
     public Boolean apply(@Nonnull List<Comparable> input) {
         checkArgument(input.size() == 2, "Geq takes only two arguments");
 
-        boolean value = input.get(0).compareTo(input.get(1)) >= 0;
-
-        return value;
+        return input.get(0).compareTo(input.get(1)) >= 0;
     }
 
     @Override

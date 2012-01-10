@@ -19,6 +19,7 @@ package see.functions.service;
 import com.google.common.base.Preconditions;
 import see.functions.VarArgFunction;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ import java.util.List;
  */
 public class While implements VarArgFunction<Object, Object> {
     @Override
-    public Object apply(List<Object> input) {
+    public Object apply(@Nonnull List<Object> input) {
         Preconditions.checkArgument(input.size() == 2, "While takes two arguments");
 
         Object lastValue = null;

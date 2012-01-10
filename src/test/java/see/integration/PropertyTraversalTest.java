@@ -23,6 +23,7 @@ import see.functions.VarArgFunction;
 import see.parser.config.ConfigBuilder;
 import see.tree.Node;
 
+import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +43,7 @@ public class PropertyTraversalTest {
     public void setUp() throws Exception {
         VarArgFunction<Object, TestBean> beanFunc = new VarArgFunction<Object, TestBean>() {
             @Override
-            public TestBean apply(List<Object> input) {
+            public TestBean apply(@Nonnull List<Object> input) {
                 return bean;
             }
         };
