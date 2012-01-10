@@ -47,7 +47,7 @@ public class PropertyTraversalTest {
                 return bean;
             }
         };
-        see = new See(ConfigBuilder.defaultConfig().addPureFunction("bean", beanFunc).build());
+        see = new See(ConfigBuilder.defaultConfig().addFunction("bean", beanFunc).build());
         bean = new TestBean("second", new TestBean("first", null));
         context = of("a", bean);
     }

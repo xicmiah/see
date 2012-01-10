@@ -28,7 +28,7 @@ import static see.parser.config.ConfigBuilder.defaultConfig;
 
 public class CacheTest {
     See see = new See(defaultConfig()
-            .addPureFunction("memoize", Memoize.memoizeFunction())
+            .addFunction("memoize", Memoize.memoizeFunction())
             .build()
     );
 

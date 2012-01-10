@@ -23,7 +23,7 @@ public class ArithmeticTest {
 
     @Before
     public void setUp() throws Exception {
-        see = new See(ConfigBuilder.defaultConfig().addPureFunction("fail", new VarArgFunction<Object, Void>() {
+        see = new See(ConfigBuilder.defaultConfig().addFunction("fail", new VarArgFunction<Object, Void>() {
             @Override
             public Void apply(@Nonnull List<Object> input) {
                 throw new IllegalStateException("Fail evaluated");

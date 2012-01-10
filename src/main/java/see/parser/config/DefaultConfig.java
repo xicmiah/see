@@ -61,8 +61,8 @@ public abstract class DefaultConfig {
         builder.addAlias("[]", "makeList");
         builder.addAlias("{}", "makeMap");
 
-        builder.addPureFunction("makeList", new MakeList());
-        builder.addPureFunction("makeMap", new MakeMap());
+        builder.addFunction("makeList", new MakeList());
+        builder.addFunction("makeMap", new MakeMap());
     }
 
     private static void addBindings(final ConfigBuilder builder) {
@@ -74,45 +74,45 @@ public abstract class DefaultConfig {
     private static void addIteration(ConfigBuilder builder) {
         builder.addAlias("for", "iterate");
         builder.addFunction("iterate", new Iterate());
-        builder.addPureFunction("while", new While());
+        builder.addFunction("while", new While());
     }
 
     private static void addProperty(ConfigBuilder builder) {
         builder.addAlias(".", "get");
-        builder.addPureFunction("get", new GetProperty());
+        builder.addFunction("get", new GetProperty());
     }
 
     private static void addCompare(ConfigBuilder builder) {
-        builder.addPureFunction("==", new Eq());
-        builder.addPureFunction("!=", new Neq());
-        builder.addPureFunction(">", new Gt());
-        builder.addPureFunction(">=", new Geq());
-        builder.addPureFunction("<", new Lt());
-        builder.addPureFunction("<=", new Leq());
+        builder.addFunction("==", new Eq());
+        builder.addFunction("!=", new Neq());
+        builder.addFunction(">", new Gt());
+        builder.addFunction(">=", new Geq());
+        builder.addFunction("<", new Lt());
+        builder.addFunction("<=", new Leq());
     }
 
     private static void addArithmetic(final ConfigBuilder builder) {
         builder.addAlias("+", "addOrConcat");
-        builder.addPureFunction("addOrConcat", new AddOrConcat());
-        builder.addPureFunction("concat", new Concat());
-        builder.addPureFunction("sum", new Sum());
+        builder.addFunction("addOrConcat", new AddOrConcat());
+        builder.addFunction("concat", new Concat());
+        builder.addFunction("sum", new Sum());
 
         builder.addAlias("-", "minus");
         builder.addAlias("*", "product");
         builder.addAlias("/", "divide");
         builder.addAlias("^", "pow");
 
-        builder.addPureFunction("min", new Min<BigDecimal>());
-        builder.addPureFunction("max", new Max<BigDecimal>());
-        builder.addPureFunction("minus", new Minus());
-        builder.addPureFunction("product", new Product());
-        builder.addPureFunction("divide", new Divide(compose(new Function<NumberFactory, MathContext>() {
+        builder.addFunction("min", new Min<BigDecimal>());
+        builder.addFunction("max", new Max<BigDecimal>());
+        builder.addFunction("minus", new Minus());
+        builder.addFunction("product", new Product());
+        builder.addFunction("divide", new Divide(compose(new Function<NumberFactory, MathContext>() {
             @Override
             public MathContext apply(@Nullable NumberFactory input) {
                 return ((BigDecimalFactory) input).getMathContext();
             }
         }, builder.getNumberFactoryReference())));
-        builder.addPureFunction("pow", new Power());
+        builder.addFunction("pow", new Power());
     }
 
     private static void addLogic(ConfigBuilder builder) {
@@ -120,9 +120,9 @@ public abstract class DefaultConfig {
         builder.addAlias("&&", "and");
         builder.addAlias("||", "or");
 
-        builder.addPureFunction("not", new Not());
-        builder.addPureFunction("and", new And());
-        builder.addPureFunction("or", new Or());
+        builder.addFunction("not", new Not());
+        builder.addFunction("and", new And());
+        builder.addFunction("or", new Or());
     }
 
     private static void addServiceFunctions(ConfigBuilder builder) {
@@ -131,11 +131,11 @@ public abstract class DefaultConfig {
         builder.addAlias("v=", "vSet");
         builder.addAlias("function", "def");
 
-        builder.addPureFunction("seq", new Sequence<Object>());
-        builder.addPureFunction("assign", new Assign<Object>());
+        builder.addFunction("seq", new Sequence<Object>());
+        builder.addFunction("assign", new Assign<Object>());
         builder.addFunction("vSet", new VarAsSettable());
         builder.addFunction("isDefined", new IsDefined());
-        builder.addPureFunction("if", new If<Object>());
+        builder.addFunction("if", new If<Object>());
         builder.addFunction("apply", new ExtensibleApply());
         builder.addFunction("def", new MakeFunction());
     }

@@ -78,7 +78,7 @@ public class ConfigBuilder {
      * @param <R>      function result type
      * @return this instance
      */
-    public <A, R> ConfigBuilder addPureFunction(String name, VarArgFunction<A, R> function) {
+    public <A, R> ConfigBuilder addFunction(String name, VarArgFunction<A, R> function) {
         functions.put(name, wrap(function));
         return this;
     }
