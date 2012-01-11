@@ -3,7 +3,7 @@
 
     <groupId>see</groupId>
     <artifactId>see</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
     <packaging>jar</packaging>
 
     <!--Name subject to change-->
