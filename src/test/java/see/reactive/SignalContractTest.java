@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.ImmutableSet.copyOf;
@@ -141,16 +142,57 @@ public abstract class SignalContractTest {
         assertEquals(of("crn", "bka"), flatMapped.now().now());
     }
 
+    @Test
+    public void testNestedSetters() throws Exception {
+        VariableSignal<String> a = signalFactory.var("a");
+        VariableSignal<String> b = signalFactory.var("b");
+
+        VariableSignal<ImmutableSet<VariableSignal<String>>> deps = signalFactory.var(of(a));
+
+        final Signal<Collection<String>> flat = Signals.flatMap(signalFactory, deps, new Function<Collection<? extends Signal<String>>, Signal<Collection<String>>>() {
+            @Override
+            public Signal<Collection<String>> apply(Collection<? extends Signal<String>> signals) {
+                return mergeSignals(signals);
+            }
+        });
+
+        final AtomicReference<Collection<String>> sink = getSink(flat);
+
+        assertEquals(of("a"), sink.get());
+
+        deps.set(of(a, b));
+        assertEquals(of("a", "b"), sink.get());
+        
+        b.set("bka");
+        assertEquals(of("a", "bka"), sink.get());
+
+        deps.set(of(b));
+        assertEquals(of("bka"), sink.get());
+    }
+
+    private <T> AtomicReference<T> getSink(final Signal<? extends T> signal) {
+        final AtomicReference<T> sink = new AtomicReference<T>();
+
+        signalFactory.bind(of(signal), new Supplier<Void>() {
+            @Override
+            public Void get() {
+                sink.set(signal.now());
+                return null;
+            }
+        });
+        return sink;
+    }
+
     private <T> Signal<Signal<Collection<T>>> signalFlatMap(final Signal<? extends Collection<? extends Signal<T>>> nested) {
         return Signals.transform(signalFactory, nested, new Function<Collection<? extends Signal<T>>, Signal<Collection<T>>>() {
             @Override
             public Signal<Collection<T>> apply(Collection<? extends Signal<T>> signals) {
-                return flatten(signals);
+                return mergeSignals(signals);
             }
         });
     }
 
-    private <T> Signal<Collection<T>> flatten(final Collection<? extends Signal<T>> signals) {
+    private <T> Signal<Collection<T>> mergeSignals(final Collection<? extends Signal<T>> signals) {
         return signalFactory.bind(signals, new Supplier<Collection<T>>() {
             @Override
             public Collection<T> get() {
