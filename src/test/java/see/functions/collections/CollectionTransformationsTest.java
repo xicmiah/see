@@ -20,6 +20,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import see.See;
+import see.functions.functional.Filter;
+import see.functions.functional.FlatMap;
+import see.functions.functional.FoldFunction;
+import see.functions.functional.Transform;
 import see.parser.config.ConfigBuilder;
 
 import java.math.BigDecimal;

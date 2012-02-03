@@ -14,58 +14,59 @@
  * limitations under the License.
  */
 
-package see.functions.collections;
+package see.functions.functional;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import see.functions.VarArgFunction;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Collections.singletonList;
 
-public class Transform implements VarArgFunction<Object, Iterable<?>> {
+public class Filter implements VarArgFunction<Object, Iterable<?>> {
     @Override
-    public Iterable<?> apply(@Nonnull final List<Object> args) {
-        Preconditions.checkArgument(args.size() == 2, "Transform takes two arguments");
-        
-        Iterable<?> items = (Iterable<?>) args.get(0);
-        final VarArgFunction<Object, ?> transformFunction = (VarArgFunction<Object, ?>) args.get(1);
+    public Iterable<?> apply(@Nonnull List<Object> args) {
+        Preconditions.checkArgument(args.size() == 2, "Filter takes two arguments");
 
-        Function<Object, Object> transformation = new Function<Object, Object>() {
+        Iterable<?> items = (Iterable<?>) args.get(0);
+        final VarArgFunction<Object, Boolean> predicateFunction = (VarArgFunction<Object, Boolean>) args.get(1);
+
+        Predicate<Object> predicate = new Predicate<Object>() {
             @Override
-            public Object apply(@Nullable Object input) {
-                return transformFunction.apply(singletonList(input));
+            public boolean apply(@Nullable Object input) {
+                return predicateFunction.apply(singletonList(input));
             }
         };
 
-        return transform(items, transformation);
+        return filter(items, predicate);
     }
 
     /**
-     * Choose appropriate transformation based on runtime type of collection
+     * Choose appropriate filter based on runtime type of collection
      * @param items collection to transform
-     * @param transformation item transformation
-     * @return lazy transformed collection
+     * @param predicate predicate to match
+     * @return lazy filtered collection
      */
-    private Iterable<?> transform(Iterable<?> items, Function<Object, Object> transformation) {
-        if (items instanceof List<?>) {
-            return Lists.transform((List<?>) items, transformation);
+    private Iterable<?> filter(Iterable<?> items, Predicate<Object> predicate) {
+        if (items instanceof Set<?>) {
+            return Sets.filter((Set<?>) items, predicate);
         } else if (items instanceof Collection<?>) {
-            return Collections2.transform((Collection<?>) items, transformation);
+            return Collections2.filter((Collection<?>) items, predicate);
         } else {
-            return Iterables.transform(items, transformation);
+            return Iterables.filter(items, predicate);
         }
     }
 
     @Override
     public String toString() {
-        return "map";
+        return "filter";
     }
 }

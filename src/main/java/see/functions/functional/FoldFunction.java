@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package see.functions.collections;
+package see.functions.functional;
 
 import com.google.common.base.Preconditions;
 import see.functions.VarArgFunction;
