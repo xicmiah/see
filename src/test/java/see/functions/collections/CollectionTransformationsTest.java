@@ -20,11 +20,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import see.See;
-import see.functions.functional.Filter;
-import see.functions.functional.FlatMap;
-import see.functions.functional.FoldFunction;
-import see.functions.functional.Transform;
-import see.parser.config.ConfigBuilder;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -39,12 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class CollectionTransformationsTest {
-    See see = new See(ConfigBuilder.defaultConfig()
-            .addFunction("map", new Transform())
-            .addFunction("filter", new Filter())
-            .addFunction("flatMap", new FlatMap())
-            .addFunction("fold", new FoldFunction())
-            .build());
+    See see = new See();
 
     @Test
     public void testMap() throws Exception {

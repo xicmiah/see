@@ -25,6 +25,10 @@ import see.functions.collections.MakeList;
 import see.functions.collections.MakeMap;
 import see.functions.common.AddOrConcat;
 import see.functions.compare.*;
+import see.functions.functional.Filter;
+import see.functions.functional.FlatMap;
+import see.functions.functional.FoldFunction;
+import see.functions.functional.Transform;
 import see.functions.properties.GetProperty;
 import see.functions.reactive.Bind;
 import see.functions.reactive.MakeSignal;
@@ -54,7 +58,15 @@ public abstract class DefaultConfig {
         addProperty(builder);
         addIteration(builder);
         addBindings(builder);
+        addFunctional(builder);
         return builder;
+    }
+
+    private static void addFunctional(ConfigBuilder builder) {
+        builder.addFunction("map", new Transform());
+        builder.addFunction("filter", new Filter());
+        builder.addFunction("flatMap", new FlatMap());
+        builder.addFunction("fold", new FoldFunction());
     }
 
     private static void addCollections(ConfigBuilder builder) {
