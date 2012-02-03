@@ -16,6 +16,7 @@
 
 package see.reactive;
 
+import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 
 import javax.annotation.Nonnull;
@@ -43,4 +44,25 @@ public interface SignalFactory {
      */
     @Nonnull
     <T> Signal<T> bind(@Nonnull Collection<? extends Signal<?>> dependencies, @Nonnull Supplier<T> evaluation);
+
+    /**
+     * Get new signal, which value is transformation applied to value of source signal
+     * @param signal source signal
+     * @param transformation transformation to apply
+     * @param <A> source value type
+     * @param <B> result value type
+     * @return signal with transformed value
+     */
+    <A, B> Signal<B> map(Signal<A> signal, Function<? super A, B> transformation);
+
+    /**
+     * Get new signal, which value is value of signal obtained by transforming value of source signal.
+     * TL;DR Signal[A] -> (A -> Signal[B]) -> Signal[B]
+     * @param signal signal to transform
+     * @param transformation transformation, which returns a signal
+     * @param <A> source value type
+     * @param <B> result value type
+     * @return signal with transformed value
+     */
+    <A, B> Signal<B> flatMap(Signal<A> signal, Function<? super A, ? extends Signal<B>> transformation);
 }

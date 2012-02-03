@@ -149,7 +149,7 @@ public abstract class SignalContractTest {
 
         VariableSignal<ImmutableSet<VariableSignal<String>>> deps = signalFactory.var(of(a));
 
-        final Signal<Collection<String>> flat = Signals.flatMap(signalFactory, deps, new Function<Collection<? extends Signal<String>>, Signal<Collection<String>>>() {
+        final Signal<Collection<String>> flat = signalFactory.flatMap(deps, new Function<Collection<? extends Signal<String>>, Signal<Collection<String>>>() {
             @Override
             public Signal<Collection<String>> apply(Collection<? extends Signal<String>> signals) {
                 return mergeSignals(signals);
@@ -184,7 +184,7 @@ public abstract class SignalContractTest {
     }
 
     private <T> Signal<Signal<Collection<T>>> signalFlatMap(final Signal<? extends Collection<? extends Signal<T>>> nested) {
-        return Signals.transform(signalFactory, nested, new Function<Collection<? extends Signal<T>>, Signal<Collection<T>>>() {
+        return signalFactory.map(nested, new Function<Collection<? extends Signal<T>>, Signal<Collection<T>>>() {
             @Override
             public Signal<Collection<T>> apply(Collection<? extends Signal<T>> signals) {
                 return mergeSignals(signals);

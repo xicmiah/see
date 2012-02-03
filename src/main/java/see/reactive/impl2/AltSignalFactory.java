@@ -16,13 +16,18 @@
 
 package see.reactive.impl2;
 
+import com.google.common.base.Function;
 import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import see.reactive.Signal;
 import see.reactive.SignalFactory;
+import see.reactive.Signals;
 import see.reactive.VariableSignal;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+
+import static com.google.common.collect.ImmutableSet.of;
 
 /**
  * Implementation of {@link SignalFactory}, which creates observer-based signals.
@@ -38,5 +43,31 @@ public class AltSignalFactory implements SignalFactory {
     @Override
     public <T> Signal<T> bind(@Nonnull Collection<? extends Signal<?>> dependencies, @Nonnull Supplier<T> evaluation) {
         return new BoundSignal<T>(dependencies, evaluation);
+    }
+
+    @Override
+    public <A, B> Signal<B> map(Signal<A> signal, Function<? super A, B> transformation) {
+        return bind(of(signal), Suppliers.compose(transformation, Signals.signalSupplier(signal)));
+    }
+
+    @Override
+    public <A, B> Signal<B> flatMap(final Signal<A> signal, final Function<? super A, ? extends Signal<B>> transformation) {
+        final VariableSignal<B> out = var(transformation.apply(signal.now()).now());
+        
+        bind(of(signal), new Supplier<Void>() {
+            @Override
+            public Void get() {
+                bind(of(transformation.apply(signal.now())), new Supplier<Void>() {
+                    @Override
+                    public Void get() {
+                        out.set(transformation.apply(signal.now()).now());
+                        return null;
+                    }
+                });
+                return null;
+            }
+        });
+        
+        return out;
     }
 }
