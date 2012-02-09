@@ -90,4 +90,9 @@ public class FunctionCreationTest {
             assertThat(e.getLastCause(), instanceOf(UnsupportedOperationException.class));
         }
     }
+
+    @Test
+    public void testNullParameter() throws Exception {
+        see.eval("function(a) { 9; }(null)");
+    }
 }

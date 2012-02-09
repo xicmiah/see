@@ -17,6 +17,7 @@
 package see.evaluation.scopes;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import see.evaluation.Scope;
 
 import javax.annotation.Nonnull;
@@ -34,7 +35,14 @@ class ImmutableOverride implements Scope {
 
     ImmutableOverride(Scope parent, Map<String, ?> overrides) {
         this.parent = parent;
-        this.overrides = ImmutableMap.copyOf(overrides);
+        this.overrides = nullSafeCopy(overrides); // Null-safe copy of values
+    }
+
+    private Map<String, Object> nullSafeCopy(Map<String, ?> overrides) {
+        if (overrides instanceof ImmutableMap<?, ?>)
+            return ImmutableMap.copyOf(overrides);
+        else
+            return Maps.newHashMap(overrides);
     }
 
     @Override
