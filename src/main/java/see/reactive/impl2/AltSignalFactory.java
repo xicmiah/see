@@ -41,33 +41,39 @@ public class AltSignalFactory implements SignalFactory {
 
     @Nonnull
     @Override
-    public <T> Signal<T> bind(@Nonnull Collection<? extends Signal<?>> dependencies, @Nonnull Supplier<T> evaluation) {
+    public <T> BoundSignal<T> bind(@Nonnull Collection<? extends Signal<?>> dependencies, @Nonnull Supplier<T> evaluation) {
         return new BoundSignal<T>(dependencies, evaluation);
     }
 
     @Override
-    public <A, B> Signal<B> map(Signal<A> signal, Function<? super A, B> transformation) {
+    public <A, B> BoundSignal<B> map(Signal<A> signal, Function<? super A, B> transformation) {
         return bind(of(signal), Suppliers.compose(transformation, Signals.signalSupplier(signal)));
     }
 
     @Override
     public <A, B> Signal<B> flatMap(final Signal<A> signal, final Function<? super A, ? extends Signal<B>> transformation) {
-        final VariableSignal<B> out = var(transformation.apply(signal.now()).now());
+        final DelegatingSignal<B> mirror = new DelegatingSignal<B>(transformation.apply(signal.now()));
         
-        bind(of(signal), new Supplier<Void>() {
-            @Override
-            public Void get() {
-                bind(of(transformation.apply(signal.now())), new Supplier<Void>() {
-                    @Override
-                    public Void get() {
-                        out.set(transformation.apply(signal.now()).now());
-                        return null;
-                    }
-                });
-                return null;
-            }
-        });
-        
-        return out;
+        bind(of(signal), new OnSourceChange<A, B>(signal, mirror, transformation));
+
+        return mirror;
+    }
+
+    private static class OnSourceChange<A, B> implements Supplier<Void> {
+        private final Signal<A> source;
+        private final DelegatingSignal<B> out;
+        private final Function<? super A, ? extends Signal<B>> transformation;
+
+        public OnSourceChange(Signal<A> source, DelegatingSignal<B> out, Function<? super A, ? extends Signal<B>> transformation) {
+            this.out = out;
+            this.transformation = transformation;
+            this.source = source;
+        }
+
+        @Override
+        public Void get() {
+            out.setDelegate(transformation.apply(source.now()));
+            return null;
+        }
     }
 }

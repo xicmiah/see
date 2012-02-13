@@ -18,7 +18,9 @@ package see.reactive;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
+import com.google.common.collect.DiscreteDomains;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Ranges;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -170,6 +172,31 @@ public abstract class SignalContractTest {
         assertEquals(of("bka"), sink.get());
     }
 
+    @Test
+    public void testFlatMapMemory() throws Exception {
+        VariableSignal<String> a = signalFactory.var("a");
+        VariableSignal<String> b = signalFactory.var("b");
+        VariableSignal<ImmutableSet<VariableSignal<String>>> deps = signalFactory.var(of(a));
+
+        Signal<Collection<String>> flat = signalFactory.flatMap(deps, new SignalMerge());
+
+        for (Integer i : Ranges.closed(1, 5).asSet(DiscreteDomains.integers())) {
+            deps.set(of(a, b));
+
+            a.set("a1");
+            b.set("b1");
+
+            deps.set(of(a));
+
+            a.set("a");
+            b.set("b");
+        }
+
+        System.gc();
+
+        assertEquals(of("a"), flat.now());
+    }
+
     private <T> AtomicReference<T> getSink(final Signal<? extends T> signal) {
         final AtomicReference<T> sink = new AtomicReference<T>();
 
@@ -199,5 +226,12 @@ public abstract class SignalContractTest {
                 return copyOf(transform(signals, Signals.<T>nowFunction()));
             }
         });
+    }
+
+    private class SignalMerge implements Function<Collection<? extends Signal<String>>, Signal<Collection<String>>> {
+        @Override
+        public Signal<Collection<String>> apply(Collection<? extends Signal<String>> signals) {
+            return mergeSignals(signals);
+        }
     }
 }

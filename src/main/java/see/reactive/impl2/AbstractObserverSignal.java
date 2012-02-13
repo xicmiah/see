@@ -22,8 +22,7 @@ import javax.annotation.Nonnull;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Predicates.instanceOf;
@@ -35,7 +34,7 @@ import static com.google.common.collect.Iterables.all;
  *
  * @param <T> value type
  */
-abstract class AbstractObserverSignal<T> implements Signal<T> {
+abstract class AbstractObserverSignal<T> implements Signal<T>, PropertyChangeListener {
     
     private final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
     
@@ -55,17 +54,17 @@ abstract class AbstractObserverSignal<T> implements Signal<T> {
 
     private void addListeners(Collection<? extends AbstractObserverSignal<?>> dependencies) {
         for (AbstractObserverSignal<?> dependency : dependencies) {
-            dependency.changeSupport.addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    handleChangeEvent();
-                }
-            });
+            dependency.changeSupport.addPropertyChangeListener(this);
         }
     }
 
     protected void fireChangeEvent(T newValue) {
         changeSupport.firePropertyChange("currentValue", currentValue, currentValue = newValue);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+        handleChangeEvent();
     }
 
     protected abstract void handleChangeEvent();
@@ -78,5 +77,9 @@ abstract class AbstractObserverSignal<T> implements Signal<T> {
     @Override
     public T apply(@Nonnull List<Void> input) throws IllegalStateException {
         throw new IllegalStateException("Can be called only from signal expressions");
+    }
+
+    PropertyChangeSupport getChangeSupport() {
+        return changeSupport;
     }
 }
