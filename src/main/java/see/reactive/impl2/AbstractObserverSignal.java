@@ -22,7 +22,8 @@ import javax.annotation.Nonnull;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Predicates.instanceOf;
@@ -54,7 +55,7 @@ abstract class AbstractObserverSignal<T> implements Signal<T>, PropertyChangeLis
 
     private void addListeners(Collection<? extends AbstractObserverSignal<?>> dependencies) {
         for (AbstractObserverSignal<?> dependency : dependencies) {
-            dependency.changeSupport.addPropertyChangeListener(this);
+            subscribe(dependency);
         }
     }
 
@@ -79,7 +80,11 @@ abstract class AbstractObserverSignal<T> implements Signal<T>, PropertyChangeLis
         throw new IllegalStateException("Can be called only from signal expressions");
     }
 
-    PropertyChangeSupport getChangeSupport() {
-        return changeSupport;
+    protected void subscribe(AbstractObserverSignal<?> target) {
+        target.changeSupport.addPropertyChangeListener(this);
+    }
+
+    protected void unsubscribe(AbstractObserverSignal<?> target) {
+        target.changeSupport.removePropertyChangeListener(this);
     }
 }
