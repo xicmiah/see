@@ -12,8 +12,10 @@ public class Not implements VarArgFunction<Boolean, Boolean> {
     @Override
     public Boolean apply(@Nonnull List<Boolean> input) {
         checkArgument(input.size() == 1, "Not takes only one argument");
-        checkNotNull(input.get(0));
-        return !input.get(0);
+        Boolean value = input.get(0);
+        checkNotNull(value);
+
+        return !value;
     }
 
     @Override
