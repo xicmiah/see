@@ -23,9 +23,11 @@ import see.functions.PartialFunction;
 import see.functions.VarArgFunction;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 public abstract class FunctionUtils {
     private FunctionUtils() {}
@@ -84,6 +86,37 @@ public abstract class FunctionUtils {
             return (Function<List<A>, R>) f;
         }
         return new VarArgToGuava<A, R>(f);
+    }
+
+    /**
+     * Converts single-argument {@link VarArgFunction} to guava {@link Function}
+     * @param f function to convert
+     * @param <A> argument type
+     * @param <R> result type
+     * @return corresponding guava function
+     */
+    public static <A, R> Function<A, R> singleArg(final VarArgFunction<A, R> f) {
+        return new Function<A, R>() {
+            @Override
+            public R apply(@Nullable A input) {
+                return f.apply(singletonList(input));
+            }
+        };
+    }
+
+    /**
+     * Convert single-argument boolean {@link VarArgFunction} to guava {@link Predicate}
+     * @param predicate function to convert
+     * @param <A> argument type
+     * @return corresponding guava predicate
+     */
+    public static <A> Predicate<A> singleArgPredicate(final VarArgFunction<A, Boolean> predicate) {
+        return new Predicate<A>() {
+            @Override
+            public boolean apply(@Nullable A input) {
+                return predicate.apply(singletonList(input));
+            }
+        };
     }
 
     private static class IsDefinedPredicate<A, R> implements Predicate<PartialFunction<? super A, ? extends R>> {
