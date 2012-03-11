@@ -20,7 +20,7 @@ import com.google.common.base.Supplier;
 
 import java.util.Collection;
 
-public class BoundSignal<T> extends AbstractOrderedSignal<T> {
+class BoundSignal<T> extends AbstractOrderedSignal<T> {
 
     private final Supplier<T> evaluation;
 

@@ -23,6 +23,7 @@ import javax.annotation.Nonnull;
 import java.util.*;
 
 import static com.google.common.base.Objects.equal;
+import static com.google.common.collect.ImmutableSet.of;
 
 /**
  * Signal implementation, where changes are propagated in topological order,
@@ -79,10 +80,8 @@ public abstract class AbstractOrderedSignal<T> implements Signal<T>, Comparable<
      */
     protected abstract T evaluate();
 
-    protected void emitUpdate(T newValue) {
-        if (updateAndCheck(newValue)) {
-            propagateChanges(this.dependants);
-        }
+    protected void invalidate() {
+        propagateChanges(of(this));
     }
 
     private boolean reEvalAndCheck() {

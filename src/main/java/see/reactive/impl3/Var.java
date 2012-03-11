@@ -19,19 +19,27 @@ package see.reactive.impl3;
 import com.google.common.collect.ImmutableSet;
 import see.reactive.VariableSignal;
 
-public class Var<T> extends AbstractOrderedSignal<T> implements VariableSignal<T> {
+class Var<T> extends AbstractOrderedSignal<T> implements VariableSignal<T> {
+
+    /**
+     * Separate current value required for invalidation logic.
+     * Call to {@link see.reactive.impl3.AbstractOrderedSignal#invalidate()} will sync with superclass.
+     */
+    private T currentValue;
 
     public Var(T value) {
         super(ImmutableSet.<AbstractOrderedSignal<?>>of(), value);
+        this.currentValue = value;
     }
 
     @Override
     protected T evaluate() {
-        return now();
+        return currentValue;
     }
 
     @Override
     public void set(T value) {
-        emitUpdate(value);
+        this.currentValue = value;
+        invalidate();
     }
 }

@@ -44,7 +44,8 @@ public class OrderedSignalFactory implements SignalFactory {
     @Override
     public <T> Signal<T> bind(@Nonnull Collection<? extends Signal<?>> dependencies, @Nonnull Supplier<T> evaluation) {
         checkArgument(all(dependencies, instanceOf(AbstractOrderedSignal.class)));
-        Collection<? extends AbstractOrderedSignal<?>> casted = (Collection<? extends AbstractOrderedSignal<?>>) dependencies;
+        @SuppressWarnings("unchecked") // safe to cast, already checked
+        Collection<AbstractOrderedSignal<?>> casted = (Collection<AbstractOrderedSignal<?>>) dependencies;
         return new BoundSignal<T>(casted, evaluation);
     }
 
