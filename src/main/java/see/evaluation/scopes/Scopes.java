@@ -41,6 +41,7 @@ public abstract class Scopes {
      * @return created scope
      */
     public static Scope fromMap(Map<String, ?> vars) {
+        if (vars.isEmpty()) return empty();
         return new ImmutableScope(vars);
     }
 
@@ -54,6 +55,7 @@ public abstract class Scopes {
      * @return created scope
      */
     public static Scope override(Scope parent, Map<String, ?> overriddenVars) {
+        if (overriddenVars.isEmpty()) return parent;
         return new ImmutableOverride(parent, overriddenVars);
     }
 
@@ -67,6 +69,7 @@ public abstract class Scopes {
      * @return created scope
      */
     public static Scope mutableOverride(Scope parent, Map<String, ?> overriddenVars) {
+        if (overriddenVars.isEmpty()) return parent;
         return new MutableOverride(parent, overriddenVars);
     }
 

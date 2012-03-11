@@ -17,23 +17,39 @@
 package see.evaluation.scopes;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import see.evaluation.Scope;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import static com.google.common.base.Predicates.isNull;
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.collect.ImmutableMap.copyOf;
+import static com.google.common.collect.ImmutableSet.of;
+import static com.google.common.collect.Maps.filterValues;
+
 class ImmutableScope implements Scope {
 
+    // Store immutable map + set of null keys
     private final Map<String, Object> contents;
+    private final Collection<String> nullKeys;
 
     ImmutableScope(Map<String, ?> contents) {
-        this.contents = ImmutableMap.copyOf(contents);
+        if (contents instanceof ImmutableMap<?, ?>) {
+            this.contents = copyOf(contents);
+            this.nullKeys = of();
+        } else {
+            this.contents = copyOf(filterValues(contents, notNull()));
+            this.nullKeys = ImmutableSet.copyOf(filterValues(contents, isNull()).keySet());
+        }
     }
 
     @Override
     public Object get(@Nonnull String var) {
-        if (contents.containsKey(var)) {
+        if (contains(var)) {
             return contents.get(var);
         } else {
             throw new NoSuchElementException("Cannot resolve variable " + var);
@@ -47,7 +63,7 @@ class ImmutableScope implements Scope {
 
     @Override
     public boolean contains(@Nonnull String var) {
-        return contents.containsKey(var);
+        return contents.containsKey(var) || nullKeys.contains(var);
     }
 
     @Nonnull
