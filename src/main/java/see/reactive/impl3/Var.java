@@ -25,21 +25,21 @@ class Var<T> extends AbstractOrderedSignal<T> implements VariableSignal<T> {
      * Separate current value required for invalidation logic.
      * Call to {@link see.reactive.impl3.AbstractOrderedSignal#invalidate()} will sync with superclass.
      */
-    private T currentValue;
+    private T localValue;
 
     public Var(T value) {
         super(ImmutableSet.<AbstractOrderedSignal<?>>of(), value);
-        this.currentValue = value;
+        this.localValue = value;
     }
 
     @Override
     protected T evaluate() {
-        return currentValue;
+        return localValue;
     }
 
     @Override
     public void set(T value) {
-        this.currentValue = value;
+        this.localValue = value;
         invalidate();
     }
 }

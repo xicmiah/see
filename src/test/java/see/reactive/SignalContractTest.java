@@ -17,6 +17,7 @@
 package see.reactive;
 
 import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import com.google.common.base.Supplier;
 import com.google.common.collect.DiscreteDomains;
 import com.google.common.collect.ImmutableSet;
@@ -170,6 +171,20 @@ public abstract class SignalContractTest {
 
         deps.set(of(b));
         assertEquals(of("bka"), sink.get());
+    }
+
+    @Test
+    public void testFlatMap() throws Exception {
+        VariableSignal<String> a = signalFactory.var("a");
+        VariableSignal<String> b = signalFactory.var("b");
+        VariableSignal<VariableSignal<String>> ref = signalFactory.var(a);
+
+        Signal<String> value = signalFactory.flatMap(ref, Functions.<Signal<String>>identity());
+        assertEquals("a", value.now());
+        ref.set(b);
+        assertEquals("b", value.now());
+        b.set("bka");
+        assertEquals("bka", value.now());
     }
 
     @Test

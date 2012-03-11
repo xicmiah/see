@@ -55,22 +55,18 @@ public class OrderedSignalFactory implements SignalFactory {
     }
 
     @Override
-    public <A, B> Signal<B> flatMap(final Signal<A> signal, final Function<? super A, ? extends Signal<B>> transformation) {
-        final VariableSignal<B> out = var(transformation.apply(signal.now()).now());
+    public <A, B> Signal<B> flatMap(final Signal<A> signal,
+                                    final Function<? super A, ? extends Signal<B>> transformation) {
+        final DelegatingSignal<B> mirror = DelegatingSignal.create(transformation.apply(signal.now()));
 
         bind(of(signal), new Supplier<Void>() {
             @Override
             public Void get() {
-                bind(of(transformation.apply(signal.now())), new Supplier<Void>() {
-                    @Override
-                    public Void get() {
-                        out.set(transformation.apply(signal.now()).now());
-                        return null;
-                    }
-                });
+                mirror.setDelegate(transformation.apply(signal.now()));
                 return null;
             }
         });
 
-        return out;
-    }}
+        return mirror;
+    }
+}

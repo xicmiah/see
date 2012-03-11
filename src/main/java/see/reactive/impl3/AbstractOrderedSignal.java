@@ -52,16 +52,16 @@ public abstract class AbstractOrderedSignal<T> implements Signal<T>, Comparable<
 
     private void subscribeDependants(Collection<? extends AbstractOrderedSignal<?>> dependencies) {
         for (AbstractOrderedSignal<?> dependency : dependencies) {
-            dependency.subscribe(this);
+            addDependency(dependency);
         }
     }
 
-    protected void subscribe(AbstractOrderedSignal<?> dependant) {
-        dependants.add(dependant);
+    protected void addDependency(AbstractOrderedSignal<?> dependency) {
+        dependency.dependants.add(this);
     }
 
-    protected void unsubscribe(AbstractOrderedSignal<?> dependant) {
-        dependants.remove(this);
+    protected void removeDependency(AbstractOrderedSignal<?> dependency) {
+        dependency.dependants.remove(this);
     }
 
     @Override
