@@ -1,6 +1,6 @@
 package see.functions;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.MutableClassToInstanceMap;
 import org.junit.Test;
 import see.evaluation.Context;
@@ -19,11 +19,14 @@ public class IsDefinedTest {
 
     @Test
     public void testOnStaticContext() throws Exception {
-          Map<String, Object> contents = ImmutableMap.<String, Object>of("c", 9);
-          Context context = fromMutable(contents);
+        Map<String, Object> contents = Maps.newHashMap();
+        contents.put("c", 9);
+        contents.put("null", null);
+        Context context = fromMutable(contents);
 
-          assertTrue(isDefined.apply(context).apply(of("c")));
-          assertFalse(isDefined.apply(context).apply(of("a")));
+        assertTrue(isDefined.apply(context).apply(of("c")));
+        assertFalse(isDefined.apply(context).apply(of("null")));
+        assertFalse(isDefined.apply(context).apply(of("nonexistent")));
     }
 
     private Context fromMutable(Map<String, ?> contents) {

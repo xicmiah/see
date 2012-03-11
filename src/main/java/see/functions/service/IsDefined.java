@@ -3,6 +3,7 @@ package see.functions.service;
 
 import com.google.common.base.Preconditions;
 import see.evaluation.Context;
+import see.evaluation.Scope;
 import see.functions.ContextCurriedFunction;
 import see.functions.VarArgFunction;
 
@@ -18,8 +19,9 @@ public class IsDefined implements ContextCurriedFunction<String, Boolean> {
                 Preconditions.checkArgument(strings.size() == 1, "isDefined takes variable name");
 
                 String variable = strings.get(0);
-                
-                return context.getScope().contains(variable);
+
+                Scope scope = context.getScope();
+                return scope.contains(variable) && scope.get(variable) != null;
             }
         };
     }
