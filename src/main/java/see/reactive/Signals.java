@@ -34,10 +34,10 @@ public abstract class Signals {
         };
     }
 
-    public static <T> Function<Signal<T>, T> nowFunction() {
-        return new Function<Signal<T>, T>() {
+    public static <T> Function<Signal<? extends T>, T> nowFunction() {
+        return new Function<Signal<? extends T>, T>() {
             @Override
-            public T apply(Signal<T> signal) {
+            public T apply(Signal<? extends T> signal) {
                 return signal.now();
             }
         };
