@@ -17,6 +17,7 @@
 package see.properties;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import see.parser.grammar.PropertyAccess;
 
@@ -45,6 +46,17 @@ public class PropertyResolvers {
      */
     public static PartialResolver aggregate(final Iterable<? extends PartialResolver> resolvers) {
         return new PartialAggregator(resolvers);
+    }
+
+    /**
+     * Construct a partial resolver from a collection of other partial resolvers.
+     * Constructed resolver delegates to first resolver, which can complete target operation.
+     *
+     * @param resolvers partial resolvers to aggregate
+     * @return constructed aggregating resolver
+     */
+    public static PartialResolver aggregate(PartialResolver... resolvers) {
+        return aggregate(ImmutableList.copyOf(resolvers));
     }
 
     private static class UniversalResolver implements PartialResolver {
