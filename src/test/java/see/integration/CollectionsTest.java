@@ -20,10 +20,12 @@ import org.junit.Test;
 import see.See;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class CollectionsTest {
     See see = new See();
@@ -57,5 +59,11 @@ public class CollectionsTest {
         );
 
         assertEquals(expected, mixed);
+    }
+
+    @Test
+    public void testNullInMaps() throws Exception {
+        Map<String, ?> map = (Map<String, ?>) see.eval("{ n: null }");
+        assertNull(map.get("n"));
     }
 }

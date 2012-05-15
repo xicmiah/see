@@ -40,7 +40,12 @@ public class MakeMap implements VarArgFunction<Object, Map<Object, Object>> {
                 new Reduce.FoldFunction<List<Object>, Builder<Object, Object>>() {
                     @Override
                     public Builder<Object, Object> apply(Builder<Object, Object> prev, List<Object> arg) {
-                        return prev.put(arg.get(0), arg.get(1));
+                        Object key = arg.get(0);
+                        Object value = arg.get(1);
+
+                        if (value == null) return prev; // Leave out null values
+
+                        return prev.put(key, value);
                     }
                 });
 
