@@ -29,6 +29,12 @@ public abstract class PropertyAccess {
      */
     public abstract Either<String, Object> value();
 
+    /**
+     * Get merged contained value - name for simple properties, index for indexed.
+     * @return merged value
+     */
+    public abstract Object mergedValue();
+
     public static Simple simple(String name) {
         return new Simple(name);
     }
@@ -59,6 +65,11 @@ public abstract class PropertyAccess {
         }
 
         @Override
+        public Object mergedValue() {
+            return name;
+        }
+
+        @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder();
             sb.append("Simple");
@@ -86,6 +97,11 @@ public abstract class PropertyAccess {
         @Override
         public Either<String, Object> value() {
             return Either.right(index);
+        }
+
+        @Override
+        public Object mergedValue() {
+            return index;
         }
 
         @Override
