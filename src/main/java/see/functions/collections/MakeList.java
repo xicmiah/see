@@ -22,11 +22,12 @@ import javax.annotation.Nonnull;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.unmodifiableList;
 
 public class MakeList implements VarArgFunction<Object, List<Object>> {
     @Override
     public List<Object> apply(@Nonnull List<Object> input) {
-        return newArrayList(input);
+        return unmodifiableList(newArrayList(input));
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.junit.Test;
 import see.See;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;
@@ -65,5 +66,23 @@ public class CollectionsTest {
     public void testNullInMaps() throws Exception {
         Map<String, ?> map = (Map<String, ?>) see.eval("{ n: null }");
         assertNull(map.get("n"));
+    }
+
+    @Test
+    public void testNullInLists() throws Exception {
+        List<?> list = (List<?>) see.eval("['a', null, 'b']");
+        assertNull(list.get(1));
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testListImmutability() throws Exception {
+        List<Object> list = (List<Object>) see.eval("['a', null, 'b']");
+        list.add("c");
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testMapImmutability() throws Exception {
+        Map<String, Object> map = (Map<String, Object>) see.eval("{ c: 9 }");
+        map.put("a", "new entry");
     }
 }
