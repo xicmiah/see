@@ -85,4 +85,9 @@ public class CollectionsTest {
         Map<String, Object> map = (Map<String, Object>) see.eval("{ c: 9 }");
         map.put("a", "new entry");
     }
+
+    @Test
+    public void testDotInMapKeys() throws Exception {
+        see.eval("{}['a.b']");
+    }
 }
