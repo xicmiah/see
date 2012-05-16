@@ -17,50 +17,29 @@
 package see.properties.impl;
 
 import com.google.common.base.Throwables;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.collect.ImmutableMap;
 import org.apache.commons.beanutils.PropertyUtils;
 import see.parser.grammar.PropertyAccess;
 import see.properties.PartialResolver;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.beans.PropertyDescriptor;
-import java.util.Map;
-
-import static com.google.common.collect.ImmutableSet.copyOf;
 
 public class BeanPropertyResolver implements PartialResolver {
 
-    private Cache<Class<?>, Map<String, PropertyDescriptor>> properties = CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<Class<?>, Map<String, PropertyDescriptor>>() {
-        @Override
-        public Map<String, PropertyDescriptor> load(Class<?> key) throws Exception {
-            Iterable<PropertyDescriptor> descriptors = copyOf(PropertyUtils.getPropertyDescriptors(key));
-
-            ImmutableMap.Builder<String, PropertyDescriptor> builder = ImmutableMap.builder();
-            for (PropertyDescriptor descriptor : descriptors) {
-                builder.put(descriptor.getName(), descriptor);
-            }
-            return builder.build();
-        }
-    });
-
     @Override
     public boolean canGet(@Nullable Object target, @Nonnull PropertyAccess propertyAccess) {
-        return isBeanProperty(propertyAccess) && properties.apply(target.getClass()).containsKey(getPropertyName(propertyAccess));
+        return isBeanProperty(propertyAccess) && PropertyUtils.isReadable(target, getPropertyName(propertyAccess));
     }
 
     @Override
     public boolean canSet(@Nullable Object target, @Nonnull PropertyAccess propertyAccess, Object value) {
-        return isBeanProperty(propertyAccess) && getDescriptor(target, propertyAccess).getWriteMethod() != null;
+        return isBeanProperty(propertyAccess) && PropertyUtils.isWriteable(target, getPropertyName(propertyAccess));
     }
 
     @Override
     public Object get(Object bean, PropertyAccess property) {
         try {
-            return getDescriptor(bean, property).getReadMethod().invoke(bean);
+            return PropertyUtils.getSimpleProperty(bean, getPropertyName(property));
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
@@ -69,7 +48,7 @@ public class BeanPropertyResolver implements PartialResolver {
     @Override
     public void set(Object bean, PropertyAccess property, Object value) {
         try {
-            getDescriptor(bean, property).getWriteMethod().invoke(bean, value);
+            PropertyUtils.setSimpleProperty(bean, getPropertyName(property), value);
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
@@ -81,10 +60,6 @@ public class BeanPropertyResolver implements PartialResolver {
 
     private boolean isBeanProperty(PropertyAccess propertyAccess) {
         return propertyAccess.mergedValue() instanceof String;
-    }
-
-    private PropertyDescriptor getDescriptor(Object bean, PropertyAccess property) {
-        return properties.apply(bean.getClass()).get(getPropertyName(property));
     }
 
 }
