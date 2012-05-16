@@ -16,8 +16,11 @@
 
 package see.parser.grammar;
 
+import com.google.common.base.Objects;
 import see.tree.Node;
 import see.util.Either;
+
+import static com.google.common.base.Objects.equal;
 
 /**
  * Parse-time property description.
@@ -59,10 +62,23 @@ public abstract class PropertyDescriptor {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Simple simple = (Simple) o;
+
+            return equal(name, simple.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(name);
+        }
+
+        @Override
         public String toString() {
-            final StringBuilder sb = new StringBuilder();
-            sb.append(".").append(name);
-            return sb.toString();
+            return "." + name;
         }
     }
 
@@ -83,8 +99,24 @@ public abstract class PropertyDescriptor {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Indexed indexed = (Indexed) o;
+
+            return equal(index, indexed.index);
+
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(index);
+        }
+
+        @Override
         public String toString() {
-            return new StringBuilder("[").append(index).append("]").toString();
+            return "[" + index + "]";
         }
     }
 }
