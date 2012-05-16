@@ -11,9 +11,7 @@ import see.parser.numbers.BigDecimalFactory;
 import see.parser.numbers.NumberFactory;
 import see.properties.ChainResolver;
 import see.properties.PropertyResolver;
-import see.properties.impl.MethodResolver;
-import see.properties.impl.PropertyUtilsResolver;
-import see.properties.impl.SingularChainResolver;
+import see.properties.impl.*;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +20,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import static com.google.common.collect.ImmutableList.of;
 import static see.evaluation.processors.AggregatingProcessor.concat;
 import static see.properties.PropertyResolvers.aggregate;
-import static see.properties.PropertyResolvers.universalResolver;
 
 public class ConfigBuilder {
     private Map<String, String> aliases;
@@ -31,7 +28,12 @@ public class ConfigBuilder {
     private List<? extends ValueProcessor> valueProcessors = of(new NumberLifter(getNumberFactoryReference()));
 
     private AtomicReference<NumberFactory> numberFactory = new AtomicReference<NumberFactory>(new BigDecimalFactory());
-    private ChainResolver propertyResolver = new SingularChainResolver(aggregate(of(new MethodResolver(), universalResolver(new PropertyUtilsResolver()))));
+    private ChainResolver propertyResolver = new SingularChainResolver(aggregate(
+            new MethodResolver(),
+            new MapResolver(),
+            new IterableResolver(),
+            new BeanPropertyResolver()
+    ));
 
     private ConfigBuilder(Map<String, String> aliases,
                           Map<String, ContextCurriedFunction<Object, Object>> functions) {
