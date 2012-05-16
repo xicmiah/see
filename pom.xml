@@ -78,10 +78,5 @@
             <artifactId>parboiled-java</artifactId>
             <version>1.0.2</version>
         </dependency>
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr-runtime</artifactId>
-            <version>3.3</version>
-        </dependency>
     </dependencies>
 </project>
