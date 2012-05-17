@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package see.reactive.impl3;
+package see.reactive.impl;
 
 import com.google.common.collect.Sets;
 import see.reactive.Signal;

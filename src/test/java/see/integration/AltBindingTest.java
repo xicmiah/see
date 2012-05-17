@@ -19,7 +19,7 @@ package see.integration;
 import org.junit.Test;
 import see.ReactiveSee;
 import see.reactive.SignalFactory;
-import see.reactive.impl3.OrderedSignalFactory;
+import see.reactive.impl.OrderedSignalFactory;
 
 import static org.junit.Assert.assertEquals;
 

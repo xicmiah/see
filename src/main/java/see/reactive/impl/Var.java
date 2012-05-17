@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Vasily Shiyan
+ * Copyright 2012 Vasily Shiyan
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,32 +17,29 @@
 package see.reactive.impl;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.eventbus.EventBus;
-import see.reactive.Signal;
 import see.reactive.VariableSignal;
 
-class Var<T> extends AbstractSignal<T> implements VariableSignal<T> {
+class Var<T> extends AbstractOrderedSignal<T> implements VariableSignal<T> {
 
-    private T value;
+    /**
+     * Separate current value required for invalidation logic.
+     * Call to {@link see.reactive.impl.AbstractOrderedSignal#invalidate()} will sync with superclass.
+     */
+    private T localValue;
 
-    public Var(EventBus eventBus, T initial) {
-        super(eventBus, ImmutableSet.<Signal<?>>of());
-        value = initial;
+    public Var(T value) {
+        super(ImmutableSet.<AbstractOrderedSignal<?>>of(), value);
+        this.localValue = value;
     }
 
     @Override
-    public void set(T newValue) {
-        value = newValue;
+    protected T evaluate() {
+        return localValue;
+    }
+
+    @Override
+    public void set(T value) {
+        this.localValue = value;
         invalidate();
-    }
-
-    @Override
-    protected void updateInternalState() {
-        // No dependencies
-    }
-
-    @Override
-    public T now() {
-        return value;
     }
 }

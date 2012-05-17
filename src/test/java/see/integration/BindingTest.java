@@ -23,7 +23,7 @@ import see.ReactiveSee;
 import see.reactive.Signal;
 import see.reactive.SignalFactory;
 import see.reactive.VariableSignal;
-import see.reactive.impl.ReactiveFactory;
+import see.reactive.impl.OrderedSignalFactory;
 import see.tree.Node;
 
 import java.util.Map;
@@ -32,7 +32,7 @@ import static com.google.common.collect.ImmutableMap.of;
 import static org.junit.Assert.*;
 
 public class BindingTest {
-    SignalFactory signalFactory = new ReactiveFactory();
+    SignalFactory signalFactory = new OrderedSignalFactory();
     ReactiveSee see = new ReactiveSee(signalFactory);
 
     @Test

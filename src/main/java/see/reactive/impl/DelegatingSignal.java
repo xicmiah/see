@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package see.reactive.impl3;
+package see.reactive.impl;
 
 import see.reactive.Signal;
 

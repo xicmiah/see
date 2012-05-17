@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package see.reactive;
+package see.reactive.impl;
 
-import see.reactive.impl2.AltSignalFactory;
+import com.google.common.base.Supplier;
 
-public class AltSignalFactoryTest extends SignalContractTest {
+import java.util.Collection;
+
+class BoundSignal<T> extends AbstractOrderedSignal<T> {
+
+    private final Supplier<T> evaluation;
+
+    public BoundSignal(Collection<? extends AbstractOrderedSignal<?>> dependencies, Supplier<T> evaluation) {
+        super(dependencies, evaluation.get());
+        this.evaluation = evaluation;
+    }
+
     @Override
-    protected SignalFactory getSignalFactory() {
-        return new AltSignalFactory();
+    protected T evaluate() {
+        return evaluation.get();
     }
 }

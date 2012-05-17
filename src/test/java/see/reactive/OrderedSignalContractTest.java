@@ -20,7 +20,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Sets;
 import org.junit.Test;
-import see.reactive.impl3.OrderedSignalFactory;
+import see.reactive.impl.OrderedSignalFactory;
 
 import java.util.Collection;
 
@@ -65,7 +65,7 @@ public class OrderedSignalContractTest extends SignalContractTest {
         });
 
         final Collection<Integer> observedValues = Sets.newTreeSet();
-        Signal<Void> sink = signalFactory.map(zero, new Function<Integer, Void>() {
+        signalFactory.map(zero, new Function<Integer, Void>() {
             @Override
             public Void apply(Integer input) {
                 observedValues.add(input);

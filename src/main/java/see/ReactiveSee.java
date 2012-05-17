@@ -22,7 +22,7 @@ import see.evaluation.evaluators.SimpleEvaluator;
 import see.parser.config.ConfigBuilder;
 import see.parser.config.GrammarConfiguration;
 import see.reactive.SignalFactory;
-import see.reactive.impl.ReactiveFactory;
+import see.reactive.impl.OrderedSignalFactory;
 import see.tree.Node;
 
 import java.util.Map;
@@ -33,7 +33,7 @@ import static see.evaluation.evaluators.SimpleEvaluator.extractServices;
 
 /**
  * Public API for working with reactive extensions(signals, bindings, etc.).
- * Holds {@link See} and {@link ReactiveFactory} instances.
+ * Holds {@link See} and {@link SignalFactory} instances.
  * Evaluation methods taking context work in new context.
  */
 @SuppressWarnings("UnusedDeclaration")
@@ -58,7 +58,7 @@ public class ReactiveSee {
      * @param config see configuration
      */
     public ReactiveSee(GrammarConfiguration config) {
-        this(config, new ReactiveFactory());
+        this(config, new OrderedSignalFactory());
     }
 
     /**
@@ -73,7 +73,7 @@ public class ReactiveSee {
      * Create new instance with default See configuration.
      */
     public ReactiveSee() {
-        this(new ReactiveFactory());
+        this(new OrderedSignalFactory());
     }
 
     /**
