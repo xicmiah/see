@@ -18,6 +18,7 @@ package see.reactive.impl;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
+import see.reactive.EvaluationResult;
 import see.reactive.Signal;
 import see.reactive.SignalFactory;
 import see.reactive.VariableSignal;
@@ -68,5 +69,10 @@ public class OrderedSignalFactory implements SignalFactory {
         });
 
         return mirror;
+    }
+
+    @Override
+    public <T> Signal<T> bindDynamic(Supplier<EvaluationResult<T>> evaluation) {
+        return DynamicDependenciesSignal.create(evaluation);
     }
 }

@@ -23,26 +23,30 @@ import javax.annotation.Nonnull;
 import java.util.*;
 
 import static com.google.common.base.Objects.equal;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Predicates.instanceOf;
+import static com.google.common.collect.ImmutableSet.copyOf;
 import static com.google.common.collect.ImmutableSet.of;
+import static com.google.common.collect.Iterables.all;
 
 /**
  * Signal implementation, where changes are propagated in topological order,
  * i.e. signal is guaranteed to be re-evaluated after it's dependencies.
  * @param <T> signal value type
  */
-public abstract class AbstractOrderedSignal<T> implements Signal<T>, Comparable<AbstractOrderedSignal<?>> {
+abstract class AbstractOrderedSignal<T> implements Signal<T>, Comparable<AbstractOrderedSignal<?>>  {
     /**
      * Signal level for topological order.
      * Sources have level zero, bound signals have max(dependencies levels)+1.
      */
-    private final int level;
+    private int level;
     private T currentValue;
-    private final Collection<AbstractOrderedSignal<?>> dependants = Sets.newHashSet();
+    private final Set<AbstractOrderedSignal<?>> dependants = Sets.newHashSet();
+    private final Set<AbstractOrderedSignal<?>> dependencies = Sets.newHashSet();
 
     protected AbstractOrderedSignal(Collection<? extends AbstractOrderedSignal<?>> dependencies, T initialValue) {
         this.currentValue = initialValue;
-        this.level = dependencies.isEmpty() ? 0 : Collections.max(dependencies).level + 1;
-        subscribeDependants(dependencies);
+        updateDependencies(copyOf(dependencies));
     }
 
     @Override
@@ -50,17 +54,38 @@ public abstract class AbstractOrderedSignal<T> implements Signal<T>, Comparable<
         throw new IllegalStateException("Can be called only from signal expressions");
     }
 
-    private void subscribeDependants(Collection<? extends AbstractOrderedSignal<?>> dependencies) {
-        for (AbstractOrderedSignal<?> dependency : dependencies) {
-            addDependency(dependency);
+    public void setDependencies(Iterable<? extends Signal<?>> newDependencies) {
+        checkArgument(all(newDependencies, instanceOf(AbstractOrderedSignal.class)));
+        Set<? extends AbstractOrderedSignal<?>> newDeps = (Set) copyOf(newDependencies);
+
+        updateDependencies(newDeps);
+    }
+
+    private void updateDependencies(Set<? extends AbstractOrderedSignal<?>> dependencies) {
+        Set<? extends AbstractOrderedSignal<?>> toAdd = copyOf(Sets.difference(dependencies, this.dependencies));
+        Set<? extends AbstractOrderedSignal<?>> toRemove = copyOf(Sets.difference(this.dependencies, dependencies));
+
+        for (AbstractOrderedSignal<?> signal : toAdd) {
+            addDependency(signal);
         }
+
+        for (AbstractOrderedSignal<?> signal : toRemove) {
+            removeDependency(signal);
+        }
+        this.level = getMaxLevel(dependencies);
+    }
+
+    private int getMaxLevel(Collection<? extends AbstractOrderedSignal<?>> dependencies) {
+        return dependencies.isEmpty() ? 0 : Collections.max(dependencies).level + 1;
     }
 
     protected void addDependency(AbstractOrderedSignal<?> dependency) {
+        dependencies.add(dependency);
         dependency.dependants.add(this);
     }
 
     protected void removeDependency(AbstractOrderedSignal<?> dependency) {
+        dependencies.remove(dependency);
         dependency.dependants.remove(this);
     }
 

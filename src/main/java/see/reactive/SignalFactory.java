@@ -65,4 +65,12 @@ public interface SignalFactory {
      * @return signal with transformed value
      */
     <A, B> Signal<B> flatMap(Signal<A> signal, Function<? super A, ? extends Signal<B>> transformation);
+
+    /**
+     * Create signal with dynamic dependencies
+     * @param evaluation expression, which returns result and current dependencies
+     * @param <T> expression return type
+     * @return constructed signal
+     */
+    <T> Signal<T> bindDynamic(Supplier<EvaluationResult<T>> evaluation);
 }
