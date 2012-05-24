@@ -18,6 +18,7 @@ package see.integration;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import org.junit.Before;
 import org.junit.Test;
 import see.ReactiveSee;
 import see.reactive.Signal;
@@ -33,7 +34,17 @@ import static org.junit.Assert.*;
 
 public class BindingTest {
     SignalFactory signalFactory = new OrderedSignalFactory();
-    ReactiveSee see = new ReactiveSee(signalFactory);
+    ReactiveSee see;
+
+    protected ReactiveSee createReactiveSee() {
+        return new ReactiveSee(signalFactory);
+    }
+
+
+    @Before
+    public void setUp() throws Exception {
+        see = createReactiveSee();
+    }
 
     @Test
     public void testBindings() throws Exception {
