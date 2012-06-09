@@ -134,7 +134,7 @@ class Expressions extends AbstractGrammar {
     }
 
     Rule Assignment() {
-        return Sequence(Settable(), T("="), Expression(), pushBinOp("="));
+        return Sequence(Optional(T("var")), Settable(), T("="), Expression(), pushBinOp("="));
     }
 
     Rule Settable() {
