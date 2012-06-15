@@ -29,16 +29,34 @@ class AltExpressions(val numberFactory: NumberFactory,
 
   import literals._
 
-  def fNode(name: String, args: Node*) = FNode(functions.get(name).asInstanceOf, args.toIndexedSeq)
-  def fNode(name: String, args: Seq[Node]):Node = fNode(name, args:_*)
+  def fNode(name: String, args: Node*):Node = FNode(functions.get(name).asInstanceOf, args.toIndexedSeq)
+  def op(body: Rule0) = (body ~> identity).terminal
+  def repeatWithOperator(body: Rule1[Node], operator: Rule0) = rule {
+    body ~ zeroOrMore(op(operator) ~ body ~~> ((a:Node, op, b) => fNode(op, a, b)))
+  }
 
   def ExpressionList = Expression
   def Expression: Rule1[Node] = RightExpression
-  def RightExpression = Atom
+
+
+  def RightExpression = OrExpression
+
+  def OrExpression = rule  { repeatWithOperator(EqualExpression, "||") }
+  def AndExpression = rule  { repeatWithOperator(EqualExpression, "&&") }
+  def EqualExpression = rule { repeatWithOperator(RelationalExpression, "!=" | "==") }
+  def RelationalExpression = rule { repeatWithOperator(AdditiveExpression, "<=" | "<=" | "<" | ">") }
+  def AdditiveExpression = rule { repeatWithOperator(MultiplicativeExpression, "+" | "-") }
+  def MultiplicativeExpression = rule { repeatWithOperator(UnaryExpression, "*" | "/") }
+
+  def UnaryExpression:Rule1[Node] = rule {
+    op(anyOf("+-!")) ~ UnaryExpression ~~> (fNode(_, _)) | PowerExpression
+  }
+
+  def PowerExpression = rule { PropertyExpression ~ optional(T("^")) }
 
 
   def PropertyExpression = rule { Atom ~ zeroOrMore(
-    FunctionApplication ~~> ((target:Node, args) => fNode("apply", target::args))
+    FunctionApplication ~~> ((target:Node, args) => fNode("apply", target::args:_*))
   | PropertyChain ~~> ((target:Node, args) => fNode(".", PropertyNode(target, args)))
   )}
 
@@ -60,10 +78,10 @@ class AltExpressions(val numberFactory: NumberFactory,
 
   def JsonLiteral = rule { ListLiteral | MapLiteral }
   def ListLiteral = rule {
-    T("[") ~ zeroOrMore(Expression, separator = T(",")) ~ T("]") ~~> (fNode("[]", _))
+    T("[") ~ zeroOrMore(Expression, separator = T(",")) ~ T("]") ~~> (fNode("[]", _:_*))
   }
   def MapLiteral = rule {
-    T("{") ~ zeroOrMore(KeyValue, separator = T(",")) ~ T("}") ~~> (pairs => fNode("{}", pairs.flatten))
+    T("{") ~ zeroOrMore(KeyValue, separator = T(",")) ~ T("}") ~~> (pairs => fNode("{}", pairs.flatten:_*))
   }
   def KeyValue = rule { (JsonKey | String) ~ T(":") ~ Expression ~~> (Seq(_, _)) }
   def JsonKey = rule { zeroOrMore(Letter | Digit) ~> ConstNode }.terminal
@@ -82,7 +100,7 @@ class AltExpressions(val numberFactory: NumberFactory,
 
 
   def ArgSeparator = T(argumentSeparator)
-  def ArgumentDeclaration = rule { zeroOrMore(Identifier ~> identity, separator = ArgSeparator) }
+  def ArgumentDeclaration = rule { zeroOrMore(op(Identifier), separator = ArgSeparator) }
 
 
   def Variable = rule { Identifier ~> VarNode }.terminal
