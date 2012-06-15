@@ -23,28 +23,28 @@ import scala.collection.JavaConversions._
 import see.parser.grammar.PropertyDescriptor
 
 object Untyped {
-  sealed abstract class Node extends see.tree.Node[Any]
+  sealed abstract class Node extends see.tree.Node[AnyRef]
 
-  def const[T](f: String => T): String => ConstNode = { s:String => ConstNode(f(s)) }
+  def const[T <: AnyRef](f: String => T): String => ConstNode = { s:String => ConstNode(f(s)) }
 
 
-  case class ConstNode(value: Any) extends Node with see.tree.ConstNode[Any] {
+  case class ConstNode(value: AnyRef) extends Node with see.tree.ConstNode[AnyRef] {
     def accept(visitor: Visitor) = visitor.visit(this)
     def accept[V](visitor: ValueVisitor[V]) = visitor.visit(this)
 
     def getValue = value
   }
 
-  case class VarNode(name: String) extends Node with see.tree.VarNode[Any] {
+  case class VarNode(name: String) extends Node with see.tree.VarNode[AnyRef] {
     def accept(visitor: Visitor) = visitor.visit(this)
     def accept[V](visitor: ValueVisitor[V]) = visitor.visit(this)
 
     def getName = name
   }
 
-  case class FNode(f: ContextCurriedFunction[Any, Any], args: IndexedSeq[Node])
+  case class FNode(f: ContextCurriedFunction[AnyRef, AnyRef], args: IndexedSeq[Node])
     extends Node
-    with see.tree.FunctionNode[Any, Any] {
+    with see.tree.FunctionNode[AnyRef, AnyRef] {
 
     def accept(visitor: Visitor) = visitor.visit(this)
     def accept[V](visitor: ValueVisitor[V]) = visitor.visit(this)
@@ -53,7 +53,7 @@ object Untyped {
     def getArguments = args
   }
 
-  case class PropertyNode(target: Node, props: Seq[PropertyDescriptor]) extends Node with see.tree.PropertyNode[Any] {
+  case class PropertyNode(target: Node, props: Seq[PropertyDescriptor]) extends Node with see.tree.PropertyNode[AnyRef] {
     def accept(visitor: Visitor) = visitor.visit(this)
     def accept[V](visitor: ValueVisitor[V]) = visitor.visit(this)
 

@@ -30,11 +30,22 @@ class AltExpressions(val numberFactory: NumberFactory,
   import literals._
 
   def fNode(name: String, args: Node*) = FNode(functions.get(name).asInstanceOf, args.toIndexedSeq)
-  def fNode(name: String, args: Seq[Node]):FNode = fNode(name, args:_*)
+  def fNode(name: String, args: Seq[Node]):Node = fNode(name, args:_*)
 
   def ExpressionList = Expression
-  def Expression: Rule1[Node] = Atom
+  def Expression: Rule1[Node] = RightExpression
+  def RightExpression = Atom
 
+
+  def PropertyExpression = rule { Atom ~ zeroOrMore(
+    FunctionApplication ~~> ((target:Node, args) => fNode("apply", target::args))
+  | PropertyChain ~~> ((target:Node, args) => fNode(".", PropertyNode(target, args)))
+  )}
+
+  def FunctionApplication = rule { T("(") ~ zeroOrMore(Expression, separator = argumentSeparator) ~ T(")") }
+  def PropertyChain = oneOrMore(SimpleProperty | IndexedProperty)
+  def SimpleProperty = rule { "." ~ (Identifier ~> PropertyDescriptor.simple _) }.terminal
+  def IndexedProperty = rule { T("[") ~ RightExpression ~ T("]") ~~> PropertyDescriptor.indexed _ }
 
 
   def Atom = rule {
@@ -59,7 +70,7 @@ class AltExpressions(val numberFactory: NumberFactory,
 
 
   def FunctionDefinition = rule {
-    T("function") ~ T("(") ~ ArgList ~ T(")") ~ T("{") ~ ExpressionList ~ T("}") ~~>
+    T("function") ~ T("(") ~ ArgumentDeclaration ~ T(")") ~ T("{") ~ ExpressionList ~ T("}") ~~>
       ((args, body) => fNode("functions", ConstNode(args), body))
   }
 
@@ -70,8 +81,8 @@ class AltExpressions(val numberFactory: NumberFactory,
   def Tree = rule { T("@tree") ~ Expression ~~> ConstNode.apply _ }
 
 
-  def ArgList = rule { zeroOrMore(Identifier ~> identity, separator = ArgSeparator) }
   def ArgSeparator = T(argumentSeparator)
+  def ArgumentDeclaration = rule { zeroOrMore(Identifier ~> identity, separator = ArgSeparator) }
 
 
   def Variable = rule { Identifier ~> VarNode }.terminal
@@ -80,6 +91,6 @@ class AltExpressions(val numberFactory: NumberFactory,
 
   def String = rule { StringLiteral ~> const(stripQuotes(_)) }
   def Number = rule { (FloatLiteral | IntLiteral) ~> const(numberFactory.getNumber(_)) }
-  def Boolean = rule { BooleanLiteral ~> const(_.toBoolean) }
+  def Boolean = rule { BooleanLiteral ~> const(java.lang.Boolean.valueOf(_)) }
   def Null  = rule { NullLiteral ~> const(null) }
 }
