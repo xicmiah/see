@@ -22,7 +22,7 @@ object AltLiterals {
   def apply(decimalSeparator: Char) = new AltLiterals(decimalSeparator.toString)
 }
 
-trait SimpleLiterals extends Parser {
+class SimpleLiterals extends Parser {
   def Letter = "a" - "z" | "A" - "Z" | "_" | "$"
   def LetterOrDigit = Letter | Digit
   def Digit = "0" - "9"

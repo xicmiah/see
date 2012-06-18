@@ -34,10 +34,41 @@ class AltExpressions(val numberFactory: NumberFactory,
   def repeatWithOperator(body: Rule1[Node], operator: Rule0) = rule {
     body ~ zeroOrMore(op(operator) ~ body ~~> ((a:Node, op, b) => fNode(op, a, b)))
   }
+  def binOp(op: String)(a: Node, b: Node) = fNode(op, a, b)
+  def seqNode(terms: Node*) = if (terms.size == 1) terms.head else fNode(";", terms:_*)
 
-  def ExpressionList = Expression
-  def Expression: Rule1[Node] = RightExpression
 
+  def ReturnExpression = rule { ExpressionList ~ T("return") ~ RightExpression ~ optional(T(";")) ~~> (seqNode(_, _)) }
+
+
+  def Block = rule { T("{") ~ ExpressionList ~ T("}") | Term }
+  def ExpressionList = rule { zeroOrMore(Term) ~~> seqNode _ }
+  def Term:Rule1[Node] = rule { Conditional | ForLoop | WhileLoop | TerminatedExpression }
+
+  def Conditional = rule {
+    T("if") ~ T("(") ~ RightExpression ~ T(")") ~ Block ~ optional(T("else") ~ Block) ~~>
+    ((cond, then, elseOpt) => fNode("if", cond::then::elseOpt.toList:_*))
+  }
+  def ForLoop = rule {
+    T("for") ~ T("(") ~ VarName ~ (T(":") | T("in")) ~ RightExpression ~ T(")") ~
+      Block ~~>
+      ((varName, target, body) => fNode("for", varName, target, ConstNode(body)))
+  }
+  def WhileLoop = rule { T("while") ~ T("(") ~ Expression ~ T(")") ~ Block ~~> binOp("while") }
+  def TerminatedExpression = rule { Expression ~ T(";") }
+
+
+  def Expression: Rule1[Node] = rule { Assignment | Binding | RightExpression }
+
+  def Assignment = rule { optional(T("var")) ~ Settable ~ T("=") ~ Expression ~~> binOp("=") }
+  def Settable = rule { SettableProperty | SettableVariable }
+  def SettableProperty = rule { Atom ~ oneOrMore(optional(FunctionApplication) ~ PropertyChain) }
+  def SettableVariable = rule { VarName ~~> (fNode("v=", _)) }
+
+  def Binding = rule { SetterBinding | SignalCreation }
+  def SetterBinding = rule { Settable ~ (T("<-") | T("<<")) ~ SignalExpression ~~> binOp("<-") }
+  def SignalCreation = rule { Settable ~ T("<<=") ~ SignalExpression ~~> binOp("=") }
+  def SignalExpression = rule { Expression ~~> (expr => fNode("signal", ConstNode(expr))) }
 
   def RightExpression = OrExpression
 
@@ -55,13 +86,15 @@ class AltExpressions(val numberFactory: NumberFactory,
   def PowerExpression = rule { PropertyExpression ~ optional(T("^")) }
 
 
-  def PropertyExpression = rule { Atom ~ zeroOrMore(
-    FunctionApplication ~~> ((target:Node, args) => fNode("apply", target::args:_*))
-  | PropertyChain ~~> ((target:Node, args) => fNode(".", PropertyNode(target, args)))
-  )}
+  def PropertyExpression = rule { Atom ~ zeroOrMore(FunctionApplication | PropertyChain) }
 
-  def FunctionApplication = rule { T("(") ~ zeroOrMore(Expression, separator = argumentSeparator) ~ T(")") }
-  def PropertyChain = oneOrMore(SimpleProperty | IndexedProperty)
+  def FunctionApplication = rule {
+    T("(") ~ zeroOrMore(Expression, separator = argumentSeparator) ~ T(")") ~~>
+      ((target:Node, args) => fNode("apply", target::args:_*))
+  }
+  def PropertyChain = rule {
+    oneOrMore(SimpleProperty | IndexedProperty) ~~> ((target:Node, props) => fNode(".", PropertyNode(target, props)))
+  }
   def SimpleProperty = rule { "." ~ (Identifier ~> PropertyDescriptor.simple _) }.terminal
   def IndexedProperty = rule { T("[") ~ RightExpression ~ T("]") ~~> PropertyDescriptor.indexed _ }
 
@@ -95,7 +128,7 @@ class AltExpressions(val numberFactory: NumberFactory,
 
   def SpecialForm = rule { IsDefined | MakeSignal | Tree }
   def IsDefined = rule { T("isDefined") ~ T("(") ~ VarName ~ T(")") ~~> (fNode("isDefined", _)) }
-  def MakeSignal = rule { T("signal") ~ T("(") ~ Expression ~ T(")") ~~> (expr => fNode("signal", ConstNode(expr))) }
+  def MakeSignal = rule { T("signal") ~ T("(") ~ SignalExpression ~ T(")") }
   def Tree = rule { T("@tree") ~ Expression ~~> ConstNode.apply _ }
 
 
