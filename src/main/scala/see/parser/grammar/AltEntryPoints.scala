@@ -18,7 +18,11 @@ package see.parser.grammar
 
 import org.parboiled.scala._
 import see.parser.numbers.NumberFactory
-import see.parser.config.FunctionResolver
+import see.parser.config.{GrammarConfiguration, FunctionResolver}
+
+object AltEntryPoints {
+  def apply(config: GrammarConfiguration) = new AltEntryPoints(config.getNumberFactory, config.getFunctions)
+}
 
 class AltEntryPoints(val numberFactory: NumberFactory,
                      val functions: FunctionResolver) extends Parser {
@@ -27,10 +31,12 @@ class AltEntryPoints(val numberFactory: NumberFactory,
   val literals = new SimpleLiterals
 
   import literals.Whitespace
-  import expressions.{ReturnExpression, Expression, ExpressionList}
+  import expressions._
 
 
   def CalcExpression = rule { Whitespace ~ ReturnExpression ~ EOI }
-  def Condition = rule { Whitespace ~ Expression ~ EOI }
+  def Simple = rule { Whitespace ~ Expression ~ EOI }
   def Script = rule { Whitespace ~ ExpressionList ~ EOI }
+
+  def Test = rule { Whitespace ~ RightExpression ~ EOI }
 }

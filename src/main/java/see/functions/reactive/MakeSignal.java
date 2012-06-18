@@ -48,9 +48,9 @@ public class MakeSignal implements ContextCurriedFunction<Object, Signal<?>> {
         return new VarArgFunction<Object, Signal<?>>() {
             @Override
             public Signal<?> apply(@Nonnull List<Object> input) {
-                Preconditions.checkArgument(input.size() == 2, "MakeSignal takes two arguments");
+                Preconditions.checkArgument(input.size() == 1, "MakeSignal takes one argument");
 
-                final Node<Object> tree = (Node<Object>) input.get(1);
+                final Node<Object> tree = (Node<Object>) input.get(0);
 
                 Collection<Signal<?>> dependencies = extractDependencies(tree);
 

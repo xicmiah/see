@@ -1,14 +1,16 @@
 package see;
 
-import org.parboiled.Parboiled;
 import org.parboiled.Rule;
+import org.parboiled.scala.rules.Rule1;
 import see.evaluation.evaluators.SimpleEvaluator;
 import see.parser.BasicParser;
 import see.parser.Parser;
+import see.parser.ScalaParser;
 import see.parser.config.ConfigBuilder;
 import see.parser.config.GrammarConfiguration;
-import see.parser.grammar.EntryPoints;
+import see.parser.grammar.AltEntryPoints;
 import see.tree.Node;
+import see.tree.nodes.Untyped;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +41,7 @@ public class See {
      * @return parsed tree
      */
     public Node<Object> parseExpression(String expression) {
-        return parse(expression, getGrammar().Condition());
+        return parse(expression, getGrammar().Simple());
     }
 
     /**
@@ -49,7 +51,7 @@ public class See {
      * @return parsed tree
      */
     public Node<Object> parseExpressionList(String expression) {
-        return parse(expression, getGrammar().Statements());
+        return parse(expression, getGrammar().Script());
     }
 
     /**
@@ -106,8 +108,13 @@ public class See {
         return parser.parse(expression);
     }
 
-    private EntryPoints getGrammar() {
-        return Parboiled.createParser(EntryPoints.class, config);
+    private Node<Object> parse(String expression, Rule1<Untyped.Node> rule) {
+        Parser<Object> parser = new ScalaParser(rule);
+        return parser.parse(expression);
+    }
+
+    private AltEntryPoints getGrammar() {
+        return AltEntryPoints.apply(config);
     }
 
 }

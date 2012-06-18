@@ -48,9 +48,9 @@ public class MakeDynamicSignal implements ContextCurriedFunction<Object, Signal<
         return new VarArgFunction<Object, Signal<?>>() {
             @Override
             public Signal<?> apply(@Nonnull List<Object> input) {
-                Preconditions.checkArgument(input.size() == 2, "MakeSignal takes two arguments");
+                Preconditions.checkArgument(input.size() == 1, "MakeSignal takes one argument");
 
-                final Node<Object> tree = (Node<Object>) input.get(1);
+                final Node<Object> tree = (Node<Object>) input.get(0);
 
                 SignalFactory signalFactory = context.getServices().getInstance(SignalFactory.class);
                 return signalFactory.bindDynamic(new Supplier<EvaluationResult<Object>>() {

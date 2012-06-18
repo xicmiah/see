@@ -34,8 +34,12 @@ class SimpleLiterals extends Parser {
 
   implicit def toTerminal[R <: rules.Rule](rule: R) = new { def terminal = Terminal(rule) }
   def Terminal[R <: rules.Rule](body: R):R = body ~ Whitespace
-  def T(body: String) = body ~ Whitespace
-  def Whitespace = zeroOrMore(anyOf(" \t\f\r\n"))
+  def T(body: Rule0) = body ~ Whitespace
+  def Whitespace = zeroOrMore(
+    anyOf(" \t\f\r\n")
+      | "/*" ~ zeroOrMore(!"*/" ~ ANY) ~ "*/"
+      | "//" ~ zeroOrMore(!anyOf("\r\n") ~ ANY) ~ ("\r\n" | "\r" | "\n" | EOI)
+  ).suppressNode
 }
 
 class AltLiterals(val decimalSeparator: String) extends SimpleLiterals {
@@ -44,13 +48,11 @@ class AltLiterals(val decimalSeparator: String) extends SimpleLiterals {
   def DelimitedString(delimiter: String) = delimiter ~ zeroOrMore(!delimiter ~ ANY) ~ delimiter
   def stripQuotes(s: String) = s.substring(1, s.length - 1)
 
-
   def IntLiteral = oneOrMore(Digit)
 
   def FloatLiteral = zeroOrMore(Digit) ~ decimalSeparator ~ oneOrMore(Digit) ~ optional(Exponent) |
       oneOrMore(Digit) ~ Exponent
 
   def Exponent = anyOf("eE") ~ optional(anyOf("+-")) ~ oneOrMore(Digit)
-
 
 }

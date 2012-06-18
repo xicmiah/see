@@ -26,13 +26,15 @@ object Untyped {
   sealed abstract class Node extends see.tree.Node[AnyRef]
 
   def const[T <: AnyRef](f: String => T): String => ConstNode = { s:String => ConstNode(f(s)) }
-
+  def constList[T](items: Seq[T]) = ConstNode(seqAsJavaList(items))
 
   case class ConstNode(value: AnyRef) extends Node with see.tree.ConstNode[AnyRef] {
     def accept(visitor: Visitor) = visitor.visit(this)
     def accept[V](visitor: ValueVisitor[V]) = visitor.visit(this)
 
     def getValue = value
+
+    override def toString = String.valueOf(value)
   }
 
   case class VarNode(name: String) extends Node with see.tree.VarNode[AnyRef] {
@@ -40,6 +42,8 @@ object Untyped {
     def accept[V](visitor: ValueVisitor[V]) = visitor.visit(this)
 
     def getName = name
+
+    override def toString = "Var(%s)".format(name)
   }
 
   case class FNode(f: ContextCurriedFunction[AnyRef, AnyRef], args: IndexedSeq[Node])
@@ -51,6 +55,8 @@ object Untyped {
 
     def getFunction = f
     def getArguments = args
+
+    override def toString = "%s(%s)".format(f, args.mkString(","))
   }
 
   case class PropertyNode(target: Node, props: Seq[PropertyDescriptor]) extends Node with see.tree.PropertyNode[AnyRef] {
@@ -59,5 +65,7 @@ object Untyped {
 
     def getTarget = target
     def getProperties = props
+
+    override def toString = "%s%s".format(target, props.mkString)
   }
 }

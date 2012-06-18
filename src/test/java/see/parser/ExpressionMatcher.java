@@ -10,6 +10,7 @@ import org.parboiled.parserunners.ParseRunner;
 import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.support.ParsingResult;
 import see.parser.config.ConfigBuilder;
+import see.parser.grammar.AltEntryPoints;
 import see.parser.grammar.EntryPoints;
 
 /**
@@ -39,18 +40,22 @@ public class ExpressionMatcher extends TypeSafeMatcher<String> {
         return Parboiled.createParser(EntryPoints.class, ConfigBuilder.defaultConfig().build());
     }
 
+    private static AltEntryPoints getAltGrammar() {
+        return AltEntryPoints.apply(ConfigBuilder.defaultConfig().build());
+    }
+
     @Factory
     public static Matcher<String> singleExpression() {
-        return new ExpressionMatcher(getDefaultGrammar().Condition(), "a single expression");
+        return new ExpressionMatcher(getAltGrammar().Simple().matcher(), "a single expression");
     }
 
     @Factory
     public static Matcher<String> returnExpression() {
-        return new ExpressionMatcher(getDefaultGrammar().CalcExpression(), "an expression");
+        return new ExpressionMatcher(getAltGrammar().CalcExpression().matcher(), "an expression");
     }
 
     @Factory
     public static Matcher<String> expressionList() {
-        return new ExpressionMatcher(getDefaultGrammar().Statements(), "a list of expressions");
+        return new ExpressionMatcher(getAltGrammar().Script().matcher(), "a list of expressions");
     }
 }

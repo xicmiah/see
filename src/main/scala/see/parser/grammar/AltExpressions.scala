@@ -29,12 +29,10 @@ class AltExpressions(val numberFactory: NumberFactory,
 
   import literals._
 
-  def fNode(name: String, args: Node*):Node = FNode(functions.get(name).asInstanceOf, args.toIndexedSeq)
+  def fNode(name: String, args: Node*):Node = FNode(functions.get(name), args.toIndexedSeq)
   def op(body: Rule0) = (body ~> identity).terminal
-  def repeatWithOperator(body: Rule1[Node], operator: Rule0) = rule {
-    body ~ zeroOrMore(op(operator) ~ body ~~> ((a:Node, op, b) => fNode(op, a, b)))
-  }
-  def binOp(op: String)(a: Node, b: Node) = fNode(op, a, b)
+  def repeatWithOperator(body: Rule1[Node], operator: Rule0) = body ~ zeroOrMore(op(operator) ~ body ~~> ((a:Node, op, b) => fNode(op, a, b)))
+  def binOp(op: String) = (a: Node, b: Node) => fNode(op, a, b)
   def seqNode(terms: Node*) = if (terms.size == 1) terms.head else fNode(";", terms:_*)
 
 
@@ -42,7 +40,7 @@ class AltExpressions(val numberFactory: NumberFactory,
 
 
   def Block = rule { T("{") ~ ExpressionList ~ T("}") | Term }
-  def ExpressionList = rule { zeroOrMore(Term) ~~> seqNode _ }
+  def ExpressionList = rule { zeroOrMore(Term) ~~> (seqNode(_:_*)) }
   def Term:Rule1[Node] = rule { Conditional | ForLoop | WhileLoop | TerminatedExpression }
 
   def Conditional = rule {
@@ -50,7 +48,7 @@ class AltExpressions(val numberFactory: NumberFactory,
     ((cond, then, elseOpt) => fNode("if", cond::then::elseOpt.toList:_*))
   }
   def ForLoop = rule {
-    T("for") ~ T("(") ~ VarName ~ (T(":") | T("in")) ~ RightExpression ~ T(")") ~
+    T("for") ~ T("(") ~ VarName ~ (T(":" | "in")) ~ RightExpression ~ T(")") ~
       Block ~~>
       ((varName, target, body) => fNode("for", varName, target, ConstNode(body)))
   }
@@ -66,16 +64,16 @@ class AltExpressions(val numberFactory: NumberFactory,
   def SettableVariable = rule { VarName ~~> (fNode("v=", _)) }
 
   def Binding = rule { SetterBinding | SignalCreation }
-  def SetterBinding = rule { Settable ~ (T("<-") | T("<<")) ~ SignalExpression ~~> binOp("<-") }
+  def SetterBinding = rule { Settable ~ (T("<-" | "<<")) ~ SignalExpression ~~> binOp("<-") }
   def SignalCreation = rule { Settable ~ T("<<=") ~ SignalExpression ~~> binOp("=") }
   def SignalExpression = rule { Expression ~~> (expr => fNode("signal", ConstNode(expr))) }
 
-  def RightExpression = OrExpression
+  def RightExpression:Rule1[Node] = rule { OrExpression }
 
-  def OrExpression = rule  { repeatWithOperator(EqualExpression, "||") }
+  def OrExpression = rule  { repeatWithOperator(AndExpression, "||") }
   def AndExpression = rule  { repeatWithOperator(EqualExpression, "&&") }
   def EqualExpression = rule { repeatWithOperator(RelationalExpression, "!=" | "==") }
-  def RelationalExpression = rule { repeatWithOperator(AdditiveExpression, "<=" | "<=" | "<" | ">") }
+  def RelationalExpression = rule { repeatWithOperator(AdditiveExpression, "<=" | ">=" | "<" | ">") }
   def AdditiveExpression = rule { repeatWithOperator(MultiplicativeExpression, "+" | "-") }
   def MultiplicativeExpression = rule { repeatWithOperator(UnaryExpression, "*" | "/") }
 
@@ -83,18 +81,19 @@ class AltExpressions(val numberFactory: NumberFactory,
     op(anyOf("+-!")) ~ UnaryExpression ~~> (fNode(_, _)) | PowerExpression
   }
 
-  def PowerExpression = rule { PropertyExpression ~ optional(T("^")) }
+  def PowerExpression = rule { PropertyExpression ~ optional(T("^") ~ UnaryExpression ~~> binOp("^")) }
 
 
-  def PropertyExpression = rule { Atom ~ zeroOrMore(FunctionApplication | PropertyChain) }
+  def PropertyExpression = rule { Atom ~ zeroOrMore(FunctionApplication | PropertyChain ~ GetProperty ) }
 
   def FunctionApplication = rule {
-    T("(") ~ zeroOrMore(Expression, separator = argumentSeparator) ~ T(")") ~~>
+    T("(") ~ zeroOrMore(Expression, separator = ArgSeparator) ~ T(")") ~~>
       ((target:Node, args) => fNode("apply", target::args:_*))
   }
-  def PropertyChain = rule {
-    oneOrMore(SimpleProperty | IndexedProperty) ~~> ((target:Node, props) => fNode(".", PropertyNode(target, props)))
+  def PropertyChain:ReductionRule1[Node, Node] = rule {
+    oneOrMore(SimpleProperty | IndexedProperty) ~~> ((target:Node, props) => PropertyNode(target, props))
   }
+  def GetProperty = rule { EMPTY ~~> (fNode(".", _:Node))  }
   def SimpleProperty = rule { "." ~ (Identifier ~> PropertyDescriptor.simple _) }.terminal
   def IndexedProperty = rule { T("[") ~ RightExpression ~ T("]") ~~> PropertyDescriptor.indexed _ }
 
@@ -117,12 +116,12 @@ class AltExpressions(val numberFactory: NumberFactory,
     T("{") ~ zeroOrMore(KeyValue, separator = T(",")) ~ T("}") ~~> (pairs => fNode("{}", pairs.flatten:_*))
   }
   def KeyValue = rule { (JsonKey | String) ~ T(":") ~ Expression ~~> (Seq(_, _)) }
-  def JsonKey = rule { zeroOrMore(Letter | Digit) ~> ConstNode }.terminal
+  def JsonKey = rule { oneOrMore(Letter | Digit) ~> ConstNode }.terminal
 
 
   def FunctionDefinition = rule {
     T("function") ~ T("(") ~ ArgumentDeclaration ~ T(")") ~ T("{") ~ ExpressionList ~ T("}") ~~>
-      ((args, body) => fNode("functions", ConstNode(args), body))
+      ((args, body) => fNode("def", constList(args), ConstNode(body)))
   }
 
 
@@ -138,10 +137,10 @@ class AltExpressions(val numberFactory: NumberFactory,
 
   def Variable = rule { Identifier ~> VarNode }.terminal
   def VarName = rule { Identifier ~> ConstNode }.terminal
-  def Constant = rule { String | Number | Boolean | Null }.suppressSubnodes.terminal
+  def Constant = rule { String | Number | Boolean | Null }.suppressSubnodes
 
-  def String = rule { StringLiteral ~> const(stripQuotes(_)) }
-  def Number = rule { (FloatLiteral | IntLiteral) ~> const(numberFactory.getNumber(_)) }
-  def Boolean = rule { BooleanLiteral ~> const(java.lang.Boolean.valueOf(_)) }
-  def Null  = rule { NullLiteral ~> const(null) }
+  def String = rule { StringLiteral ~> const(stripQuotes(_)) }.terminal
+  def Number = rule { (FloatLiteral | IntLiteral) ~> const(numberFactory.getNumber(_)) }.terminal
+  def Boolean = rule { BooleanLiteral ~> const(java.lang.Boolean.valueOf(_)) }.terminal
+  def Null  = rule { NullLiteral ~ push(ConstNode(null)) }.terminal
 }
