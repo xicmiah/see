@@ -63,9 +63,11 @@ class AltExpressions(val numberFactory: NumberFactory,
   def SettableProperty = rule { Atom ~ oneOrMore(optional(FunctionApplication) ~ PropertyChain) }.memoMismatches
   def SettableVariable = rule { VarName ~~> (fNode("v=", _)) }.memoMismatches
 
-  def Binding = rule { SetterBinding | SignalCreation }
-  def SetterBinding = rule { Settable ~ (T("<-" | "<<")) ~ SignalExpression ~~> binOp("<-") }
-  def SignalCreation = rule { Settable ~ T("<<=") ~ SignalExpression ~~> binOp("=") }
+  def Binding = rule { Settable ~ (
+    T("<-" | "<<") ~ SignalExpression ~~> binOp("<-")
+  | T("<<=") ~ SignalExpression ~~> binOp("=")
+    )
+  }
   def SignalExpression = rule { Expression ~~> (expr => fNode("signal", ConstNode(expr))) }
 
   def RightExpression:Rule1[Node] = rule { OrExpression }
@@ -82,7 +84,6 @@ class AltExpressions(val numberFactory: NumberFactory,
   }
 
   def PowerExpression = rule { PropertyExpression ~ optional(T("^") ~ UnaryExpression ~~> binOp("^")) }
-
 
   def PropertyExpression = rule { Atom ~ zeroOrMore(FunctionApplication | PropertyChain ~ GetProperty ) }
 
