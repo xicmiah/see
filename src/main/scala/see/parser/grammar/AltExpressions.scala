@@ -58,7 +58,7 @@ class AltExpressions(val numberFactory: NumberFactory,
 
   def Expression: Rule1[Node] = rule { Assignment | Binding | RightExpression }
 
-  def Assignment = rule { optional(T("var")) ~ Settable ~ T("=") ~ Expression ~~> binOp("=") }
+  def Assignment = rule { Settable ~ T("=") ~ Expression ~~> binOp("=") }
   def Settable = rule { SettableProperty | SettableVariable }
   def SettableProperty = rule { Atom ~ oneOrMore(optional(FunctionApplication) ~ PropertyChain) }
   def SettableVariable = rule { VarName ~~> (fNode("v=", _)) }
@@ -135,8 +135,8 @@ class AltExpressions(val numberFactory: NumberFactory,
   def ArgumentDeclaration = rule { zeroOrMore(op(Identifier), separator = ArgSeparator) }
 
 
-  def Variable = rule { Identifier ~> VarNode }.terminal
-  def VarName = rule { Identifier ~> ConstNode }.terminal
+  def Variable = rule { optional("var" ~ WhitespaceElement) ~ (Identifier ~> VarNode) }.terminal
+  def VarName = rule { Variable ~~> (varNode => ConstNode(varNode.name)) }
   def Constant = rule { String | Number | Boolean | Null }.suppressSubnodes
 
   def String = rule { StringLiteral ~> const(stripQuotes(_)) }.terminal

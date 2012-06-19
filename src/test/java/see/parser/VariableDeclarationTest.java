@@ -17,13 +17,30 @@
 package see.parser;
 
 import org.junit.Test;
+import see.See;
+import see.tree.Node;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static see.parser.ExpressionMatcher.expressionList;
 import static see.parser.ExpressionMatcher.singleExpression;
 
 public class VariableDeclarationTest {
+    See see = new See();
+
     @Test
     public void testVarDeclarations() throws Exception {
         assertThat("var c = 9", singleExpression());
+    }
+
+    @Test
+    public void testForLoopDeclarations() throws Exception {
+        assertThat("for(var a in items) a.omg;", expressionList());
+    }
+
+    @Test
+    public void testIdentifiersWithVar() throws Exception {
+        Node<?> tree = see.parseExpressionList("varC = 'bka'; varC;");
+        assertEquals("bka", see.evaluate(tree));
     }
 }

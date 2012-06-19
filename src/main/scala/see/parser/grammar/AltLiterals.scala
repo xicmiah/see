@@ -29,17 +29,18 @@ class SimpleLiterals extends Parser {
   def BooleanLiteral = "true" | "false"
   def NullLiteral: Rule0 = "null"
 
-  def Identifier = Name
-  def Name = rule { Letter ~ zeroOrMore(Letter | Digit) }
+  def Identifier = rule { Letter ~ zeroOrMore(Letter | Digit) }
 
   implicit def toTerminal[R <: rules.Rule](rule: R) = new { def terminal = Terminal(rule) }
   def Terminal[R <: rules.Rule](body: R):R = body ~ Whitespace
   def T(body: Rule0) = body ~ Whitespace
-  def Whitespace = zeroOrMore(
-    anyOf(" \t\f\r\n")
-      | "/*" ~ zeroOrMore(!"*/" ~ ANY) ~ "*/"
-      | "//" ~ zeroOrMore(!anyOf("\r\n") ~ ANY) ~ ("\r\n" | "\r" | "\n" | EOI)
-  ).suppressNode
+  def Whitespace = optional(WhitespaceElement).suppressNode
+  def WhitespaceElement = oneOrMore(
+    anyOf(" \t\f\r\n") |
+      "/*" ~ zeroOrMore(!"*/" ~ ANY) ~ "*/" |
+      "//" ~ zeroOrMore(!anyOf("\r\n") ~ ANY) ~ ("\r\n" | "\r" | "\n" | EOI)
+    ).suppressNode
+
 }
 
 class AltLiterals(val decimalSeparator: String) extends SimpleLiterals {
