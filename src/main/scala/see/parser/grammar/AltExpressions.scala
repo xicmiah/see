@@ -19,7 +19,7 @@ package see.parser.grammar
 import org.parboiled.scala._
 import see.parser.numbers.NumberFactory
 import see.parser.config.FunctionResolver
-import see.tree.nodes.Untyped._
+import see.tree.Untyped._
 
 class AltExpressions(val numberFactory: NumberFactory,
                      val functions: FunctionResolver) extends Parser {
@@ -60,8 +60,8 @@ class AltExpressions(val numberFactory: NumberFactory,
 
   def Assignment = rule { Settable ~ T("=") ~ Expression ~~> binOp("=") }
   def Settable = rule { SettableProperty | SettableVariable }
-  def SettableProperty = rule { Atom ~ oneOrMore(optional(FunctionApplication) ~ PropertyChain) }
-  def SettableVariable = rule { VarName ~~> (fNode("v=", _)) }
+  def SettableProperty = rule { Atom ~ oneOrMore(optional(FunctionApplication) ~ PropertyChain) }.memoMismatches
+  def SettableVariable = rule { VarName ~~> (fNode("v=", _)) }.memoMismatches
 
   def Binding = rule { SetterBinding | SignalCreation }
   def SetterBinding = rule { Settable ~ (T("<-" | "<<")) ~ SignalExpression ~~> binOp("<-") }
@@ -135,7 +135,7 @@ class AltExpressions(val numberFactory: NumberFactory,
   def ArgumentDeclaration = rule { zeroOrMore(op(Identifier), separator = ArgSeparator) }
 
 
-  def Variable = rule { optional("var" ~ WhitespaceElement) ~ (Identifier ~> VarNode) }.terminal
+  def Variable = rule { optional(T("var" ~ !LetterOrDigit)) ~ (Identifier ~> VarNode) }.terminal
   def VarName = rule { Variable ~~> (varNode => ConstNode(varNode.name)) }
   def Constant = rule { String | Number | Boolean | Null }.suppressSubnodes
 

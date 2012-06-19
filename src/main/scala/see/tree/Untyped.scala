@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package see.tree.nodes
+package see.tree
 
-import see.tree.Node.ValueVisitor
-import see.tree.Visitor
 import see.functions.ContextCurriedFunction
 import scala.collection.JavaConversions._
 import see.parser.grammar.PropertyDescriptor

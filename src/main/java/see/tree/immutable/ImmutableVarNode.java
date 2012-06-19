@@ -1,6 +1,7 @@
 package see.tree.immutable;
 
 import com.google.common.base.Objects;
+import see.tree.ValueVisitor;
 import see.tree.VarNode;
 import see.tree.Visitor;
 

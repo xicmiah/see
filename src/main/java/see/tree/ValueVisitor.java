@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package see.parser
+package see.tree;
 
-import org.parboiled.scala.parserunners.ReportingParseRunner
-import org.parboiled.scala.rules.Rule1
-import see.tree.Untyped.Node
-import see.exceptions.ParseException
+/**
+ * Visitor with arbitrary return type.
+ * @param <T> return type
+ */
+public interface ValueVisitor<T> {
+    T visit(ConstNode<?> constNode);
 
-class ScalaParser(val rule: Rule1[Node]) extends Parser[AnyRef] {
-  def parse(input: String) = {
-    val result = ReportingParseRunner.apply(rule).run(input)
+    T visit(VarNode<?> varNode);
 
-    result.result.getOrElse(throw new ParseException(result))
-  }
+    T visit(FunctionNode<?, ?> functionNode);
+
+    T visit(PropertyNode<?> propertyNode);
 }

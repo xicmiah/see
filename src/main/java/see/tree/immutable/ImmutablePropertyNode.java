@@ -21,6 +21,7 @@ import com.google.common.base.Objects;
 import see.parser.grammar.PropertyDescriptor;
 import see.tree.Node;
 import see.tree.PropertyNode;
+import see.tree.ValueVisitor;
 import see.tree.Visitor;
 
 import java.util.List;

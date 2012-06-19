@@ -2,6 +2,7 @@ package see.tree.immutable;
 
 import com.google.common.base.Objects;
 import see.tree.ConstNode;
+import see.tree.ValueVisitor;
 import see.tree.Visitor;
 
 public final class ImmutableConstNode<T> implements ConstNode<T> {

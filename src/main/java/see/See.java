@@ -10,7 +10,7 @@ import see.parser.config.ConfigBuilder;
 import see.parser.config.GrammarConfiguration;
 import see.parser.grammar.AltEntryPoints;
 import see.tree.Node;
-import see.tree.nodes.Untyped;
+import see.tree.Untyped;
 
 import java.util.HashMap;
 import java.util.Map;
