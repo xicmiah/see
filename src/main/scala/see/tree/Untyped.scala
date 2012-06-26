@@ -19,9 +19,12 @@ package see.tree
 import see.functions.ContextCurriedFunction
 import scala.collection.JavaConversions._
 import see.parser.grammar.PropertyDescriptor
+import com.google.common.collect.ImmutableList
+import java.util
 
 object Untyped {
-  sealed abstract class Node extends see.tree.Node[AnyRef]
+  type SeeNode = see.tree.Node[AnyRef]
+  sealed abstract class Node extends SeeNode
 
   def const[T <: AnyRef](f: String => T): String => ConstNode = { s:String => ConstNode(f(s)) }
   def constList[T](items: Seq[T]) = ConstNode(seqAsJavaList(items))
@@ -52,7 +55,7 @@ object Untyped {
     def accept[V](visitor: ValueVisitor[V]) = visitor.visit(this)
 
     def getFunction = f
-    def getArguments = args
+    val getArguments = ImmutableList.copyOf(args.iterator).asInstanceOf[util.List[SeeNode]]
 
     override def toString = "%s(%s)".format(f, args.mkString(","))
   }
@@ -62,7 +65,7 @@ object Untyped {
     def accept[V](visitor: ValueVisitor[V]) = visitor.visit(this)
 
     def getTarget = target
-    def getProperties = props
+    val getProperties = ImmutableList.copyOf(props.iterator)
 
     override def toString = "%s%s".format(target, props.mkString)
   }
