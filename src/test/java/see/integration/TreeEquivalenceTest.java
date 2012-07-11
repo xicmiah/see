@@ -22,5 +22,6 @@ public class TreeEquivalenceTest {
         Node<Object> run2 = see.parseExpression(example);
 
         assertEquals(run1, run2);
+        assertEquals(run1.hashCode(), run2.hashCode());
     }
 }
