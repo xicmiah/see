@@ -19,7 +19,7 @@ package see.integration;
 import com.google.common.collect.Maps;
 import org.junit.Test;
 import see.See;
-import see.exceptions.PropagatedException;
+import see.exceptions.SeeRuntimeException;
 import see.functions.VarArgFunction;
 import see.tree.Node;
 
@@ -76,8 +76,8 @@ public class FunctionCreationTest {
         try {
             see.evaluate(tree);
             fail("Exception expected");
-        } catch (PropagatedException e) {
-            assertThat(e.getLastCause(), instanceOf(NoSuchElementException.class));
+        } catch (SeeRuntimeException e) {
+            assertThat(e.getCause(), instanceOf(NoSuchElementException.class));
         }
     }
 
@@ -86,8 +86,8 @@ public class FunctionCreationTest {
         try {
             see.eval("function(a) { a = 42; } (9)");
             fail("Exception expected");
-        } catch (PropagatedException e) {
-            assertThat(e.getLastCause(), instanceOf(UnsupportedOperationException.class));
+        } catch (SeeRuntimeException e) {
+            assertThat(e.getCause(), instanceOf(UnsupportedOperationException.class));
         }
     }
 

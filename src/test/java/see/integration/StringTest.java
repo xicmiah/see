@@ -2,7 +2,7 @@ package see.integration;
 
 import org.junit.Test;
 import see.See;
-import see.exceptions.PropagatedException;
+import see.exceptions.SeeRuntimeException;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -22,8 +22,8 @@ public class StringTest {
         try {
             see.eval("\"4\"+5");
             throw new AssertionError("No exception is raised");
-        } catch (PropagatedException e) {
-            assertThat(e.getLastCause(), instanceOf(ClassCastException.class));
+        } catch (SeeRuntimeException e) {
+            assertThat(e.getCause(), instanceOf(ClassCastException.class));
         }
     }
 

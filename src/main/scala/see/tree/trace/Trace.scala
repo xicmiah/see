@@ -17,8 +17,23 @@
 package see.tree.trace
 
 import org.parboiled.buffers.InputBuffer
+import org.parboiled.errors.ErrorUtils
 
-case class TraceElement(input: InputBuffer, index: Int)
+case class TraceElement(input: InputBuffer, index: Int) {
+  override def toString = ErrorUtils.printErrorMessage("%s line %s col %s", "at", index, input)
+
+  private val buffersEqual: Equiv[InputBuffer] = Equiv.by(bufferToString)
+
+  private def bufferToString(buffer: InputBuffer) = buffer.extract(0, Int.MaxValue)
+
+  override def equals(obj: Any) = obj match {
+    case TraceElement(otherInput, otherIndex) => buffersEqual.equiv(input, otherInput) && index == otherIndex
+    case _ => false
+  }
+
+  override def hashCode() = (bufferToString(input), index).hashCode()
+}
+
 
 trait Tracing {
   def position: Option[TraceElement]
