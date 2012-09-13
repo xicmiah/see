@@ -58,13 +58,18 @@ public class LazyVisitorTest {
                 }
             }
         });
-        evaluator = SimpleEvaluator.fromConfig(ConfigBuilder.defaultConfig().setNumberFactory(new IntegerFactory()).build());
+        evaluator = SimpleEvaluator.fromConfig(ConfigBuilder.defaultConfig()
+                .addFunction("plus", plus)
+                .addFunction("fail", fail)
+                .addFunction("cond", cond)
+                .setNumberFactory(new IntegerFactory())
+                .build());
     }
 
     @Test
     public void testEvaluation() throws Exception {
         List<Node<Integer>> arguments = ImmutableList.<Node<Integer>>of(new ImmutableConstNode<Integer>(1), new ImmutableConstNode<Integer>(2));
-        Node<Integer> tree = new ImmutableFunctionNode<Integer, Integer>(plus, arguments);
+        Node<Integer> tree = new ImmutableFunctionNode<Integer, Integer>("plus", arguments);
 
         int result = evaluator.evaluate(tree, new HashMap<String, Object>());
 
@@ -73,13 +78,13 @@ public class LazyVisitorTest {
 
     @Test
     public void testLazy() throws Exception {
-        Node<Integer> failNode = new ImmutableFunctionNode<Integer, Integer>(fail);
+        Node<Integer> failNode = new ImmutableFunctionNode<Integer, Integer>("fail");
         ImmutableList<Node<Integer>> conditionArgs = ImmutableList.of(
                 new ImmutableConstNode<Integer>(1),
                 new ImmutableConstNode<Integer>(42),
                 failNode
         );
-        Node<Integer> tree = new ImmutableFunctionNode<Integer, Integer>(cond, conditionArgs);
+        Node<Integer> tree = new ImmutableFunctionNode<Integer, Integer>("cond", conditionArgs);
 
         int result = evaluator.evaluate(tree, Collections.<String, Object>emptyMap());
         assertEquals(42, result);
@@ -88,7 +93,7 @@ public class LazyVisitorTest {
     @Test
     public void testVariables() throws Exception {
         List<Node<Integer>> plusArgs = ImmutableList.of(new ImmutableVarNode<Integer>("a"), new ImmutableConstNode<Integer>(5));
-        Node<Integer> tree = new ImmutableFunctionNode<Integer, Integer>(plus, plusArgs);
+        Node<Integer> tree = new ImmutableFunctionNode<Integer, Integer>("plus", plusArgs);
 
         ImmutableMap<String, Object> context = ImmutableMap.<String, Object>of("a", 4);
 

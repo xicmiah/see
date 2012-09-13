@@ -380,7 +380,7 @@ class Expressions extends AbstractGrammar {
         if (function == null) {
             throw new ParsingException("Function not found: " + name);
         }
-        return new ImmutableFunctionNode<Object, Object>(function, (List<Node<Object>>) args);
+        return new ImmutableFunctionNode<Object, Object>(name, (List<Node<Object>>) args);
     }
 
     /**

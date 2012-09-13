@@ -4,6 +4,7 @@ import com.google.common.collect.ClassToInstanceMap;
 import see.evaluation.*;
 import see.evaluation.conversions.BuiltinConversions;
 import see.exceptions.EvaluationException;
+import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
 import see.properties.ChainResolver;
@@ -41,6 +42,7 @@ public class SimpleEvaluator implements Evaluator {
                 .put(ChainResolver.class, config.getChainResolver())
                 .put(ValueProcessor.class, config.getValueProcessor())
                 .put(ToFunction.class, BuiltinConversions.all())
+                .put(FunctionResolver.class, config.getFunctions())
                 .build();
     }
 

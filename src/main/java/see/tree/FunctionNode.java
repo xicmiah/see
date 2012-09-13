@@ -1,8 +1,5 @@
 package see.tree;
 
-
-import see.functions.ContextCurriedFunction;
-
 import java.util.List;
 
 /**
@@ -10,7 +7,7 @@ import java.util.List;
  * @since 05.09.11
  */
 public interface FunctionNode<Arg, Result> extends Node<Result> {
-    ContextCurriedFunction<Arg, Result> getFunction();
+    String getFunctionName();
 
     List<Node<Arg>> getArguments();
 }

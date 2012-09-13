@@ -5,7 +5,6 @@ import org.junit.Test;
 import see.evaluation.evaluators.SimpleEvaluator;
 import see.exceptions.EvaluationException;
 import see.exceptions.PropagatedException;
-import see.functions.PureFunction;
 import see.functions.VarArgFunction;
 import see.parser.config.ConfigBuilder;
 import see.tree.Node;
@@ -20,8 +19,7 @@ import static org.junit.Assert.fail;
 
 public class SimpleEvaluatorTest {
 
-    Evaluator evaluator = SimpleEvaluator.fromConfig(ConfigBuilder.defaultConfig().build());
-    
+
     final VarArgFunction<Object, Object> epicFail = new VarArgFunction<Object, Object>() {
         @Override
         public Object apply(@Nonnull List<Object> input) {
@@ -36,13 +34,18 @@ public class SimpleEvaluatorTest {
         }
     };
 
+    Evaluator evaluator = SimpleEvaluator.fromConfig(ConfigBuilder.defaultConfig()
+            .addFunction("epicFail", epicFail)
+            .addFunction("fail", fail)
+            .build());
+
     /**
      * Test that all runtime exceptions are wrapped in EvaluationException
      * @throws Exception
      */
     @Test(expected = EvaluationException.class)
     public void testExceptionTranslationForRuntime() throws Exception {
-        Node<Object> tree = new ImmutableFunctionNode<Object, Object>(PureFunction.wrap(fail));
+        Node<Object> tree = new ImmutableFunctionNode<Object, Object>("fail");
 
         evaluator.evaluate(tree, ImmutableMap.<String, Object>of());
     }
@@ -53,8 +56,7 @@ public class SimpleEvaluatorTest {
      */
     @Test
     public void testExceptionTranslation() throws Exception {
-        PureFunction<Object, Object> pureFail = PureFunction.wrap(epicFail);
-        Node<Object> tree = new ImmutableFunctionNode<Object, Object>(pureFail);
+        Node<Object> tree = new ImmutableFunctionNode<Object, Object>("epicFail");
 
         try {
             evaluator.evaluate(tree, ImmutableMap.<String, Object>of());

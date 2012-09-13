@@ -47,14 +47,14 @@ object Untyped {
     override def toString = "Var(%s)".format(name)
   }
 
-  case class FNode(f: ContextCurriedFunction[AnyRef, AnyRef], args: IndexedSeq[Node])
+  case class FNode(f: String, args: IndexedSeq[Node])
     extends Node
     with see.tree.FunctionNode[AnyRef, AnyRef] {
 
     def accept(visitor: Visitor) = visitor.visit(this)
     def accept[V](visitor: ValueVisitor[V]) = visitor.visit(this)
 
-    def getFunction = f
+    def getFunctionName = f
     val getArguments = ImmutableList.copyOf(args.iterator).asInstanceOf[util.List[SeeNode]]
 
     override def toString = "%s(%s)".format(f, args.mkString(","))

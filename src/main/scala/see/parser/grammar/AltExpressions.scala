@@ -29,7 +29,7 @@ class AltExpressions(val numberFactory: NumberFactory,
 
   import literals._
 
-  def fNode(name: String, args: Node*):Node = FNode(functions.get(name), args.toIndexedSeq)
+  def fNode(name: String, args: Node*):Node = FNode(name, args.toIndexedSeq)
   def op(body: Rule0) = (body ~> identity).terminal
   def repeatWithOperator(body: Rule1[Node], operator: Rule0) = body ~ zeroOrMore(op(operator) ~ body ~~> ((a:Node, op, b) => fNode(op, a, b)))
   def binOp(op: String) = (a: Node, b: Node) => fNode(op, a, b)

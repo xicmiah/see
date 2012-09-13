@@ -20,8 +20,10 @@ import com.google.common.base.Function;
 import see.evaluation.Context;
 import see.evaluation.ValueProcessor;
 import see.exceptions.PropagatedException;
+import see.functions.ContextCurriedFunction;
 import see.functions.Property;
 import see.functions.VarArgFunction;
+import see.parser.config.FunctionResolver;
 import see.parser.grammar.PropertyAccess;
 import see.parser.grammar.PropertyDescriptor;
 import see.properties.ChainResolver;
@@ -48,8 +50,12 @@ public abstract class AbstractVisitor implements Visitor {
         try {
             List<Arg> evaluatedArgs = evaluateArgs(node.getArguments());
 
+            FunctionResolver funcResolver = context.getServices().getInstance(FunctionResolver.class);
+
             // Note: evaluatedArgs are lazy
-            VarArgFunction<Arg, Result> partial = node.getFunction().apply(context);
+            ContextCurriedFunction<Arg,Result> objectObjectContextCurriedFunction =
+                    (ContextCurriedFunction<Arg, Result>) funcResolver.get(node.getFunctionName());
+            VarArgFunction<Arg, Result> partial = objectObjectContextCurriedFunction.apply(context);
             Result result = partial.apply(evaluatedArgs);
 
             return processValue(result);
