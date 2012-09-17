@@ -20,6 +20,8 @@ import com.google.common.base.Objects;
 import see.tree.Node;
 import see.util.Either;
 
+import java.io.Serializable;
+
 import static com.google.common.base.Objects.equal;
 
 /**
@@ -27,7 +29,7 @@ import static com.google.common.base.Objects.equal;
  * Property can be either simple("a.prop") described by string name,
  * or indexed ("a[prop]") described by arbitrary expression (corresponding tree here).
  */
-public abstract class PropertyDescriptor {
+public abstract class PropertyDescriptor implements Serializable {
     private PropertyDescriptor() {
     }
 
@@ -45,7 +47,7 @@ public abstract class PropertyDescriptor {
         return new Indexed(index);
     }
 
-    public static class Simple extends PropertyDescriptor {
+    public static class Simple extends PropertyDescriptor implements Serializable {
         private final String name;
 
         private Simple(String name) {
@@ -82,7 +84,7 @@ public abstract class PropertyDescriptor {
         }
     }
 
-    public static class Indexed extends PropertyDescriptor {
+    public static class Indexed extends PropertyDescriptor implements Serializable {
         private final Node<Object> index;
 
         private Indexed(Node<Object> index) {
