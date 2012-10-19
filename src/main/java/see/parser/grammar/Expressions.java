@@ -126,7 +126,7 @@ class Expressions extends AbstractGrammar {
     }
 
     Rule SetterBinding() {
-        return Sequence(Settable(), T(FirstOf("<-", "<<")), Expression(), push(makeSignalNode(pop())), pushBinOp("<-"));
+        return Sequence(Settable(), T("<<"), Expression(), push(makeSignalNode(pop())), pushBinOp("<<"));
     }
 
     Rule SignalCreation() {

@@ -53,7 +53,7 @@ public class BindingTest {
 
         Map<String, Object> context = of("a", bean, "v", var);
         
-        see.eval("a.name <- v()", context);
+        see.eval("a.name << v()", context);
         assertEquals("crno", bean.getName());
 
         var.set("bka");
@@ -68,7 +68,7 @@ public class BindingTest {
 
         Map<String, Object> context = of("a", a, "b", b, "bean", bean);
 
-        see.eval("bean.value <- a() + b()", context);
+        see.eval("bean.value << a() + b()", context);
         assertEquals("3.0", bean.getValue().toString());
         
         a.set(7);
@@ -85,7 +85,7 @@ public class BindingTest {
 
         Map<String, Object> context = Maps.newHashMap(of("a", a, "b", 2, "bean", bean));
 
-        see.eval("bean.value <- a() + b", context);
+        see.eval("bean.value << a() + b", context);
         assertEquals("9.0", bean.getValue().toString());
 
         context.put("b", 42);
@@ -101,7 +101,7 @@ public class BindingTest {
         TestBean bean = new TestBean();
 
         Map<String, Object> context = of("a", a, "bean", bean);
-        Node<Object> tree = see.parseExpressionList("b = a.now(); bean.value <- b + 2;");
+        Node<Object> tree = see.parseExpressionList("b = a.now(); bean.value << b + 2;");
         see.evaluate(tree, context);
 
         assertEquals("9.0", bean.getValue().toString());
@@ -116,7 +116,7 @@ public class BindingTest {
         TestBean bean = new TestBean();
 
         Map<String, Object> context = of("a", a, "bean", bean);
-        see.eval("bean.value <- a() + 5", context); // No signal() function
+        see.eval("bean.value << a() + 5", context); // No signal() function
 
         assertEquals("9.0", bean.getValue().toString());
         

@@ -32,7 +32,7 @@ public class AltBindingTest {
 
     @Test
     public void testBindEquality() throws Exception {
-        assertEquals(see.parseExpression("a.b <- c() + 9"), see.parseExpression("a.b << c() + 9"));
+        assertEquals(see.parseExpression("a.b << c() + 9"), see.parseExpression("a.b << c() + 9"));
     }
 
     @Test

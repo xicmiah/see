@@ -78,7 +78,7 @@ public abstract class DefaultConfig {
     }
 
     private static void addBindings(final ConfigBuilder builder) {
-        builder.addAlias("<-", "bind");
+        builder.addAlias("<<", "bind");
         builder.addFunction("bind", new Bind());
         builder.addFunction("signal", new MakeSignal());
     }

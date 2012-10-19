@@ -64,7 +64,7 @@ class AltExpressions(val numberFactory: NumberFactory,
   def SettableVariable = rule { VarName ~~> (fNode("v=", _)) }.memoMismatches
 
   def Binding = rule { Settable ~ (
-    T("<-" | "<<") ~ SignalExpression ~~> binOp("<-")
+    T("<<") ~ SignalExpression ~~> binOp("<<")
   | T("<<=") ~ SignalExpression ~~> binOp("=")
     )
   }
