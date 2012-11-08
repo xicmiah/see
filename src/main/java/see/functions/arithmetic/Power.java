@@ -32,7 +32,7 @@ public class Power implements VarArgFunction<BigDecimal, Number> {
     }
 
     private boolean isInteger(BigDecimal exponent) {
-        return exponent.stripTrailingZeros().scale() <= 0;
+        return exponent.stripTrailingZeros().scale() <= 0 && exponent.compareTo(BigDecimal.ZERO) > 0;
     }
 
     @Override

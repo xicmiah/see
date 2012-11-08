@@ -59,6 +59,7 @@ public class ArithmeticTest {
     public void testPower() throws Exception {
         assertEquals(nine, see.eval("3^2"));
         assertEquals(9, ((Number) see.eval("81^0.5")).intValue());
+        assertEquals(valueOf(4.0), see.eval("0.5^-2"));
     }
 
     @Test
