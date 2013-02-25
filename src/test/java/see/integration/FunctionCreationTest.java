@@ -95,4 +95,16 @@ public class FunctionCreationTest {
     public void testNullParameter() throws Exception {
         see.eval("function(a) { 9; }(null)");
     }
+
+    @Test
+    public void testShortSyntaxSingleArg() throws Exception {
+        Node<?> parsed = see.parseExpression("a => a + 1");
+        assertEquals(see.parseExpression("function(a) { a + 1; }"), parsed);
+    }
+
+    @Test
+    public void testShortSyntaxMultipleArgs() throws Exception {
+        Node<?> parsed = see.parseExpression("(a, b) => a + b");
+        assertEquals(see.parseExpression("function(a, b) { a + b; }"), parsed);
+    }
 }

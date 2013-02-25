@@ -103,6 +103,7 @@ class AltExpressions(val numberFactory: NumberFactory,
     Constant |
       SpecialForm |
       FunctionDefinition |
+      ShortFunctionDef |
       Variable |
       JsonLiteral |
       T("(") ~ Expression ~ T(")")
@@ -125,6 +126,11 @@ class AltExpressions(val numberFactory: NumberFactory,
       ((args, body) => fNode("def", constList(args), ConstNode(body)))
   }
 
+  def ShortFunctionDef: Rule1[Node] = rule {
+    ShortArgList ~ T("=>") ~ RightExpression ~~> ((args, body) => fNode("def", constList(args), ConstNode(body)))
+  }
+
+  def ShortArgList = rule { T("(") ~ ArgumentDeclaration ~ T(")") | op(Identifier) ~~> (id => List(id)) }
 
   def SpecialForm = rule { IsDefined | MakeSignal | Tree }
   def IsDefined = rule { T("isDefined") ~ T("(") ~ VarName ~ T(")") ~~> (fNode("isDefined", _)) }
@@ -142,6 +148,8 @@ class AltExpressions(val numberFactory: NumberFactory,
 
   def String = rule { StringLiteral ~> const(stripQuotes(_)) }.terminal
   def Number = rule { (FloatLiteral | IntLiteral) ~> const(numberFactory.getNumber(_)) }.terminal
-  def Boolean = rule { BooleanLiteral ~> const(java.lang.Boolean.valueOf(_)) }.terminal
+  def Boolean = rule { BooleanLiteral ~> toBoolean }.terminal
   def Null  = rule { NullLiteral ~ push(ConstNode(null)) }.terminal
+
+  def toBoolean(text: String) = ConstNode(text.toBoolean: java.lang.Boolean)
 }
