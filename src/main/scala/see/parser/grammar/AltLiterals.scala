@@ -26,8 +26,10 @@ class SimpleLiterals extends Parser {
   def Letter = "a" - "z" | "A" - "Z" | "_" | "$"
   def LetterOrDigit = Letter | Digit
   def Digit = "0" - "9"
-  def BooleanLiteral = "true" | "false"
-  def NullLiteral: Rule0 = "null"
+  def BooleanLiteral = rule { ("true" | "false") ~ endOfWord }
+  def NullLiteral: Rule0 = rule { "null" ~ endOfWord }
+
+  def endOfWord = !LetterOrDigit
 
   def Identifier = rule { Letter ~ zeroOrMore(Letter | Digit) }
 
