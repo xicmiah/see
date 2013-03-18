@@ -2,6 +2,7 @@ package see;
 
 import org.parboiled.Rule;
 import org.parboiled.scala.rules.Rule1;
+import see.evaluation.Evaluator;
 import see.evaluation.evaluators.SimpleEvaluator;
 import see.parser.BasicParser;
 import see.parser.Parser;
@@ -18,20 +19,20 @@ import java.util.Map;
 /**
  * Facade to parse/evaluate operations.
  * All operations are thread-safe. Parse results are immutable and can be reused/cached between different instances.
- * Warning: evaluation can modify passed context. If that is undesirable, create new HashMap via copy constructor or
- * pass ImmutableMap instance.
  */
 @SuppressWarnings("UnusedDeclaration")
 public class See {
 
     private final GrammarConfiguration config;
+    private final Evaluator evaluator;
 
     public See() {
-        config = ConfigBuilder.defaultConfig().build();
+        this(ConfigBuilder.defaultConfig().build());
     }
 
     public See(GrammarConfiguration config) {
         this.config = config;
+        this.evaluator = SimpleEvaluator.fromConfig(config);
     }
 
     /**
@@ -73,7 +74,7 @@ public class See {
      * @return evaluated value
      */
     public <T> T evaluate(Node<T> tree, Map<String, ?> context) {
-        return SimpleEvaluator.fromConfig(config).evaluate(tree, context);
+        return evaluator.evaluate(tree, context);
     }
 
     /**
@@ -84,7 +85,7 @@ public class See {
      * @return evaluated value
      */
     public <T> T evaluate(Node<T> tree) {
-        return SimpleEvaluator.fromConfig(config).evaluate(tree, new HashMap<String, Object>());
+        return evaluator.evaluate(tree, new HashMap<String, Object>());
     }
 
     /**
