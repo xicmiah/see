@@ -112,10 +112,10 @@ class AltExpressions(val numberFactory: NumberFactory,
 
   def JsonLiteral = rule { ListLiteral | MapLiteral }
   def ListLiteral = rule {
-    T("[") ~ zeroOrMore(Expression, separator = T(",")) ~ T("]") ~~> (fNode("[]", _:_*))
+    T("[") ~ zeroOrMore(Expression, separator = ArgSeparator) ~ T("]") ~~> (fNode("[]", _:_*))
   }
   def MapLiteral = rule {
-    T("{") ~ zeroOrMore(KeyValue, separator = T(",")) ~ T("}") ~~> (pairs => fNode("{}", pairs.flatten:_*))
+    T("{") ~ zeroOrMore(KeyValue, separator = ArgSeparator) ~ T("}") ~~> (pairs => fNode("{}", pairs.flatten:_*))
   }
   def KeyValue = rule { (JsonKey | String) ~ T(":") ~ Expression ~~> (Seq(_, _)) }
   def JsonKey = rule { oneOrMore(Letter | Digit) ~> ConstNode }.terminal

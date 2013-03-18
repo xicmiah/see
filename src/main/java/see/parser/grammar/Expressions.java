@@ -280,7 +280,7 @@ class Expressions extends AbstractGrammar {
     Rule ListLiteral() {
         ListVar<Node<?>> items = new ListVar<Node<?>>();
         return Sequence(
-                T("["), repsep(Sequence(Expression(), items.append(pop())), T(",")), T("]"),
+                T("["), repsep(Sequence(Expression(), items.append(pop())), ArgumentSeparator()), T("]"),
                 push(makeFNode("[]", items.get()))
                 );
     }
@@ -291,7 +291,7 @@ class Expressions extends AbstractGrammar {
                 T("{"), 
                 repsep(
                         Sequence(KeyValuePair(), swap() && entries.append(pop()) && entries.append(pop())),
-                        T(",")
+                        ArgumentSeparator()
                 ),
                 T("}"),
                 push(makeFNode("{}", entries.get()))
