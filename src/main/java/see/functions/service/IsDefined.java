@@ -2,28 +2,24 @@ package see.functions.service;
 
 
 import com.google.common.base.Preconditions;
-import see.evaluation.Context;
-import see.evaluation.Scope;
-import see.functions.ContextCurriedFunction;
+import see.exceptions.NoSuchVariableException;
 import see.functions.VarArgFunction;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class IsDefined implements ContextCurriedFunction<String, Boolean> {
+public class IsDefined implements VarArgFunction<Object, Boolean> {
+
     @Override
-    public VarArgFunction<String, Boolean> apply(@Nonnull final Context context) {
-        return new VarArgFunction<String, Boolean>() {
-            @Override
-            public Boolean apply(@Nonnull List<String> strings) {
-                Preconditions.checkArgument(strings.size() == 1, "isDefined takes variable name");
+    public Boolean apply(@Nonnull List<Object> args) {
+        Preconditions.checkArgument(args.size() == 1, "isDefined takes one argument");
 
-                String variable = strings.get(0);
-
-                Scope scope = context.getScope();
-                return scope.contains(variable) && scope.get(variable) != null;
-            }
-        };
+        try {
+            Object value = args.get(0);
+            return value != null;
+        } catch (NoSuchVariableException e) {
+            return false;
+        }
     }
 
     @Override

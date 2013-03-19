@@ -132,8 +132,7 @@ class AltExpressions(val numberFactory: NumberFactory,
 
   def ShortArgList = rule { T("(") ~ ArgumentDeclaration ~ T(")") | op(Identifier) ~~> (id => List(id)) }
 
-  def SpecialForm = rule { IsDefined | MakeSignal | Tree }
-  def IsDefined = rule { T("isDefined") ~ T("(") ~ VarName ~ T(")") ~~> (fNode("isDefined", _)) }
+  def SpecialForm = rule { MakeSignal | Tree }
   def MakeSignal = rule { T("signal") ~ T("(") ~ SignalExpression ~ T(")") }
   def Tree = rule { T("@tree") ~ Expression ~~> ConstNode.apply _ }
 
