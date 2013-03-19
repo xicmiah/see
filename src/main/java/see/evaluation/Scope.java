@@ -16,10 +16,11 @@
 
 package see.evaluation;
 
+import see.exceptions.NoSuchVariableException;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 /**
  * Hierarchical {@link Map}-like container.
@@ -29,9 +30,9 @@ public interface Scope {
      * Get variable value by it's name.
      * @param var variable name
      * @return variable value
-     * @throws NoSuchElementException if variable wasn't found
+     * @throws NoSuchVariableException if variable wasn't found
      */
-    Object get(@Nonnull String var) throws NoSuchElementException;
+    Object get(@Nonnull String var) throws NoSuchVariableException;
 
     /**
      * Return, if variable with such value exists.

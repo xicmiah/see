@@ -19,11 +19,11 @@ package see.evaluation.scopes;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import see.evaluation.Scope;
+import see.exceptions.NoSuchVariableException;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import static com.google.common.base.Predicates.isNull;
 import static com.google.common.base.Predicates.notNull;
@@ -52,7 +52,7 @@ class ImmutableScope implements Scope {
         if (contains(var)) {
             return contents.get(var);
         } else {
-            throw new NoSuchElementException("Cannot resolve variable " + var);
+            throw new NoSuchVariableException(var);
         }
     }
 

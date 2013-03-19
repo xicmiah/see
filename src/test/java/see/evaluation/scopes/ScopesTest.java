@@ -19,8 +19,7 @@ package see.evaluation.scopes;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import see.evaluation.Scope;
-
-import java.util.NoSuchElementException;
+import see.exceptions.NoSuchVariableException;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static org.junit.Assert.assertEquals;
@@ -46,7 +45,7 @@ public class ScopesTest {
         assertEquals(initial, scope.asMap());
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test(expected = NoSuchVariableException.class)
     public void testAbsentVariables() throws Exception {
         Scope scope = Scopes.fromMap(of("a", 9));
 
