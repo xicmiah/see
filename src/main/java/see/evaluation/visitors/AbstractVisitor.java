@@ -20,6 +20,7 @@ import com.google.common.base.Function;
 import see.evaluation.Context;
 import see.evaluation.ValueProcessor;
 import see.exceptions.PropagatedException;
+import see.exceptions.SeeRuntimeException;
 import see.functions.ContextCurriedFunction;
 import see.functions.Property;
 import see.functions.VarArgFunction;
@@ -28,6 +29,7 @@ import see.parser.grammar.PropertyAccess;
 import see.parser.grammar.PropertyDescriptor;
 import see.properties.ChainResolver;
 import see.tree.*;
+import see.tree.trace.Tracing;
 
 import java.util.List;
 
@@ -61,8 +63,12 @@ public abstract class AbstractVisitor implements Visitor {
             return processValue(result);
         } catch (PropagatedException e) {
             throw new PropagatedException(node, e);
-        }  catch (Exception e) {
-            throw new PropagatedException(node, e);
+        } catch (Exception e) {
+            if (node instanceof Tracing) {
+                throw new SeeRuntimeException(node, e);
+            } else {
+                throw new PropagatedException(node, e);
+            }
         }
     }
 
