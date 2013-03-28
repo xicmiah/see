@@ -31,37 +31,43 @@ object Untyped {
     def withPos(context: Context[Any]):Node = withPos(TraceElement(context.getInputBuffer, context.getStartIndex))
   }
 
-  def const[T <: AnyRef](f: String => T): String => ConstNode = { s:String => ConstNode(f(s)) }
-  def constList[T](items: Seq[T]) = ConstNode(seqAsJavaList(items))
+  def const[T <: AnyRef](f: String => T): String => ConstNode = { s:String => constNode(f(s)) }
+  def constList[T](items: Seq[T]) = constNode(seqAsJavaList(items))
 
-  def constNode(value: AnyRef) = ConstNode(value)
-  def varNode(name: String) = VarNode(name)
-  def funcNode(f: String, args: IndexedSeq[Node]) = FNode(f, args)
-  def propNode(target: Node, props: Seq[PropertyDescriptor]) = PropertyNode(target, props)
+  def constNode(value: AnyRef) = ConstNode(value)()
+  def varNode(name: String) = VarNode(name)()
+  def funcNode(f: String, args: IndexedSeq[Node]) = FNode(f, args)()
+  def propNode(target: Node, props: Seq[PropertyDescriptor]) = PropertyNode(target, props)()
 
-  case class ConstNode(value: AnyRef, position:Option[TraceElement] = None) extends Node with see.tree.ConstNode[AnyRef] {
+  case class ConstNode(value: AnyRef)(val position:Option[TraceElement] = None)
+    extends Node
+    with see.tree.ConstNode[AnyRef] {
+
     def accept(visitor: Visitor) = visitor.visit(this)
     def accept[V](visitor: ValueVisitor[V]) = visitor.visit(this)
 
     def getValue = value
 
-    def withPos(trace: TraceElement) = copy(position = Some(trace))
+    def withPos(trace: TraceElement) = copy()(position = Some(trace))
 
     override def toString = String.valueOf(value)
   }
 
-  case class VarNode(name: String, position: Option[TraceElement] = None) extends Node with see.tree.VarNode[AnyRef] {
+  case class VarNode(name: String)(val position: Option[TraceElement] = None)
+    extends Node
+    with see.tree.VarNode[AnyRef] {
+
     def accept(visitor: Visitor) = visitor.visit(this)
     def accept[V](visitor: ValueVisitor[V]) = visitor.visit(this)
 
     def getName = name
 
-    def withPos(trace: TraceElement) = copy(position = Some(trace))
+    def withPos(trace: TraceElement) = copy()(position = Some(trace))
 
     override def toString = "Var(%s)".format(name)
   }
 
-  case class FNode(f: String, args: IndexedSeq[Node], position: Option[TraceElement] = None)
+  case class FNode(f: String, args: IndexedSeq[Node])(val position: Option[TraceElement] = None)
     extends Node
     with see.tree.FunctionNode[AnyRef, AnyRef] {
 
@@ -71,19 +77,22 @@ object Untyped {
     def getFunctionName = f
     val getArguments = ImmutableList.copyOf(args.iterator).asInstanceOf[util.List[SeeNode]]
 
-    def withPos(trace: TraceElement) = copy(position = Some(trace))
+    def withPos(trace: TraceElement) = copy()(position = Some(trace))
 
     override def toString = "%s(%s)".format(f, args.mkString(","))
   }
 
-  case class PropertyNode(target: Node, props: Seq[PropertyDescriptor], position: Option[TraceElement] = None) extends Node with see.tree.PropertyNode[AnyRef] {
+  case class PropertyNode(target: Node, props: Seq[PropertyDescriptor])(val position: Option[TraceElement] = None)
+    extends Node
+    with see.tree.PropertyNode[AnyRef] {
+
     def accept(visitor: Visitor) = visitor.visit(this)
     def accept[V](visitor: ValueVisitor[V]) = visitor.visit(this)
 
     def getTarget = target
     val getProperties = ImmutableList.copyOf(props.iterator)
 
-    def withPos(trace: TraceElement) = copy(position = Some(trace))
+    def withPos(trace: TraceElement) = copy()(position = Some(trace))
 
     override def toString = "%s%s".format(target, props.mkString)
   }
