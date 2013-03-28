@@ -16,7 +16,6 @@
 
 package see.tree
 
-import see.functions.ContextCurriedFunction
 import scala.collection.JavaConversions._
 import see.parser.grammar.PropertyDescriptor
 import com.google.common.collect.ImmutableList
@@ -34,6 +33,11 @@ object Untyped {
 
   def const[T <: AnyRef](f: String => T): String => ConstNode = { s:String => ConstNode(f(s)) }
   def constList[T](items: Seq[T]) = ConstNode(seqAsJavaList(items))
+
+  def constNode(value: AnyRef) = ConstNode(value)
+  def varNode(name: String) = VarNode(name)
+  def funcNode(f: String, args: IndexedSeq[Node]) = FNode(f, args)
+  def propNode(target: Node, props: Seq[PropertyDescriptor]) = PropertyNode(target, props)
 
   case class ConstNode(value: AnyRef, position:Option[TraceElement] = None) extends Node with see.tree.ConstNode[AnyRef] {
     def accept(visitor: Visitor) = visitor.visit(this)

@@ -33,7 +33,7 @@ class AltExpressions(val numberFactory: NumberFactory,
   val addPosition = withContext((_:Node).withPos(_:Context[Any]))
   def Ctx = pushFromContext(identity)
 
-  def fNode(name: String, args: Node*):Node = FNode(name, args.toIndexedSeq)
+  def fNode(name: String, args: Node*):Node = funcNode(name, args.toIndexedSeq)
   def op(body: Rule0) = (body ~> identity).terminal
   def repeatWithOperator(body: Rule1[Node], operator: Rule0) =
     body ~ zeroOrMore(Ctx ~ op(operator) ~ body ~~> ((a:Node, context, op, b) => fNode(op, a, b).withPos(context)))
@@ -55,7 +55,7 @@ class AltExpressions(val numberFactory: NumberFactory,
   def ForLoop = rule {
     T("for") ~ T("(") ~ VarName ~ (T(":" | "in")) ~ RightExpression ~ T(")") ~
       Block ~~>
-      ((varName, target, body) => fNode("for", varName, target, ConstNode(body)))
+      ((varName, target, body) => fNode("for", varName, target, constNode(body)))
   } ~~> addPosition
   def WhileLoop = rule { T("while") ~ T("(") ~ Expression ~ T(")") ~ Block ~~> binOp("while") }
   def TerminatedExpression = rule { Expression ~ T(";") }
@@ -73,7 +73,7 @@ class AltExpressions(val numberFactory: NumberFactory,
   | T("<<=") ~ SignalExpression ~~> binOp("=")
     )
   }
-  def SignalExpression = rule { Expression ~~> (expr => fNode("signal", ConstNode(expr))) } ~~> addPosition
+  def SignalExpression = rule { Expression ~~> (expr => fNode("signal", constNode(expr))) } ~~> addPosition
 
   def RightExpression:Rule1[Node] = rule { OrExpression }
 
@@ -98,7 +98,7 @@ class AltExpressions(val numberFactory: NumberFactory,
   }
   def PropertyChain:ReductionRule1[Node, Node] = rule {
     Ctx ~ oneOrMore(SimpleProperty | IndexedProperty) ~~>
-      ((target: Node, trace, props) => PropertyNode(target, props).withPos(trace))
+      ((target: Node, trace, props) => propNode(target, props).withPos(trace))
   }
   def GetProperty = rule { EMPTY ~~> (fNode(".", _:Node))  }
   def SimpleProperty = rule { "." ~ (Identifier ~> PropertyDescriptor.simple _) }.terminal
@@ -124,36 +124,36 @@ class AltExpressions(val numberFactory: NumberFactory,
     T("{") ~ zeroOrMore(KeyValue, separator = ArgSeparator) ~ T("}") ~~> (pairs => fNode("{}", pairs.flatten:_*))
   }
   def KeyValue = rule { (JsonKey | String) ~ T(":") ~ Expression ~~> (Seq(_, _)) }
-  def JsonKey = rule { oneOrMore(Letter | Digit) ~> (ConstNode(_)) }.terminal
+  def JsonKey = rule { oneOrMore(Letter | Digit) ~> (constNode(_)) }.terminal
 
 
   def FunctionDefinition = rule {
     T("function") ~ T("(") ~ ArgumentDeclaration ~ T(")") ~ T("{") ~ ExpressionList ~ T("}") ~~>
-      ((args, body) => fNode("def", constList(args), ConstNode(body)))
+      ((args, body) => fNode("def", constList(args), constNode(body)))
   }
 
   def ShortFunctionDef: Rule1[Node] = rule {
-    ShortArgList ~ T("=>") ~ RightExpression ~~> ((args, body) => fNode("def", constList(args), ConstNode(body)))
+    ShortArgList ~ T("=>") ~ RightExpression ~~> ((args, body) => fNode("def", constList(args), constNode(body)))
   }
 
   def ShortArgList = rule { T("(") ~ ArgumentDeclaration ~ T(")") | op(Identifier) ~~> (id => List(id)) }
 
   def SpecialForm = rule { MakeSignal | Tree }
   def MakeSignal = rule { T("signal") ~ T("(") ~ SignalExpression ~ T(")") }
-  def Tree = rule { T("@tree") ~ Expression ~~> (ConstNode(_)) }
+  def Tree = rule { T("@tree") ~ Expression ~~> (constNode(_)) }
 
 
   def ArgSeparator = T(argumentSeparator)
   def ArgumentDeclaration = rule { zeroOrMore(op(Identifier), separator = ArgSeparator) }
 
-  def Variable = rule { optional(T("var" ~ !LetterOrDigit)) ~ (Identifier ~> (VarNode(_))) }.terminal
-  def VarName = rule { Variable ~~> (varNode => ConstNode(varNode.name)) }
+  def Variable = rule { optional(T("var" ~ !LetterOrDigit)) ~ (Identifier ~> varNode) }.terminal
+  def VarName = rule { Variable ~~> (varNode => constNode(varNode.name)) }
   def Constant = rule { String | Number | Boolean | Null }.suppressSubnodes
 
   def String = rule { StringLiteral ~> const(stripQuotes(_)) }.terminal
   def Number = rule { (FloatLiteral | IntLiteral) ~> const(numberFactory.getNumber(_)) }.terminal
   def Boolean = rule { BooleanLiteral ~> toBoolean }.terminal
-  def Null  = rule { NullLiteral ~ push(ConstNode(null)) }.terminal
+  def Null  = rule { NullLiteral ~ push(constNode(null)) }.terminal
 
-  def toBoolean(text: String) = ConstNode(text.toBoolean: java.lang.Boolean)
+  def toBoolean(text: String) = constNode(text.toBoolean: java.lang.Boolean)
 }
