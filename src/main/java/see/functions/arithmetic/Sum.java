@@ -6,13 +6,12 @@ import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class Sum implements VarArgFunction<Comparable, Comparable> {
+public class Sum implements VarArgFunction<BigDecimal, BigDecimal> {
     @Override
-    public Comparable apply(@Nonnull List<Comparable> input) {
+    public BigDecimal apply(@Nonnull List<BigDecimal> input) {
         BigDecimal result = BigDecimal.ZERO;
-        for (Comparable value : input) {
-            BigDecimal decValue=(BigDecimal) value;
-            result = result.add(decValue);
+        for (BigDecimal value : input) {
+            result = result.add(value);
         }
         return result;
     }

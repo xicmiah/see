@@ -8,14 +8,20 @@ import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class AddOrConcat implements VarArgFunction<Comparable, Comparable> {
+public class AddOrConcat implements VarArgFunction<Object, Object> {
+
+    private final Sum sum = new Sum();
+    private final Concat concat = new Concat();
+
     @Override
-    public Comparable apply(@Nonnull List<Comparable> input) {
-        Comparable firstElement = input.get(0);
+    public Object apply(@Nonnull List<Object> input) {
+        Object firstElement = input.get(0);
         if (firstElement instanceof BigDecimal) {
-            return new Sum().apply(input);
+            //noinspection unchecked
+            List<BigDecimal> numArgs = (List) input;
+            return sum.apply(numArgs);
         }
-        return new Concat().apply(input);
+        return concat.apply(input);
     }
 
     @Override
