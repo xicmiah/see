@@ -2,7 +2,6 @@ package see.functions.service;
 
 
 import com.google.common.base.Preconditions;
-import see.exceptions.NoSuchVariableException;
 import see.functions.VarArgFunction;
 
 import javax.annotation.Nonnull;
@@ -17,7 +16,7 @@ public class IsDefined implements VarArgFunction<Object, Boolean> {
         try {
             Object value = args.get(0);
             return value != null;
-        } catch (NoSuchVariableException e) {
+        } catch (Exception e) {
             return false;
         }
     }
