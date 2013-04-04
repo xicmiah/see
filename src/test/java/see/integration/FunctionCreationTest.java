@@ -19,14 +19,12 @@ package see.integration;
 import com.google.common.collect.Maps;
 import org.junit.Test;
 import see.See;
-import see.exceptions.SeeRuntimeException;
 import see.exceptions.NoSuchVariableException;
-import see.exceptions.PropagatedException;
+import see.exceptions.SeeRuntimeException;
 import see.functions.VarArgFunction;
 import see.tree.Node;
 
 import java.math.BigDecimal;
-import java.util.NoSuchElementException;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
@@ -78,8 +76,8 @@ public class FunctionCreationTest {
         try {
             see.evaluate(tree);
             fail("Exception expected");
-        } catch (PropagatedException e) {
-            assertThat(e.getLastCause(), instanceOf(NoSuchVariableException.class));
+        } catch (SeeRuntimeException e) {
+            assertThat(e.getCause(), instanceOf(NoSuchVariableException.class));
         }
     }
 
