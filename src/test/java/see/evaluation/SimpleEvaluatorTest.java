@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import see.evaluation.evaluators.SimpleEvaluator;
 import see.exceptions.EvaluationException;
-import see.exceptions.PropagatedException;
+import see.exceptions.SeeRuntimeException;
 import see.functions.VarArgFunction;
 import see.parser.config.ConfigBuilder;
 import see.tree.Node;
@@ -61,8 +61,8 @@ public class SimpleEvaluatorTest {
         try {
             evaluator.evaluate(tree, ImmutableMap.<String, Object>of());
             fail("Exception expected");
-        } catch (PropagatedException e) {
-            assertThat(e.getLastCause(), instanceOf(EpicFailException.class));
+        } catch (SeeRuntimeException e) {
+            assertThat(e.getCause(), instanceOf(EpicFailException.class));
         }
     }
 

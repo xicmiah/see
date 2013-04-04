@@ -4,6 +4,8 @@ import com.google.common.collect.ClassToInstanceMap;
 import see.evaluation.*;
 import see.evaluation.conversions.BuiltinConversions;
 import see.exceptions.EvaluationException;
+import see.exceptions.PropagatedException;
+import see.exceptions.SeeRuntimeException;
 import see.parser.config.FunctionResolver;
 import see.parser.config.GrammarConfiguration;
 import see.parser.numbers.NumberFactory;
@@ -62,10 +64,10 @@ public class SimpleEvaluator implements Evaluator {
             Context context = SimpleContext.create(createLocalScope(initial), services);
 
             return new LazyContextEvaluator().evaluate(tree, context);
-        } catch (EvaluationException e) {
-            throw e;
+        } catch (PropagatedException e) {
+            throw new SeeRuntimeException(SeeRuntimeException.getTrace(e), e.getLastCause());
         } catch (Exception e) {
-            throw new EvaluationException(e);
+            throw new SeeRuntimeException(SeeRuntimeException.getTrace(e), e);
         }
     }
 

@@ -16,63 +16,57 @@
 
 package see.exceptions;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.FluentIterable;
 import scala.Option;
 import see.tree.Node;
 import see.tree.trace.TraceElement;
 import see.tree.trace.Tracing;
 
+import javax.annotation.Nullable;
 import java.util.List;
+
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.base.Throwables.getCausalChain;
+import static com.google.common.collect.FluentIterable.from;
 
 public class SeeRuntimeException extends EvaluationException {
     private final List<TraceElement> trace;
 
-    public SeeRuntimeException(Node<?> node, Throwable cause) {
-        super(getMessage(node, cause), getProperCause(cause));
-        this.trace = buildTrace(node, cause);
+    /**
+     * Extract see stacktrace from a throwable
+     * @param throwable target throwable
+     * @return extracted trace
+     */
+    public static List<TraceElement> getTrace(Throwable throwable) {
+        List<Throwable> causalChain = getCausalChain(throwable);
+        FluentIterable<PropagatedException> stack = from(causalChain).filter(PropagatedException.class);
+        FluentIterable<Node<?>> nodes = stack.transform(new Function<PropagatedException, Node<?>>() {
+            @Override
+            public Node<?> apply(PropagatedException input) {
+                return input.getFailedNode();
+            }
+        });
+        FluentIterable<TraceElement> trace = nodes.filter(Tracing.class)
+                .transform(new Function<Tracing, TraceElement>() {
+                    @Nullable
+                    @Override
+                    public TraceElement apply(Tracing input) {
+                        Option<TraceElement> position = input.position();
+                        if (position.isDefined()) return position.get();
+                        else return null;
+                    }
+                }).filter(notNull());
+        return trace.toList();
     }
 
-    private static List<TraceElement> buildTrace(Node<?> node, Throwable cause) {
-        ImmutableList.Builder<TraceElement> builder = ImmutableList.builder();
-        builder.addAll(getTrace(node));
-
-        if (cause instanceof SeeRuntimeException) {
-            builder.addAll(((SeeRuntimeException) cause).getTrace());
-        }
-        return builder.build();
-    }
-
-    private static String getMessage(Node<?> node, Throwable cause) {
-        if (cause instanceof SeeRuntimeException) {
-            return formatMessage(buildTrace(node, cause));
-        } else {
-            return formatMessage(getTrace(node));
-        }
-    }
-
-    private static Throwable getProperCause(Throwable cause) {
-        if (cause instanceof SeeRuntimeException) {
-            return cause.getCause();
-        } else {
-            return cause;
-        }
-    }
-
-    private static Iterable<TraceElement> getTrace(Node<?> node) {
-        Option<TraceElement> position = ((Tracing) node).position();
-        if (position.isDefined()) {
-            return ImmutableList.of(position.get());
-        } else {
-            return ImmutableList.of();
-        }
+    public SeeRuntimeException(List<TraceElement> trace, Throwable cause) {
+        super("\n" + Joiner.on("").join(trace), cause);
+        this.trace = trace;
     }
 
     public List<TraceElement> getTrace() {
         return trace;
-    }
-
-    private static String formatMessage(Iterable<TraceElement> trace) {
-        return "\n" + Joiner.on("").join(trace);
     }
 }

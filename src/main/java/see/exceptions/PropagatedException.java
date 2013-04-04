@@ -26,22 +26,18 @@ public class PropagatedException extends EvaluationException {
 
     private final Throwable lastCause;
 
-    private PropagatedException(Node<?> failedNode, Throwable cause, Throwable lastCause) {
+    public PropagatedException(Node<?> failedNode, Throwable cause) {
         super(formatMessage(failedNode), cause);
         this.failedNode = failedNode;
-        this.lastCause = lastCause;
-    }
-
-    public PropagatedException(Node<?> failedNode, Throwable cause) {
-        this(failedNode, cause, cause);
-    }
-
-    public PropagatedException(Node<?> failedNode, PropagatedException cause) {
-        this(failedNode, cause, cause.getLastCause());
+        this.lastCause = getLastCause(cause);
     }
 
     private static String formatMessage(Node<?> failedNode) {
-        return new StringBuilder("Evaluation failed at node ").append(failedNode).toString();
+        return "Evaluation failed at node " + failedNode;
+    }
+
+    private static Throwable getLastCause(Throwable cause) {
+        return cause instanceof PropagatedException ? ((PropagatedException) cause).getLastCause() : cause;
     }
 
     public Node<?> getFailedNode() {

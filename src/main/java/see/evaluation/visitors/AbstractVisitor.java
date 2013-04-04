@@ -20,7 +20,6 @@ import com.google.common.base.Function;
 import see.evaluation.Context;
 import see.evaluation.ValueProcessor;
 import see.exceptions.PropagatedException;
-import see.exceptions.SeeRuntimeException;
 import see.functions.ContextCurriedFunction;
 import see.functions.Property;
 import see.functions.VarArgFunction;
@@ -29,7 +28,6 @@ import see.parser.grammar.PropertyAccess;
 import see.parser.grammar.PropertyDescriptor;
 import see.properties.ChainResolver;
 import see.tree.*;
-import see.tree.trace.Tracing;
 
 import java.util.List;
 
@@ -61,14 +59,8 @@ public abstract class AbstractVisitor implements Visitor {
             Result result = partial.apply(evaluatedArgs);
 
             return processValue(result);
-        } catch (PropagatedException e) {
-            throw new PropagatedException(node, e);
         } catch (Exception e) {
-            if (node instanceof Tracing) {
-                throw new SeeRuntimeException(node, e);
-            } else {
-                throw new PropagatedException(node, e);
-            }
+            throw new PropagatedException(node, e);
         }
     }
 
@@ -86,10 +78,14 @@ public abstract class AbstractVisitor implements Visitor {
 	@Override
     @SuppressWarnings("unchecked")
     public <T> T visit(VarNode<T> node) {
-        Object value = context.getScope().get(node.getName());
+        try {
+            Object value = context.getScope().get(node.getName());
 
-        return (T) processValue(value);
-	}
+            return (T) processValue(value);
+        } catch (Exception e) {
+            throw new PropagatedException(node, e);
+        }
+    }
 
     @Override
     public <T> T visit(ConstNode<T> node) {
@@ -115,8 +111,6 @@ public abstract class AbstractVisitor implements Visitor {
                     return processValue(resolver.get(target, evaluatedProps));
                 }
             };
-        } catch (PropagatedException e) {
-            throw new PropagatedException(propertyNode, e);
         } catch (Exception e) {
             throw new PropagatedException(propertyNode, e);
         }
