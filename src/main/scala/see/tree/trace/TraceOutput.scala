@@ -24,10 +24,10 @@ object TraceOutput {
   def getNodes(parent: Node): Seq[Node] = parent +: getChildren(parent)
 
   def getChildren(parent: Node): Seq[Node] = parent match {
-    case ConstNode(_, _) => Seq()
-    case VarNode(_, _) => Seq()
-    case FNode(_, args, _) => args flatMap getNodes
-    case PropertyNode(target, props, _) => getNodes(target) ++ getNodes(props)
+    case ConstNode(_) => Seq()
+    case VarNode(_) => Seq()
+    case FNode(_, args) => args flatMap getNodes
+    case PropertyNode(target, props) => getNodes(target) ++ getNodes(props)
   }
 
   def getNodes(props: Seq[PropertyDescriptor]): Seq[Node] = props.collect {
