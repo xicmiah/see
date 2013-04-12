@@ -18,7 +18,9 @@ package see.exceptions;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
+import org.parboiled.support.Position;
 import scala.Option;
 import see.tree.Node;
 import see.tree.trace.TraceElement;
@@ -34,12 +36,24 @@ import static com.google.common.collect.FluentIterable.from;
 public class SeeRuntimeException extends EvaluationException {
     private final List<TraceElement> trace;
 
+    private final Throwable originalCause;
+
+    private SeeRuntimeException(List<TraceElement> trace, Throwable cause, Throwable originalCause) {
+        super("Evaluation failed\n" + Joiner.on("").join(trace), cause);
+        this.trace = trace;
+        this.originalCause = originalCause;
+    }
+
+    public SeeRuntimeException(Throwable cause) {
+        this(getTrace(cause), getCollapsedCause(cause), cause);
+    }
+
     /**
      * Extract see stacktrace from a throwable
      * @param throwable target throwable
      * @return extracted trace
      */
-    public static List<TraceElement> getTrace(Throwable throwable) {
+    private static List<TraceElement> getTrace(Throwable throwable) {
         List<Throwable> causalChain = getCausalChain(throwable);
         FluentIterable<PropagatedException> stack = from(causalChain).filter(PropagatedException.class);
         FluentIterable<Node<?>> nodes = stack.transform(new Function<PropagatedException, Node<?>>() {
@@ -58,12 +72,21 @@ public class SeeRuntimeException extends EvaluationException {
                         else return null;
                     }
                 }).filter(notNull());
-        return trace.toList();
+        return trace.toList().reverse();
     }
 
-    public SeeRuntimeException(List<TraceElement> trace, Throwable cause) {
-        super("\n" + Joiner.on("").join(trace), cause);
-        this.trace = trace;
+    private static Throwable getCollapsedCause(Throwable cause) {
+        if (cause instanceof PropagatedException) return ((PropagatedException) cause).getLastCause();
+        else return cause;
+    }
+
+    public Optional<Position> getPosition() {
+        if (trace.isEmpty()) return Optional.absent();
+        return Optional.of(trace.get(0).position());
+    }
+
+    public Throwable getOriginalCause() {
+        return originalCause;
     }
 
     public List<TraceElement> getTrace() {

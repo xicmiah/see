@@ -26,6 +26,8 @@ case class TraceElement(input: InputBuffer, index: Int) {
 
   private def bufferToString(buffer: InputBuffer) = buffer.extract(0, Int.MaxValue)
 
+  def position = input.getPosition(index)
+
   override def equals(obj: Any) = obj match {
     case TraceElement(otherInput, otherIndex) => buffersEqual.equiv(input, otherInput) && index == otherIndex
     case _ => false
