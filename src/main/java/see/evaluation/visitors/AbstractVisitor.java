@@ -94,7 +94,7 @@ public abstract class AbstractVisitor implements Visitor {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T visit(PropertyNode<T> propertyNode) {
+    public <T> T visit(final PropertyNode<T> propertyNode) {
         try {
             final Object target = propertyNode.getTarget().accept(this);
 
@@ -103,12 +103,20 @@ public abstract class AbstractVisitor implements Visitor {
             return (T) new Property<Object>() {
                 @Override
                 public void set(Object value) {
-                    resolver.set(target, evaluatedProps, value);
+                    try {
+                        resolver.set(target, evaluatedProps, value);
+                    } catch (Exception e) {
+                        throw new PropagatedException(propertyNode, e);
+                    }
                 }
 
                 @Override
                 public Object get() {
-                    return processValue(resolver.get(target, evaluatedProps));
+                    try {
+                        return processValue(resolver.get(target, evaluatedProps));
+                    } catch (Exception e) {
+                        throw new PropagatedException(propertyNode, e);
+                    }
                 }
             };
         } catch (Exception e) {
