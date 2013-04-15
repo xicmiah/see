@@ -17,7 +17,6 @@
 package see.tree.trace
 
 import see.tree.Untyped._
-import org.parboiled.errors.ErrorUtils
 import see.parser.grammar.PropertyDescriptor
 
 object TraceOutput {
@@ -34,8 +33,7 @@ object TraceOutput {
     case desc: PropertyDescriptor.Indexed => desc.getIndex.asInstanceOf[Node]
   }
 
-  def formatTrace(node: Node) = for (pos <- node.position) yield
-    ErrorUtils.printErrorMessage("%s line %s col %s", node.toString, pos.index, pos.input)
+  def formatTrace(node: Node) = for (pos <- node.position) yield pos.toString
 
   def dump(parent: Node): Seq[String] = getNodes(parent) flatMap formatTrace
 

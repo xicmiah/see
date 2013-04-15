@@ -18,22 +18,21 @@ package see.tree.trace
 
 import org.parboiled.buffers.InputBuffer
 import org.parboiled.errors.ErrorUtils
+import org.parboiled.support.Position
 
-case class TraceElement(input: InputBuffer, index: Int) {
-  override def toString = ErrorUtils.printErrorMessage("%s line %s col %s", "at", index, input)
-
-  private val buffersEqual: Equiv[InputBuffer] = Equiv.by(bufferToString)
-
-  private def bufferToString(buffer: InputBuffer) = buffer.extract(0, Int.MaxValue)
-
-  def position = input.getPosition(index)
-
-  override def equals(obj: Any) = obj match {
-    case TraceElement(otherInput, otherIndex) => buffersEqual.equiv(input, otherInput) && index == otherIndex
-    case _ => false
+object TraceElement {
+  def apply(input: InputBuffer, index: Int): TraceElement = {
+    val msg = ErrorUtils.printErrorMessage("%s line %s col %s", "at", index, input)
+    val position = input.getPosition(index)
+    val line = input.extractLine(position.line)
+    TraceElement(msg, line, position.line, position.column)
   }
+}
 
-  override def hashCode() = (bufferToString(input), index).hashCode()
+case class TraceElement(msg: String, affectedLine: String, line: Int, col: Int) {
+  override def toString = msg
+
+  def position = new Position(line, col)
 }
 
 
